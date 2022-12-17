@@ -1,0 +1,10 @@
+{
+  "name": "com.giantparticle.inspector_graph",
+  "version": "0.8.0-b",
+  "displayName": "Giant Particle - Inspector Graph",
+  "unity": "2022.1",
+  "description": "Tool to better visualize, understand and manipulate objects in a reference hierarchy.",
+  "dependencies": {
+    "com.unity.modules.uielements": "1.0.0"
+  }
+}
