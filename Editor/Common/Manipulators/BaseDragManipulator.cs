@@ -1,7 +1,7 @@
-// ****************
-// Giant Particle Inc.
+// ********************************
+// (C) 2022 - Giant Particle Games 
 // All rights reserved.
-// ****************
+// ********************************
 
 using UnityEngine;
 using UnityEngine.UIElements;

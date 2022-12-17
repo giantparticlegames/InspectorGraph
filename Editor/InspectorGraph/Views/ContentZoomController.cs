@@ -1,7 +1,7 @@
-// ****************
-// Giant Particle Inc.
+// ********************************
+// (C) 2022 - Giant Particle Games 
 // All rights reserved.
-// ****************
+// ********************************
 
 using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
