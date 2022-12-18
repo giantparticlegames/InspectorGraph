@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -33,11 +33,11 @@ namespace GiantParticle.InspectorGraph
         private ScrollView _content;
         private ObjectField _refField;
 
-        private ReferenceNodeFactory _nodeFactory = new ReferenceNodeFactory();
+        private ReferenceNodeFactory _nodeFactory = new();
         private IObjectNode _rootNode;
         private Preferences _preferences;
 
-        [MenuItem("Giant Particle/Editor Tools/Inspector Graph")]
+        [MenuItem("Window/Giant Particle/Inspector Graph")]
         public static void ShowWindow()
         {
             EditorWindow window = GetWindow<InspectorGraph>();
