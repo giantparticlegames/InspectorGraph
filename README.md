@@ -1,7 +1,7 @@
 # Giant Particle - Inspector Graph <!-- omit in toc -->
 The Inspector Graph is a tool to better visualize, understand and manipulate objects in a reference hierarchy.
 
-![Window Sample](Documentation~/WindowSample.png)
+![Window Sample](.docs/WindowSample.png)
 
 ## Index <!-- omit in toc -->
 - [Main Features](#main-features)
@@ -42,39 +42,39 @@ The main window has multiple controls for you to use
 #### View Menu
 The view menu lets you control some visual elements of the graph hierarchy.
 
-![View Menu](Documentation~/ViewMenu.png)
+![View Menu](.docs/ViewMenu.png)
 
 * **Refresh**: The refresh button lets you update the current graph with any changes that were not picked up while editing. It also rearranges the untouched windows in the graph to accommodate new windows or window positions.
 * **Show > Scripts**: This option enables the visualization of MonoScripts involved in the hierarchy. By default this is disabled as it will quickly clutter the graph.
 
 | Show Script - Disabled                                      | Show Script - Enabled                                     |
 | ----------------------------------------------------------- | --------------------------------------------------------- |
-| ![Script View Disabled](Documentation~/ViewMenu-ShowScripts-Off.png) | ![Script View Enabled](Documentation~/ViewMenu-ShowScripts-On.png) |
+| ![Script View Disabled](.docs/ViewMenu-ShowScripts-Off.png) | ![Script View Enabled](.docs/ViewMenu-ShowScripts-On.png) |
 
 * **Show > Prefab References**: This option enables the visualization of all references inside a prefab. This includes references from scripts within the prefab and nested prefabs. Note that all modifications to the nested prefabs are visualized correctly. For example, if a nested prefab reference to a Mesh `A` is modified to be Mesh `B`, Mesh `B` will show up in the graph while Mesh `A` will not.
 
 | Show Prefab References - Disabled                                               | Show Prefab References - Enabled                                              |
 | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| ![Prefab References View Disabled](Documentation~/ViewMenu-ShowPrefabReferences-Off.png) | ![Prefab References View Enabled](Documentation~/ViewMenu-ShowPrefabReferences-On.png) |
+| ![Prefab References View Disabled](.docs/ViewMenu-ShowPrefabReferences-Off.png) | ![Prefab References View Enabled](.docs/ViewMenu-ShowPrefabReferences-On.png) |
 
 #### Reset Button
 The reset button allows you to reset all windows the their default state, position and size.
 
-![Reset Button](Documentation~/Reset.png)
+![Reset Button](.docs/Reset.png)
 
 #### Inspected Object Reference
 This field is located at the upper right corner and allows you yo assign a reference of an object you want to inspect.
 
-![Inspected Object Reference](Documentation~/InspectedObjectReference.png)
+![Inspected Object Reference](.docs/InspectedObjectReference.png)
 
 #### Zoom Controls
 The Zoom controls are located at the bottom left corner of the main window and give you control of the scale of the visualization. The zoom level is controlled by the slider and the reset button will reset the zoom to 1.
-![Zoom Controls](Documentation~/ZoomControls.png)
+![Zoom Controls](.docs/ZoomControls.png)
 
 ## Inspector Window
 The inspector window is a small version of the Unity inspector with extra functionality to better visualize references.
 
-![Inspector Window](Documentation~/InspectorWindow.png)
+![Inspector Window](.docs/InspectorWindow.png)
 
 ### Controls
 The Inspector window gives you extra controls for visualization purposes.
@@ -82,25 +82,25 @@ The Inspector window gives you extra controls for visualization purposes.
 #### Window controls
 Currently, the window can be minimized or extended using the buttons at the top left corner.
 
-![Window Controls](Documentation~/InspectorWindow-WindowControls.png)
+![Window Controls](.docs/InspectorWindow-WindowControls.png)
 
 * Minimize: The minimize button (Yellow) will collapse the window leaving only the header and the window controls visible.
 
-![Window - Minimized](Documentation~/InspectorWindow-Minimized.png)
+![Window - Minimized](.docs/InspectorWindow-Minimized.png)
 
 * Extend: The extend button (Green) will eliminate the height restrictions allowing for the entire inspector to be displayed.
 
-![Window - Extended](Documentation~/InspectorWindow-Extended.png)
+![Window - Extended](.docs/InspectorWindow-Extended.png)
 
 #### Toolbar
 The toolbar provides a reference to the object being presented in the window and options to switch the representation of it (See the [Views](#views) section for more information).
 
-![Window - Toolbar](Documentation~/InspectorWindow-Toolbar.png)
+![Window - Toolbar](.docs/InspectorWindow-Toolbar.png)
 
 #### Footer
 At the bottom of the window you will be able to see more information and controls.
 
-![Window - Footer](Documentation~/InspectorWindow-Footer.png)
+![Window - Footer](.docs/InspectorWindow-Footer.png)
 
 ##### Stats
 The following information is displayed at the left of the footer:
@@ -118,44 +118,44 @@ At the right of the footer you have the following controls
 ### Views
 The window provides different options to visualize the content. Depending on the object compatibility some options will be disabled.
 
-![View Modes](Documentation~/InspectorWindow-ViewModes.png)
+![View Modes](.docs/InspectorWindow-ViewModes.png)
 
 #### Inspector Element
 This view mode is available when an object has an inspector that supports [UI Toolkit](https://docs.unity3d.com/Manual/UIElements.html).
 > Note: In some occasions UI Toolkit is still supported but it is not displayed correctly.
 
-![Inspector Element Mode](Documentation~/InspectorWindow-ViewMode-InspectorElement.png)
+![Inspector Element Mode](.docs/InspectorWindow-ViewMode-InspectorElement.png)
 
 #### IMGUI
 This view mode uses the [Immediate Mode GUI](https://docs.unity3d.com/Manual/GUIScriptingGuide.html) inspector to display the content.
 
-![IMGUI Mode](Documentation~/InspectorWindow-ViewMode-IMGUI.png)
+![IMGUI Mode](.docs/InspectorWindow-ViewMode-IMGUI.png)
 
 #### Preview
 This view mode visualizes a preview of the object (If supported). Very Often, Prefabs with visual elements, 3D Models, Textures and other assets will show this option.
 
-![Preview Mode](Documentation~/InspectorWindow-ViewMode-Preview.png)
+![Preview Mode](.docs/InspectorWindow-ViewMode-Preview.png)
 
 #### Static Preview
 The static preview mode shows an image of the object either taken from the Preview or from the default icon based on the type of object.
 
 | Static Preview - Mesh                                                  | Static Preview - Shader                                                    |
 | ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ![Mesh Static Preview](Documentation~/InspectorWindow-ViewMode-Static-Mesh.png) | ![Shader Static Preview](Documentation~/InspectorWindow-ViewMode-Static-Shader.png) |
+| ![Mesh Static Preview](.docs/InspectorWindow-ViewMode-Static-Mesh.png) | ![Shader Static Preview](.docs/InspectorWindow-ViewMode-Static-Shader.png) |
 
 ### References
 References are represented in the graph as curved arrows. The source of the arrow indicate the object that holds the reference and the end of the arrow represents the reference target.
 
-![Reference](Documentation~/Reference.png)
+![Reference](.docs/Reference.png)
 
 The color of the arrow indicate what type of reference it is:
-* <span style="color:white">White</span> for direct reference on a serialized field
-* <span style="color:cyan">Cyan</span> for nested prefab references
+* White for direct reference on a serialized field
+* Cyan for nested prefab references
 
 #### Highlighting
 The references to, and from, a specific object will be highlighted by hovering over the header of the inspector window or by activating the highlight lock (See [Footer Controls](#controls-2))
 
 | Reference - Normal                               | Reference - Highlighted                                    |
 | ------------------------------------------------ | ---------------------------------------------------------- |
-| ![Normal References](Documentation~/Reference-Normal.png) | ![Highlighted References](Documentation~/Reference-Highlighted.png) |
+| ![Normal References](.docs/Reference-Normal.png) | ![Highlighted References](.docs/Reference-Highlighted.png) |
 
