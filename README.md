@@ -58,12 +58,12 @@ The view menu lets you control some visual elements of the graph hierarchy.
 | ![Prefab References View Disabled](.docs/ViewMenu-ShowPrefabReferences-Off.png) | ![Prefab References View Enabled](.docs/ViewMenu-ShowPrefabReferences-On.png) |
 
 #### Reset Button
-The reset button allows you to reset all windows the their default state, position and size.
+The reset button allows you to reset all windows to their default state, position and size.
 
 ![Reset Button](.docs/Reset.png)
 
 #### Inspected Object Reference
-This field is located at the upper right corner and allows you yo assign a reference of an object you want to inspect.
+This field is located at the upper right corner and allows you to assign a reference of an object you want to inspect.
 
 ![Inspected Object Reference](.docs/InspectedObjectReference.png)
 
@@ -112,7 +112,7 @@ The following information is displayed at the left of the footer:
 
 ##### Controls
 At the right of the footer you have the following controls
-* Button with a diverging arrow that with lock the highlight of the references to and from the object.
+* Button with a diverging arrow that will lock the highlight of the references to and from the object.
 * Resize control that allows you to resize the window by clicking and dragging the dotted corner.
 
 ### Views
@@ -122,7 +122,7 @@ The window provides different options to visualize the content. Depending on the
 
 #### Inspector Element
 This view mode is available when an object has an inspector that supports [UI Toolkit](https://docs.unity3d.com/Manual/UIElements.html).
-> Note: In some occasions UI Toolkit is still supported but it is not displayed correctly.
+> Note: On some occasions UI Toolkit is still supported but it is not displayed correctly.
 
 ![Inspector Element Mode](.docs/InspectorWindow-ViewMode-InspectorElement.png)
 
@@ -144,7 +144,7 @@ The static preview mode shows an image of the object either taken from the Previ
 | ![Mesh Static Preview](.docs/InspectorWindow-ViewMode-Static-Mesh.png) | ![Shader Static Preview](.docs/InspectorWindow-ViewMode-Static-Shader.png) |
 
 ### References
-References are represented in the graph as curved arrows. The source of the arrow indicate the object that holds the reference and the end of the arrow represents the reference target.
+References are represented in the graph as curved arrows. The source of the arrow indicates the object that holds the reference and the end of the arrow represents the reference target.
 
 ![Reference](.docs/Reference.png)
 
