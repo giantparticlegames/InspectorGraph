@@ -100,11 +100,11 @@ dotnet_naming_symbols.static_fields_should_have_prefix_symbols.resharper_require
 dotnet_naming_symbols.type_parameters_symbols.applicable_accessibilities = *
 dotnet_naming_symbols.type_parameters_symbols.applicable_kinds = type_parameter
 dotnet_naming_symbols.unity_serialized_field_symbols.applicable_accessibilities = *
-dotnet_naming_symbols.unity_serialized_field_symbols.applicable_kinds = 
+dotnet_naming_symbols.unity_serialized_field_symbols.applicable_kinds =
 dotnet_naming_symbols.unity_serialized_field_symbols.resharper_applicable_kinds = unity_serialised_field
 dotnet_naming_symbols.unity_serialized_field_symbols.resharper_required_modifiers = instance
 dotnet_naming_symbols.unity_serialized_field_symbols_1.applicable_accessibilities = *
-dotnet_naming_symbols.unity_serialized_field_symbols_1.applicable_kinds = 
+dotnet_naming_symbols.unity_serialized_field_symbols_1.applicable_kinds =
 dotnet_naming_symbols.unity_serialized_field_symbols_1.resharper_applicable_kinds = unity_serialised_field
 dotnet_naming_symbols.unity_serialized_field_symbols_1.resharper_required_modifiers = instance
 dotnet_style_parentheses_in_arithmetic_binary_operators = never_if_unnecessary:none
@@ -292,7 +292,7 @@ csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 
 # License header
-file_header_template = ********************************\n(C) 2022 - Giant Particle Games\nAll rights reserved.\n********************************
+file_header_template = ********************************\n(C) 2023 - Giant Particle Games\nAll rights reserved.\n********************************
 
 # C++ Files
 [*.{cpp,h,in}]

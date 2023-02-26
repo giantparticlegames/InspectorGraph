@@ -1,12 +1,12 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes
+namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {
     public enum ReferenceType
     {

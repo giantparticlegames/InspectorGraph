@@ -5,13 +5,14 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Common.Prefs;
 using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
-using GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -35,7 +36,6 @@ namespace GiantParticle.InspectorGraph
 
         private ReferenceNodeFactory _nodeFactory = new();
         private IObjectNode _rootNode;
-        private Preferences _preferences;
 
         [MenuItem("Window/Giant Particle/Inspector Graph")]
         public static void ShowWindow()
@@ -50,6 +50,17 @@ namespace GiantParticle.InspectorGraph
             GlobalApplicationContext.Dispose();
         }
 
+        public void OnEnable()
+        {
+            GlobalApplicationContext.Instantiate();
+            if (!GlobalApplicationContext.Instance.Contains<IPreferenceHandler>())
+            {
+                var handler = new PreferenceHandler();
+                handler.LoadAllPreferences();
+                GlobalApplicationContext.Instance.Add<IPreferenceHandler>(handler);
+            }
+        }
+
         public void OnDisable()
         {
             ClearCurrentContent();
@@ -57,8 +68,8 @@ namespace GiantParticle.InspectorGraph
 
         public void CreateGUI()
         {
-            GlobalApplicationContext.Instantiate();
             GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
+
             WindowVisualTree.CloneTree(rootVisualElement);
 
             _content = rootVisualElement.Q<ScrollView>(nameof(_content));
@@ -73,34 +84,40 @@ namespace GiantParticle.InspectorGraph
                     UpdateView(_rootNode.Target);
                 });
             viewMenu.menu.AppendSeparator();
-            viewMenu.menu.AppendAction(
-                actionName: "Show/Scripts",
-                action: (menuAction) =>
-                {
-                    Type monoScriptType = typeof(MonoScript);
-                    if (_nodeFactory.ExcludedTypes.Contains(monoScriptType))
-                        _nodeFactory.ExcludedTypes.Remove(monoScriptType);
-                    else _nodeFactory.ExcludedTypes.Add(monoScriptType);
-                    // Refresh view if needed
-                    if (_rootNode != null) UpdateView(_rootNode.Target);
-                },
-                actionStatusCallback: action =>
-                {
-                    if (!_nodeFactory.ExcludedTypes.Contains(typeof(MonoScript)))
-                        return DropdownMenuAction.Status.Checked;
-                    return DropdownMenuAction.Status.Normal;
-                });
-            viewMenu.menu.AppendAction(
-                actionName: "Show/Prefab References",
-                action: (menuAction) =>
-                {
-                    _nodeFactory.ShouldProcessPrefabs = !_nodeFactory.ShouldProcessPrefabs;
-                    // Refresh view if needed
-                    if (_rootNode != null) UpdateView(_rootNode.Target);
-                },
-                actionStatusCallback: action => _nodeFactory.ShouldProcessPrefabs
-                    ? DropdownMenuAction.Status.Checked
-                    : DropdownMenuAction.Status.Normal);
+
+            foreach (ITypeFilter filter in _nodeFactory.TypeFilter.Filters)
+            {
+                // Show
+                viewMenu.menu.AppendAction(
+                    actionName: $"Show/{filter.MenuName}",
+                    action: (menuAction) =>
+                    {
+                        filter.ShouldShowType = !filter.ShouldShowType;
+                        // Refresh view if needed
+                        if (_rootNode != null) UpdateView(_rootNode.Target);
+                    },
+                    actionStatusCallback: action =>
+                    {
+                        if (filter.ShouldShowType)
+                            return DropdownMenuAction.Status.Checked;
+                        return DropdownMenuAction.Status.Normal;
+                    });
+                // Expand
+                viewMenu.menu.AppendAction(
+                    actionName: $"Expand/{filter.MenuName}",
+                    action: (menuAction) =>
+                    {
+                        filter.ShouldExpandType = !filter.ShouldExpandType;
+                        // Refresh view if needed
+                        if (_rootNode != null) UpdateView(_rootNode.Target);
+                    },
+                    actionStatusCallback: action =>
+                    {
+                        if (filter.ShouldExpandType)
+                            return DropdownMenuAction.Status.Checked;
+                        return DropdownMenuAction.Status.Normal;
+                    });
+            }
 
             // Update Reference Field
             _refField = rootVisualElement.Q<ObjectField>(nameof(_refField));
@@ -108,12 +125,15 @@ namespace GiantParticle.InspectorGraph
             _refField.RegisterCallback<ChangeEvent<Object>>(evt =>
             {
                 var assignedObject = evt.newValue;
-                if (assignedObject == null) _preferences.LastInspectedObjectPath = null;
+                IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
+                GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
+
+                if (assignedObject == null) generalPrefs.LastInspectedObjectPath = null;
                 else
                 {
                     var path = AssetDatabase.GetAssetPath(assignedObject);
-                    _preferences.LastInspectedObjectPath = path;
-                    _preferences.Save();
+                    generalPrefs.LastInspectedObjectPath = path;
+                    handler.Save<GeneralPreferences>();
                 }
 
                 CreateContentTree(assignedObject);
@@ -135,10 +155,12 @@ namespace GiantParticle.InspectorGraph
 
         private void LoadPreferences()
         {
-            _preferences = Preferences.LoadPreferences();
-            if (!string.IsNullOrEmpty(_preferences.LastInspectedObjectPath))
+            IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
+
+            GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
+            if (!string.IsNullOrEmpty(generalPrefs.LastInspectedObjectPath))
             {
-                var lastObject = AssetDatabase.LoadAssetAtPath<Object>(_preferences.LastInspectedObjectPath);
+                var lastObject = AssetDatabase.LoadAssetAtPath<Object>(generalPrefs.LastInspectedObjectPath);
                 if (lastObject != null)
                     _refField.value = lastObject;
             }

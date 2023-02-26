@@ -1,10 +1,10 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;

@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -10,6 +10,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
 {
     public interface IApplicationContext
     {
+        bool Contains<T>() where T : class;
         T Get<T>() where T : class;
         void Add<T>(object instance) where T : class;
         void Remove<T>() where T : class;
@@ -18,6 +19,11 @@ namespace GiantParticle.InspectorGraph.Editor.Common
     public class ApplicationContext : IApplicationContext
     {
         private Dictionary<Type, object> _objectsByType = new();
+
+        public bool Contains<T>() where T : class
+        {
+            return _objectsByType.ContainsKey(typeof(T));
+        }
 
         public T Get<T>()
             where T : class
