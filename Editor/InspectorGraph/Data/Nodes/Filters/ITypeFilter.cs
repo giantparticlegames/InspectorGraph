@@ -15,11 +15,6 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
         Type TargetType { get; }
 
         /// <summary>
-        /// Indicate the name of the menu item that controls this filter
-        /// </summary>
-        string MenuName { get; }
-
-        /// <summary>
         /// Indicate if an object of type <see cref="TargetType"/> should be expanded in the hierarchy
         /// </summary>
         bool ShouldExpandType { get; set; }

@@ -11,6 +11,7 @@ namespace GiantParticle.InspectorGraph.Common.Prefs
     {
         public abstract string Key { get; }
         public Type DataType => typeof(T);
+        public object Data => CurrentData;
 
         protected T CurrentData { get; private set; }
 

@@ -12,5 +12,6 @@ namespace GiantParticle.InspectorGraph.Common.Prefs
         string Key { get; }
         Type DataType { get; }
         void LoadData(object data);
+        object Data { get; }
     }
 }

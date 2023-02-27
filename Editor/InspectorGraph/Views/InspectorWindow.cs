@@ -35,11 +35,13 @@ namespace GiantParticle.InspectorGraph
         public event Action GUIChanged;
 
         public IObjectNode Node { get; }
+        private bool forceStaticPreviewMode;
 
 
-        public InspectorWindow(IObjectNode node, VisualTreeAsset visualTreeAsset)
+        public InspectorWindow(IObjectNode node, VisualTreeAsset visualTreeAsset, bool forceStaticPreview = false)
         {
             Node = node;
+            forceStaticPreviewMode = forceStaticPreview;
             CreateLayout(visualTreeAsset);
             ConfigureWindowManipulation();
         }
@@ -63,7 +65,9 @@ namespace GiantParticle.InspectorGraph
             title.text = $"[{Node.Target.name}]";
 
             // Toolbar
-            var preferredMode = WindowContentFactory.PreferredViewModeForObject(Node.Target);
+            ContentViewMode preferredMode = forceStaticPreviewMode
+                ? ContentViewMode.StaticPreview
+                : WindowContentFactory.PreferredViewModeForObject(Node.Target);
             var viewModeMenu = new ViewModeMenu(Node.Target);
             viewModeMenu.ViewMode = preferredMode;
             viewModeMenu.ViewModeChanged += SwitchView;
@@ -135,7 +139,7 @@ namespace GiantParticle.InspectorGraph
             _content.contentContainer.RemoveFromClassList($"{_currentMode}");
 
             _currentMode = mode;
-            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData);
+            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData, forceStaticPreviewMode);
             _view.ContentChanged += OnContentChanged;
             _content.Add(_view);
             _content.contentContainer.AddToClassList($"{mode}");

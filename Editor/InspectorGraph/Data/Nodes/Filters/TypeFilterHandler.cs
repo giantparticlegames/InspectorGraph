@@ -5,21 +5,34 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Common;
+using GiantParticle.InspectorGraph.Settings;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
 {
-    public class TypeFilterHandler
+    public interface ITypeFilterHandler
+    {
+        IReadOnlyCollection<ITypeFilter> Filters { get; }
+        bool ShouldExpandObject(object objectInstance);
+        bool ShouldShowObject(object objectInstance);
+    }
+
+    public class TypeFilterHandler : ITypeFilterHandler
     {
         private readonly Dictionary<Type, ITypeFilter> _filters = new();
 
         public IReadOnlyCollection<ITypeFilter> Filters => _filters.Values;
 
-        public TypeFilterHandler()
+        public TypeFilterHandler(IInspectorGraphSettings settings)
         {
-            Type[] allImplementations = ReflectionHelper.GetAllInterfaceImplementations(typeof(ITypeFilter));
-            for (int i = 0; i < allImplementations.Length; ++i)
-                AssignFilter((ITypeFilter)Activator.CreateInstance(allImplementations[i]));
+            if (settings.TypeFilters == null || settings.TypeFilters.Count <= 0)
+                return;
+            for (int i = 0; i < settings.TypeFilters.Count; ++i)
+            {
+                var filter = new TypeFilterByName(settings.TypeFilters[i]);
+                if (filter.TargetType == null) continue;
+
+                AssignFilter(filter);
+            }
         }
 
         private void AssignFilter(ITypeFilter filter)

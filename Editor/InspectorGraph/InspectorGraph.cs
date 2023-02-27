@@ -10,6 +10,7 @@ using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
+using GiantParticle.InspectorGraph.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace GiantParticle.InspectorGraph
         private ScrollView _content;
         private ObjectField _refField;
 
-        private ReferenceNodeFactory _nodeFactory = new();
+        private ReferenceNodeFactory _nodeFactory;
         private IObjectNode _rootNode;
 
         [MenuItem("Window/Giant Particle/Inspector Graph")]
@@ -59,6 +60,15 @@ namespace GiantParticle.InspectorGraph
                 handler.LoadAllPreferences();
                 GlobalApplicationContext.Instance.Add<IPreferenceHandler>(handler);
             }
+
+            if (!GlobalApplicationContext.Instance.Contains<IInspectorGraphSettings>())
+                GlobalApplicationContext.Instance.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
+
+            if (_nodeFactory == null)
+            {
+                var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
+                _nodeFactory = new ReferenceNodeFactory(new TypeFilterHandler(settings));
+            }
         }
 
         public void OnDisable()
@@ -76,6 +86,7 @@ namespace GiantParticle.InspectorGraph
 
             // Toolbar
             var viewMenu = rootVisualElement.Q<ToolbarMenu>("_viewMenu");
+            // Refresh View
             viewMenu.menu.AppendAction(
                 actionName: "Refresh",
                 action: (menuAction) =>
@@ -85,11 +96,21 @@ namespace GiantParticle.InspectorGraph
                 });
             viewMenu.menu.AppendSeparator();
 
+            // Open project settings
+            viewMenu.menu.AppendAction(
+                actionName: "Project Settings",
+                action: (menuAction) =>
+                {
+                    SettingsService.OpenProjectSettings($"{InspectorGraphSettingsRegister.kMenuPath}");
+                });
+            viewMenu.menu.AppendSeparator();
+
+            // Filters
             foreach (ITypeFilter filter in _nodeFactory.TypeFilter.Filters)
             {
                 // Show
                 viewMenu.menu.AppendAction(
-                    actionName: $"Show/{filter.MenuName}",
+                    actionName: $"Filters/{filter.TargetType.FullName}/Show",
                     action: (menuAction) =>
                     {
                         filter.ShouldShowType = !filter.ShouldShowType;
@@ -104,7 +125,7 @@ namespace GiantParticle.InspectorGraph
                     });
                 // Expand
                 viewMenu.menu.AppendAction(
-                    actionName: $"Expand/{filter.MenuName}",
+                    actionName: $"Filters/{filter.TargetType.FullName}/Expand",
                     action: (menuAction) =>
                     {
                         filter.ShouldExpandType = !filter.ShouldExpandType;
@@ -310,10 +331,19 @@ namespace GiantParticle.InspectorGraph
 
         private InspectorWindow CreateWindow(IObjectNode node)
         {
+            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
             var key = node.Target;
             if (_viewRegistry.IsWindowRegisteredByTarget(key)) return null;
+            if (_viewRegistry.WindowCount > settings.MaxWindows)
+            {
+                Debug.LogWarning("Max Window limit reached");
+                return null;
+            }
 
-            var window = new InspectorWindow(node: node, visualTreeAsset: InspectorWindowVisualTree);
+            var window = new InspectorWindow(
+                node: node,
+                visualTreeAsset: InspectorWindowVisualTree,
+                forceStaticPreview: _viewRegistry.WindowCount > settings.MaxPreviewWindows);
             window.style.width = new StyleLength(kDefaultWindowMaxWidth);
             window.style.maxHeight = new StyleLength(kDefaultWindowMaxHeight);
             window.style.position = new StyleEnum<Position>(Position.Absolute);
@@ -339,6 +369,7 @@ namespace GiantParticle.InspectorGraph
                 foreach (IObjectNodeReference nodeReference in node.References)
                 {
                     var targetWindow = _viewRegistry.WindowByTarget(nodeReference.TargetNode.Target);
+                    if (targetWindow == null) continue;
                     var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
                     _content.Add(line);
                     line.SendToBack();
@@ -391,6 +422,7 @@ namespace GiantParticle.InspectorGraph
                 }
 
                 InspectorWindow window = _viewRegistry.WindowByTarget(item.Item1.Target);
+                if (window == null) continue;
                 // Avoid reposition already repositioned window
                 if (windowsVisited.Contains(window)) continue;
 

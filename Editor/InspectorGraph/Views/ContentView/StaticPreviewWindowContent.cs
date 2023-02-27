@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -14,11 +14,14 @@ namespace GiantParticle.InspectorGraph.ContentView
         private IWindowData _windowData;
         private VisualElement _view;
 
-        public StaticPreviewWindowContent(IWindowData windowData)
+        public StaticPreviewWindowContent(IWindowData windowData, bool forceMini)
         {
             _windowData = windowData;
             windowData.CreateNewSerializedTarget();
-            Texture2D preview = AssetPreview.GetAssetPreview(windowData.Target);
+
+            Texture2D preview = forceMini
+                ? AssetPreview.GetMiniThumbnail(windowData.Target)
+                : AssetPreview.GetAssetPreview(windowData.Target);
             bool shouldWaitForTexture = false;
             if (preview == null)
             {

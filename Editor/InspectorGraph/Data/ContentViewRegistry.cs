@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -11,6 +11,7 @@ namespace GiantParticle.InspectorGraph
 {
     public interface IContentViewRegistry
     {
+        int WindowCount { get; }
         InspectorWindow WindowByTarget(Object target);
         void ExecuteOnEachWindow(Action<InspectorWindow> action);
         IEnumerable<ConnectionLine> AllConnectionsRelatedToWindow(InspectorWindow window);
@@ -23,6 +24,7 @@ namespace GiantParticle.InspectorGraph
         private Dictionary<Object, InspectorWindow> _windowsByObject = new();
         private HashSet<ConnectionLine> _allLines = new();
 
+        public int WindowCount => _windowsByObject.Count;
         public IEnumerable<InspectorWindow> Windows => _windowsByObject.Values;
 
         public void Clear()

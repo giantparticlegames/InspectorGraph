@@ -16,7 +16,12 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
     {
         private readonly Queue<ObjectNode> _queue = new();
 
-        public TypeFilterHandler TypeFilter { get; } = new();
+        public ITypeFilterHandler TypeFilter { get; }
+
+        public ReferenceNodeFactory(ITypeFilterHandler filterHandler)
+        {
+            TypeFilter = filterHandler;
+        }
 
         public IObjectNode CreateGraphFromObject(Object rootObject)
         {
