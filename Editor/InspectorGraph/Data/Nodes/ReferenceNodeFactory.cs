@@ -16,11 +16,11 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
     {
         private readonly Queue<ObjectNode> _queue = new();
 
-        public ITypeFilterHandler TypeFilter { get; }
+        private readonly ITypeFilterHandler _typeFilter;
 
         public ReferenceNodeFactory(ITypeFilterHandler filterHandler)
         {
-            TypeFilter = filterHandler;
+            _typeFilter = filterHandler;
         }
 
         public IObjectNode CreateGraphFromObject(Object rootObject)
@@ -38,7 +38,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
                 if (root == null) root = node;
                 visitedObjects.Add(node.Target, node);
 
-                if (!TypeFilter.ShouldExpandObject(node.Target))
+                if (!_typeFilter.ShouldExpandObject(node.Target))
                     continue;
 
                 // Process Object
@@ -62,7 +62,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
                 var reference = iterator.objectReferenceValue;
                 if (reference == null)
                     continue;
-                if (!TypeFilter.ShouldShowObject(reference))
+                if (!_typeFilter.ShouldShowObject(reference))
                     continue;
                 if (internalReferences != null && internalReferences.Contains(reference))
                     continue;
@@ -79,7 +79,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
                 parentNode.AddNode(childNode, ReferenceType.Direct);
 
                 // Expand if indicated
-                if (!TypeFilter.ShouldExpandObject(reference))
+                if (!_typeFilter.ShouldExpandObject(reference))
                     continue;
                 _queue.Enqueue(childNode);
             }
@@ -87,7 +87,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 
         private void ProcessGameObject(ObjectNode rootNode)
         {
-            if (!TypeFilter.ShouldShowObject(rootNode.Target)) return;
+            if (!_typeFilter.ShouldShowObject(rootNode.Target)) return;
             if (!(rootNode.Target is GameObject rootPrefab)) return;
 
             var hierarchyMap = CreateHierarchyMap(rootPrefab, rootNode);

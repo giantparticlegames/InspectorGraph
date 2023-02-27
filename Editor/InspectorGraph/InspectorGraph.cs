@@ -22,6 +22,10 @@ namespace GiantParticle.InspectorGraph
 {
     public class InspectorGraph : EditorWindow
     {
+        private const string kDocsURL = "https://github.com/giantparticlegames/InspectorGraph/blob/main/README.md";
+        private const string kReportBugURL = "https://github.com/giantparticlegames/InspectorGraph/issues/new";
+        private const string kWebsite = "https://www.giantparticlegames.com/home/inspector-graph";
+
         private const int kPositionXOffset = 80;
         private const int kPositionYOffset = 30;
         private const int kDefaultWindowMaxWidth = 400;
@@ -64,11 +68,20 @@ namespace GiantParticle.InspectorGraph
             if (!GlobalApplicationContext.Instance.Contains<IInspectorGraphSettings>())
                 GlobalApplicationContext.Instance.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
 
-            if (_nodeFactory == null)
+            if (!GlobalApplicationContext.Instance.Contains<ITypeFilterHandler>())
             {
                 var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
-                _nodeFactory = new ReferenceNodeFactory(new TypeFilterHandler(settings));
+                GlobalApplicationContext.Instance.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
             }
+
+            if (_nodeFactory == null)
+            {
+                var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+                _nodeFactory = new ReferenceNodeFactory(typeFilterHandler);
+            }
+
+            if (!GlobalApplicationContext.Instance.Contains<IContentViewRegistry>())
+                GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
         }
 
         public void OnDisable()
@@ -78,8 +91,6 @@ namespace GiantParticle.InspectorGraph
 
         public void CreateGUI()
         {
-            GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
-
             WindowVisualTree.CloneTree(rootVisualElement);
 
             _content = rootVisualElement.Q<ScrollView>(nameof(_content));
@@ -94,19 +105,18 @@ namespace GiantParticle.InspectorGraph
                     if (_rootNode == null) return;
                     UpdateView(_rootNode.Target);
                 });
-            viewMenu.menu.AppendSeparator();
-
-            // Open project settings
             viewMenu.menu.AppendAction(
-                actionName: "Project Settings",
+                actionName: "Reset",
                 action: (menuAction) =>
                 {
-                    SettingsService.OpenProjectSettings($"{InspectorGraphSettingsRegister.kMenuPath}");
+                    if (_rootNode == null) return;
+                    CreateContentTree(_rootNode.Target);
                 });
             viewMenu.menu.AppendSeparator();
 
             // Filters
-            foreach (ITypeFilter filter in _nodeFactory.TypeFilter.Filters)
+            var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+            foreach (ITypeFilter filter in typeFilterHandler.Filters)
             {
                 // Show
                 viewMenu.menu.AppendAction(
@@ -140,6 +150,28 @@ namespace GiantParticle.InspectorGraph
                     });
             }
 
+            // Edit
+            var editMenu = rootVisualElement.Q<ToolbarMenu>("_editMenu");
+            // Open project settings
+            editMenu.menu.AppendAction(
+                actionName: "Project Settings",
+                action: (menuAction) =>
+                {
+                    SettingsService.OpenProjectSettings($"{InspectorGraphSettingsRegister.kMenuPath}");
+                });
+
+            // Help
+            var helpMenu = rootVisualElement.Q<ToolbarMenu>("_helpMenu");
+            helpMenu.menu.AppendAction(
+                actionName: "Documentation",
+                action: (menuAction) => { Application.OpenURL(kDocsURL); });
+            helpMenu.menu.AppendAction(
+                actionName: "Report a bug",
+                action: (menuAction) => { Application.OpenURL(kReportBugURL); });
+            helpMenu.menu.AppendAction(
+                actionName: "Website",
+                action: (menuAction) => { Application.OpenURL(kWebsite); });
+
             // Update Reference Field
             _refField = rootVisualElement.Q<ObjectField>(nameof(_refField));
             _refField.objectType = typeof(Object);
@@ -158,13 +190,6 @@ namespace GiantParticle.InspectorGraph
                 }
 
                 CreateContentTree(assignedObject);
-            });
-
-            var resetButton = rootVisualElement.Q<ToolbarButton>("_reset");
-            resetButton.RegisterCallback<ClickEvent>(evt =>
-            {
-                if (_rootNode == null) return;
-                CreateContentTree(_rootNode.Target);
             });
 
             var footer = rootVisualElement.Q<Toolbar>("_footer");
@@ -370,6 +395,8 @@ namespace GiantParticle.InspectorGraph
                 {
                     var targetWindow = _viewRegistry.WindowByTarget(nodeReference.TargetNode.Target);
                     if (targetWindow == null) continue;
+                    if (_viewRegistry.ContainsConnection(sourceWindow, targetWindow)) continue;
+
                     var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
                     _content.Add(line);
                     line.SendToBack();

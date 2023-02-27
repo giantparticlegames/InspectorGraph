@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph
@@ -80,6 +81,17 @@ namespace GiantParticle.InspectorGraph
 
         #region Connections
 
+        public bool ContainsConnection(VisualElement source, VisualElement dest)
+        {
+            foreach (ConnectionLine connectionLine in _allLines)
+            {
+                if (connectionLine.Source != source) continue;
+                if (connectionLine.Destination != dest) continue;
+                return true;
+            }
+
+            return false;
+        }
         public void RegisterConnection(ConnectionLine line)
         {
             _allLines.Add(line);
