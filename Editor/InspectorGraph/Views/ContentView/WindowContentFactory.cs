@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.ContentView
 {
-    public static class WindowContentFactory
+    internal static class WindowContentFactory
     {
         private static Dictionary<Type, ContentViewMode> _cachedModes = new();
 

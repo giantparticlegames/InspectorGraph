@@ -7,7 +7,7 @@ using System;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
 {
-    public interface ITypeFilter
+    internal interface ITypeFilter
     {
         /// <summary>
         /// Indicate the target type

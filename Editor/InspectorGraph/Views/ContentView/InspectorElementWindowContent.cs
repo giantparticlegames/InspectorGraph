@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -7,7 +7,7 @@ using UnityEditor.UIElements;
 
 namespace GiantParticle.InspectorGraph.ContentView
 {
-    public class InspectorElementWindowContent : BaseWindowContent
+    internal class InspectorElementWindowContent : BaseWindowContent
     {
         private InspectorElement _view;
         private InspectorElementObserver _inspectorElementObserver;

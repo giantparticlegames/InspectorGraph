@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace GiantParticle.InspectorGraph.Editor.Common
 {
-    public class ReflectionHelper
+    internal static class ReflectionHelper
     {
         public static Type[] GetAllInterfaceImplementations(Type interfaceType, bool includeAbstract = false)
         {

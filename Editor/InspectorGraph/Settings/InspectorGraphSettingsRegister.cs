@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace GiantParticle.InspectorGraph.Settings
 {
-    public static class InspectorGraphSettingsRegister
+    internal static class InspectorGraphSettingsRegister
     {
         public const string kMenuPath = "Giant Particle/Inspector Graph";
 

@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Settings
 {
-    public class InspectorGraphSettingsProvider : SettingsProvider
+    internal class InspectorGraphSettingsProvider : SettingsProvider
     {
         public InspectorGraphSettingsProvider(string path, SettingsScope scopes, IEnumerable<string> keywords = null) :
             base(path, scopes, keywords)

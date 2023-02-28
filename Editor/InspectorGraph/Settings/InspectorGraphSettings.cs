@@ -10,14 +10,14 @@ using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.Settings
 {
-    public interface IInspectorGraphSettings
+    internal interface IInspectorGraphSettings
     {
         int MaxPreviewWindows { get; }
         int MaxWindows { get; }
         IReadOnlyList<FilterTypeSettings> TypeFilters { get; }
     }
 
-    public class InspectorGraphSettings : ScriptableObject, IInspectorGraphSettings
+    internal class InspectorGraphSettings : ScriptableObject, IInspectorGraphSettings
     {
         public const string kDefaultSettingsLocation =
             "Assets/Editor/com.giantparticle.inspector_graph/InspectorGraphSettings.asset";

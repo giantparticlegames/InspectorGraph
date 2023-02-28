@@ -9,7 +9,7 @@ using GiantParticle.InspectorGraph.Settings;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
 {
-    public class TypeFilterByName : ITypeFilter
+    internal class TypeFilterByName : ITypeFilter
     {
         public Type TargetType { get; }
 

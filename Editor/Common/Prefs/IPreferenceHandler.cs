@@ -5,7 +5,7 @@
 
 namespace GiantParticle.InspectorGraph.Common.Prefs
 {
-    public interface IPreferenceHandler
+    internal interface IPreferenceHandler
     {
         int Count { get; }
         void LoadAllPreferences();

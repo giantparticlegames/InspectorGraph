@@ -5,14 +5,14 @@
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {
-    public interface IObjectNodeReference
+    internal interface IObjectNodeReference
     {
         ReferenceType RefType { get; }
         IObjectNode TargetNode { get; }
         int RefCount { get; }
     }
 
-    public class ObjectNodeReference : IObjectNodeReference
+    internal class ObjectNodeReference : IObjectNodeReference
     {
         public ReferenceType RefType { get; }
         public IObjectNode TargetNode { get; }

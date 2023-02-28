@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.ToolbarContent
 {
-    public class ViewModeMenu : ToolbarMenu
+    internal class ViewModeMenu : ToolbarMenu
     {
         public event Action<ContentViewMode> ViewModeChanged;
         private ContentViewMode _viewMode;

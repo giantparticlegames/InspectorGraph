@@ -20,7 +20,7 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class InspectorGraph : EditorWindow
+    internal class InspectorGraph : EditorWindow
     {
         private const string kDocsURL = "https://github.com/giantparticlegames/InspectorGraph/blob/main/README.md";
         private const string kReportBugURL = "https://github.com/giantparticlegames/InspectorGraph/issues/new";

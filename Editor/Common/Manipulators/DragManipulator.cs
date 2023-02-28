@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common.Manipulators
 {
-    public class DragManipulator : BaseDragManipulator, IPositionManipulator
+    internal class DragManipulator : BaseDragManipulator, IPositionManipulator
     {
         public event Action<VisualElement> PositionChanged;
         private Vector3 _startTargetPosition;

@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class QuickStatsView : VisualElement
+    internal class QuickStatsView : VisualElement
     {
         private IObjectNode Node { get; }
 

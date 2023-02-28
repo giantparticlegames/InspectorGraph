@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.ContentView
 {
-    public class StaticPreviewWindowContent : BaseWindowContent
+    internal class StaticPreviewWindowContent : BaseWindowContent
     {
         private IWindowData _windowData;
         private VisualElement _view;

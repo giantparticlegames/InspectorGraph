@@ -15,7 +15,7 @@ using GiantParticle.InspectorGraph.Editor.Common.Utils;
 namespace GiantParticle.InspectorGraph.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(FilterTypeSettings))]
-    public class FilterTypeSettingsPropertyDrawer : PropertyDrawer
+    internal class FilterTypeSettingsPropertyDrawer : PropertyDrawer
     {
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {

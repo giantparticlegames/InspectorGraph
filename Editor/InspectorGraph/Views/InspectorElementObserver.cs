@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class InspectorElementObserver
+    internal class InspectorElementObserver
     {
         private InspectorElement _inspectorElement;
         private List<ObjectField> _registeredFields = new();

@@ -7,7 +7,7 @@ using System;
 
 namespace GiantParticle.InspectorGraph.Common.Prefs
 {
-    public interface IPreference
+    internal interface IPreference
     {
         string Key { get; }
         Type DataType { get; }

@@ -8,27 +8,27 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common
 {
-    public enum UIDocumentTypes
+    internal enum UIDocumentTypes
     {
         MainWindow = 1,
         InspectorWindow = 2,
         FilterTypeSettings = 3,
-        Settings = 4
+        Settings = 4,
+        TypeOptions = 5
     }
 
-    public interface IUIDocumentInfo
+    internal interface IUIDocumentInfo
     {
         UIDocumentTypes Type { get; }
         VisualTreeAsset Asset { get; }
     }
 
     [Serializable]
-    public class UIDocumentInfo : IUIDocumentInfo
+    internal class UIDocumentInfo : IUIDocumentInfo
     {
         [SerializeField]
         private UIDocumentTypes _type;
@@ -40,7 +40,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
         public VisualTreeAsset Asset => _asset;
     }
 
-    public interface IUIDocumentCatalog
+    internal interface IUIDocumentCatalog
     {
         IUIDocumentInfo this[UIDocumentTypes type] { get; }
     }
@@ -48,7 +48,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
     // [CreateAssetMenu(
     //     fileName = "UIDocumentCatalog",
     //     menuName = "GiantParticle/Inspector Graph/Create UI Document Catalog")]
-    public class UIDocumentCatalog : ScriptableObject, IUIDocumentCatalog
+    internal class UIDocumentCatalog : ScriptableObject, IUIDocumentCatalog
     {
         [SerializeField]
         private UIDocumentInfo[] _entries;
@@ -61,7 +61,12 @@ namespace GiantParticle.InspectorGraph.Editor.Common
             get
             {
                 EnsureIndex();
-                if (!_index.ContainsKey(type)) return null;
+                if (!_index.ContainsKey(type))
+                {
+                    Debug.LogError($"[{typeof(UIDocumentCatalog)}] instance does not contain type [{type}]");
+                    return null;
+                }
+
                 return _index[type];
             }
         }

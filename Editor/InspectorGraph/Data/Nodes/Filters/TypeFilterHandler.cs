@@ -9,14 +9,14 @@ using GiantParticle.InspectorGraph.Settings;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
 {
-    public interface ITypeFilterHandler
+    internal interface ITypeFilterHandler
     {
         IReadOnlyCollection<ITypeFilter> Filters { get; }
         bool ShouldExpandObject(object objectInstance);
         bool ShouldShowObject(object objectInstance);
     }
 
-    public class TypeFilterHandler : ITypeFilterHandler
+    internal class TypeFilterHandler : ITypeFilterHandler
     {
         private readonly Dictionary<Type, ITypeFilter> _filters = new();
 

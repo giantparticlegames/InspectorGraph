@@ -8,21 +8,21 @@ using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {
-    public enum ReferenceType
+    internal enum ReferenceType
     {
         Direct,
         HierarchyEmbedded
     }
 
 
-    public interface IObjectNode
+    internal interface IObjectNode
     {
         Object Target { get; }
         IWindowData WindowData { get; }
         IEnumerable<IObjectNodeReference> References { get; }
     }
 
-    public class ObjectNode : IObjectNode
+    internal class ObjectNode : IObjectNode
     {
         public Object Target { get; }
         public IWindowData WindowData { get; }

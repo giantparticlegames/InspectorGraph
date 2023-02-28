@@ -15,7 +15,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class InspectorWindow : VisualElement, IDisposable
+    internal class InspectorWindow : VisualElement, IDisposable
     {
         private class NoTypeClass
         {

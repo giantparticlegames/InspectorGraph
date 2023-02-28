@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph
 {
-    public interface IContentViewRegistry
+    internal interface IContentViewRegistry
     {
         int WindowCount { get; }
         InspectorWindow WindowByTarget(Object target);
@@ -20,7 +20,7 @@ namespace GiantParticle.InspectorGraph
         IEnumerable<ConnectionLine> ConnectionsToWindow(InspectorWindow destination);
     }
 
-    public class ContentViewRegistry : IContentViewRegistry
+    internal class ContentViewRegistry : IContentViewRegistry
     {
         private Dictionary<Object, InspectorWindow> _windowsByObject = new();
         private HashSet<ConnectionLine> _allLines = new();

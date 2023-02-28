@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.Common.Prefs
 {
-    public class PreferenceHandler : IPreferenceHandler
+    internal class PreferenceHandler : IPreferenceHandler
     {
         public const string kEditorPrefsSuffix = "GiantParticle-InspectorGraph";
         private Dictionary<Type, IPreference> _preferences = new();

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace GiantParticle.InspectorGraph.Editor.Common
 {
-    public interface IApplicationContext
+    internal interface IApplicationContext
     {
         bool Contains<T>() where T : class;
         T Get<T>() where T : class;
@@ -16,7 +16,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
         void Remove<T>() where T : class;
     }
 
-    public class ApplicationContext : IApplicationContext
+    internal class ApplicationContext : IApplicationContext
     {
         private Dictionary<Type, object> _objectsByType = new();
 
@@ -50,7 +50,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
         }
     }
 
-    public static class GlobalApplicationContext
+    internal static class GlobalApplicationContext
     {
         private static IApplicationContext _instance;
 

@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common.Manipulators
 {
-    public class HighlightManipulator : BaseHoverManipulator
+    internal class HighlightManipulator : BaseHoverManipulator
     {
         [Flags]
         public enum Mode

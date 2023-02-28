@@ -21,3 +21,5 @@ MonoBehaviour:
     _asset: {fileID: 9197481963319205126, guid: e9c2f321051024fcc9954407b1981631, type: 3}
   - _type: 4
     _asset: {fileID: 9197481963319205126, guid: 25e2a000771f04d6fa51874a8e2f4d42, type: 3}
+  - _type: 5
+    _asset: {fileID: 9197481963319205126, guid: 4554197094cd3406c85d944735b5cdd5, type: 3}

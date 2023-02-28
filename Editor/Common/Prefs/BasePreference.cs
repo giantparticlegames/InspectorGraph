@@ -7,7 +7,7 @@ using System;
 
 namespace GiantParticle.InspectorGraph.Common.Prefs
 {
-    public abstract class BasePreference<T> : IPreference
+    internal abstract class BasePreference<T> : IPreference
     {
         public abstract string Key { get; }
         public Type DataType => typeof(T);

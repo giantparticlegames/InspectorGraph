@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class ConnectionLine : VisualElement
+    internal class ConnectionLine : VisualElement
     {
         private static Color kTransparentWhite = new Color(1, 1, 1, 0.5f);
         private static Color kTransparentCyan = new Color(0, 1, 1, 0.5f);

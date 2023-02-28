@@ -12,9 +12,8 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common.Utils
 {
-    public class TypeOptionsPopup : PopupWindowContent
+    internal class TypeOptionsPopup : PopupWindowContent
     {
-        private const string kLayoutGUID = "4554197094cd3406c85d944735b5cdd5";
         private const int kItemHeight = 16;
         private const int kWindowWidth = 300;
         private const int kWindowHeight = 300;
@@ -42,7 +41,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common.Utils
 
         public override void OnOpen()
         {
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(kLayoutGUID));
+            var visualTree = UIDocumentCatalog.GetCatalog()[UIDocumentTypes.TypeOptions].Asset;
             visualTree.CloneTree(editorWindow.rootVisualElement);
 
             ToolbarSearchField search = editorWindow.rootVisualElement.Q<ToolbarSearchField>("_searchField");

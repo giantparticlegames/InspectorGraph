@@ -8,7 +8,7 @@ using System;
 namespace GiantParticle.InspectorGraph.Settings
 {
     [Serializable]
-    public class FilterTypeSettings
+    internal class FilterTypeSettings
     {
         public string FullyQualifiedName;
         public bool ShowType;

@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {
-    public class ReferenceNodeFactory
+    internal class ReferenceNodeFactory
     {
         private readonly Queue<ObjectNode> _queue = new();
 
