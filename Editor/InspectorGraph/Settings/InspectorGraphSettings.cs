@@ -37,8 +37,13 @@ namespace GiantParticle.InspectorGraph.Settings
 
         internal static InspectorGraphSettings GetSettings()
         {
+            // Check if the settings are in the default location
             var settings = AssetDatabase.LoadAssetAtPath<InspectorGraphSettings>(kDefaultSettingsLocation);
             if (settings != null) return settings;
+            // Check if the settings are somewhere else
+            string[] guids = AssetDatabase.FindAssets($"t:{typeof(InspectorGraphSettings).FullName}");
+            if (guids != null && guids.Length > 0)
+                return AssetDatabase.LoadAssetAtPath<InspectorGraphSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
 
             // Create default settings
             settings = CreateInstance<InspectorGraphSettings>();
@@ -52,12 +57,10 @@ namespace GiantParticle.InspectorGraph.Settings
                 {
                     FullyQualifiedName = "UnityEditor.MonoScript", ShowType = false, ExpandType = false
                 },
-#if PACKAGE_UNITY_2D_SPRITE
                 new FilterTypeSettings()
                 {
                     FullyQualifiedName = "UnityEngine.U2D.SpriteAtlas", ShowType = true, ExpandType = false
                 },
-#endif
             };
             Directory.CreateDirectory(Path.GetDirectoryName(kDefaultSettingsLocation));
             // Save

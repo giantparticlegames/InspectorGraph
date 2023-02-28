@@ -92,7 +92,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
 
         public static IUIDocumentCatalog GetCatalog()
         {
-            var guids = AssetDatabase.FindAssets($"t:{typeof(UIDocumentCatalog).FullName}");
+            string[] guids = AssetDatabase.FindAssets($"t:{typeof(UIDocumentCatalog).FullName}");
             if (guids == null || guids.Length <= 0)
                 throw new FileNotFoundException(
                     $"Instance of Scriptable Object [{typeof(UIDocumentCatalog).Name}] not found in project");

@@ -5,19 +5,24 @@ The Inspector Graph is a tool to better visualize, understand and manipulate obj
 
 ## Index <!-- omit in toc -->
 - [Main Features](#main-features)
+- [Change log](#change-log)
+- [Project Settings](#project-settings)
+  - [General settings](#general-settings)
+  - [Filters](#filters)
 - [Main Window](#main-window)
-  - [Controls](#controls)
-    - [View Menu](#view-menu)
-    - [Reset Button](#reset-button)
-    - [Inspected Object Reference](#inspected-object-reference)
-    - [Zoom Controls](#zoom-controls)
+  - [View Menu](#view-menu)
+    - [Filters](#filters-1)
+  - [Edit Menu](#edit-menu)
+  - [Help Menu](#help-menu)
+  - [Inspected Object Reference](#inspected-object-reference)
+  - [Zoom Controls](#zoom-controls)
 - [Inspector Window](#inspector-window)
-  - [Controls](#controls-1)
+  - [Controls](#controls)
     - [Window controls](#window-controls)
     - [Toolbar](#toolbar)
     - [Footer](#footer)
       - [Stats](#stats)
-      - [Controls](#controls-2)
+      - [Controls](#controls-1)
   - [Views](#views)
     - [Inspector Element](#inspector-element)
     - [IMGUI](#imgui)
@@ -34,40 +39,77 @@ The Inspector Graph is a tool to better visualize, understand and manipulate obj
 * Zoom control for better visualization
 * and more...
 
+## Change log
+Take a look at the latest changes [here](CHANGELOG.md).
+
+## Project Settings
+The Project settings section is where the per project settings of this tool are controlled. You can access this section either via the [`Edit`](#edit-menu) menu under the Inspector Graph Window or via Unity `Edit > Project Settings...`.
+
+By default, the data is saved in your project under `Assets/Editor/com.giantparticle.inspector_graph/InspectorGraphSettings.asset`. Feel free to move it to a different place if you want.
+
+![Project Settings](.docs/ProjectSettings.png)
+
+### General settings
+* **Max Windows**: Indicate the maximum number of Inspector Windows that will be displayed. `100` is the maximum limit, otherwise Unity starts to complain about it.
+* **Max Preview Windows**: Indicate the maximum number of windows that can display the Preview Mode. After this number is reached, new windows will be forced to display a static preview (Icon based on the object type). This is to avoid potential performance issues, feel free to change this value if your computer is capable and/or your project is not that resource intensive.
+
+### Filters
+Filters are an easy way to control the visibility or expansion of objects of certain types. In this section you can add or remove filters based on your preferences and the types available in your project.
+
+When clicking the **Fully Qualified Name** field, you will see a popup with all available types in your project, just search for the one you are looking for via the search bar and double-click it to autocomplete the field or manually type in the type.
+
+![Type Selection Popup](.docs/TypeSelectionPopup.png)
+
 ## Main Window
+The main window has multiple controls for you to use which are explained in this section.
 
-### Controls
-The main window has multiple controls for you to use
-
-#### View Menu
-The view menu lets you control some visual elements of the graph hierarchy.
+### View Menu
+The **View menu** lets you control some visual elements of the graph hierarchy.
 
 ![View Menu](.docs/ViewMenu.png)
 
 * **Refresh**: The refresh button lets you update the current graph with any changes that were not picked up while editing. It also rearranges the untouched windows in the graph to accommodate new windows or window positions.
-* **Show > Scripts**: This option enables the visualization of MonoScripts involved in the hierarchy. By default this is disabled as it will quickly clutter the graph.
+* **Reset**: The reset button allows you to reset all windows to their default state, position and size.
 
-| Show Script - Disabled                                      | Show Script - Enabled                                     |
+#### Filters
+The filters submenu allows you to temporarily control the visibility and/or expansion of inspectors based on the type of object being inspected. By default there are `3` types available: `UnityEngine.GameObject`, `UnityEditor.MonoScript` and `UnityEngine.U2D.SpriteAtlas` you can add or remove these under the [Project Settings section](#project-settings).
+
+![Filters](.docs/ViewMenu-Filters.png)
+
+* **Show**: This option shows or hides the visualization of any reference of the indicated type involved in the hierarchy.
+
+| Show `UnityEditor.MonoScript`</br>Disabled                  | Show `UnityEditor.MonoScript`</br>Enabled                 |
 | ----------------------------------------------------------- | --------------------------------------------------------- |
 | ![Script View Disabled](.docs/ViewMenu-ShowScripts-Off.png) | ![Script View Enabled](.docs/ViewMenu-ShowScripts-On.png) |
 
-* **Show > Prefab References**: This option enables the visualization of all references inside a prefab. This includes references from scripts within the prefab and nested prefabs. Note that all modifications to the nested prefabs are visualized correctly. For example, if a nested prefab reference to a Mesh `A` is modified to be Mesh `B`, Mesh `B` will show up in the graph while Mesh `A` will not.
+* **Expand**: This option enables or disables the visualization of references within the objects with the indicated type.
 
-| Show Prefab References - Disabled                                               | Show Prefab References - Enabled                                              |
+> Note: In the case of Prefabs (`UnityEngine.GameObject`), the expansion of them includes references from scripts within the prefab and nested prefabs. Note that all modifications to the nested prefabs are visualized correctly. For example, if a nested prefab reference to a Mesh `A` is modified to be Mesh `B`, Mesh `B` will show up in the graph while Mesh `A` will not.
+
+| Expand `UnityEngine.GameObject`</br>Disabled                                    | Expand `UnityEngine.GameObject`</br>Enabled                                   |
 | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | ![Prefab References View Disabled](.docs/ViewMenu-ShowPrefabReferences-Off.png) | ![Prefab References View Enabled](.docs/ViewMenu-ShowPrefabReferences-On.png) |
 
-#### Reset Button
-The reset button allows you to reset all windows to their default state, position and size.
+### Edit Menu
+The **Edit** menu currently has only one option that opens the Inspector Graph [project settings](#project-settings).
 
-![Reset Button](.docs/Reset.png)
+![Edit Menu](.docs/EditMenu.png)
 
-#### Inspected Object Reference
+### Help Menu
+The **Help Menu** has useful links
+
+![Help Menu](.docs/HelpMenu.png)
+
+* **Documentation**: Links to this document
+* **Report a bug**: Link to the GitHub page to create a new issue
+* **Website**: Link to the [Official website](http://www.giantparticlegames.com) of this tool
+
+### Inspected Object Reference
 This field is located at the upper right corner and allows you to assign a reference of an object you want to inspect.
 
 ![Inspected Object Reference](.docs/InspectedObjectReference.png)
 
-#### Zoom Controls
+### Zoom Controls
 The Zoom controls are located at the bottom left corner of the main window and give you control of the scale of the visualization. The zoom level is controlled by the slider and the reset button will reset the zoom to 1.
 ![Zoom Controls](.docs/ZoomControls.png)
 

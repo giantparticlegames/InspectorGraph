@@ -11,12 +11,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.unity.2d.sprite",
-            "expression": "1.0.0",
-            "define": "PACKAGE_UNITY_2D_SPRITE"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }
