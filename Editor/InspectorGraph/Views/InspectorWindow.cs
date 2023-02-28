@@ -38,11 +38,11 @@ namespace GiantParticle.InspectorGraph
         private bool forceStaticPreviewMode;
 
 
-        public InspectorWindow(IObjectNode node, VisualTreeAsset visualTreeAsset, bool forceStaticPreview = false)
+        public InspectorWindow(IObjectNode node, bool forceStaticPreview = false)
         {
             Node = node;
             forceStaticPreviewMode = forceStaticPreview;
-            CreateLayout(visualTreeAsset);
+            CreateLayout();
             ConfigureWindowManipulation();
         }
 
@@ -52,9 +52,11 @@ namespace GiantParticle.InspectorGraph
             _stateController?.Dispose();
         }
 
-        private void CreateLayout(VisualTreeAsset visualTreeAsset)
+        private void CreateLayout()
         {
-            visualTreeAsset.CloneTree(this);
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
+            var xmlLayout = catalog[UIDocumentTypes.InspectorWindow].Asset;
+            xmlLayout.CloneTree(this);
 
             _content = this.Q<ScrollView>(nameof(_content));
             _windowContent = this.Q<VisualElement>(nameof(_windowContent));

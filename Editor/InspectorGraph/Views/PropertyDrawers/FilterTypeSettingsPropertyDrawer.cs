@@ -17,24 +17,14 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
     [CustomPropertyDrawer(typeof(FilterTypeSettings))]
     public class FilterTypeSettingsPropertyDrawer : PropertyDrawer
     {
-        private const string kLayoutGUID = "e9c2f321051024fcc9954407b1981631";
-        private VisualTreeAsset _layout;
-
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             var root = new VisualElement();
-            LoadVisualTree();
-            _layout.CloneTree(root);
+            var layout = UIDocumentCatalog.GetCatalog()[UIDocumentTypes.FilterTypeSettings].Asset;
+            layout.CloneTree(root);
             CreateFields(root, property);
 
             return root;
-        }
-
-        private void LoadVisualTree()
-        {
-            if (_layout != null) return;
-
-            _layout = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(kLayoutGUID));
         }
 
         private void CreateFields(VisualElement root, SerializedProperty property)

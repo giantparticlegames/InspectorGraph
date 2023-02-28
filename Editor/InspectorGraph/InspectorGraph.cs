@@ -31,9 +31,6 @@ namespace GiantParticle.InspectorGraph
         private const int kDefaultWindowMaxWidth = 400;
         private const int kDefaultWindowMaxHeight = 300;
 
-        public VisualTreeAsset WindowVisualTree;
-        public VisualTreeAsset InspectorWindowVisualTree;
-
         private ContentViewRegistry _viewRegistry = new();
         private HashSet<InspectorWindow> _waitForResize = new();
         private ScrollView _content;
@@ -82,6 +79,9 @@ namespace GiantParticle.InspectorGraph
 
             if (!GlobalApplicationContext.Instance.Contains<IContentViewRegistry>())
                 GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
+
+            if (!GlobalApplicationContext.Instance.Contains<IUIDocumentCatalog>())
+                GlobalApplicationContext.Instance.Add<IUIDocumentCatalog>(UIDocumentCatalog.GetCatalog());
         }
 
         public void OnDisable()
@@ -91,7 +91,9 @@ namespace GiantParticle.InspectorGraph
 
         public void CreateGUI()
         {
-            WindowVisualTree.CloneTree(rootVisualElement);
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
+            var layout = catalog[UIDocumentTypes.MainWindow].Asset;
+            layout.CloneTree(rootVisualElement);
 
             _content = rootVisualElement.Q<ScrollView>(nameof(_content));
 
@@ -367,7 +369,6 @@ namespace GiantParticle.InspectorGraph
 
             var window = new InspectorWindow(
                 node: node,
-                visualTreeAsset: InspectorWindowVisualTree,
                 forceStaticPreview: _viewRegistry.WindowCount > settings.MaxPreviewWindows);
             window.style.width = new StyleLength(kDefaultWindowMaxWidth);
             window.style.maxHeight = new StyleLength(kDefaultWindowMaxHeight);
