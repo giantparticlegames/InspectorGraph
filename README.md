@@ -57,7 +57,11 @@ By default, the data is saved in your project under `Assets/Editor/com.giantpart
 ### Filters
 Filters are an easy way to control the visibility or expansion of objects of certain types. In this section you can add or remove filters based on your preferences and the types available in your project.
 
-When clicking the **Fully Qualified Name** field, you will see a popup with all available types in your project, just search for the one you are looking for via the search bar and double-click it to autocomplete the field or manually type in the type.
+* **Type Full Name**: This is the [fully qualified name](https://learn.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/specifying-fully-qualified-type-names) of the object type to filter without the assembly name (See [Type.FullName](https://learn.microsoft.com/en-us/dotnet/api/system.type.fullname?view=net-7.0))
+* **Display Type**: Indicate to display, or not, objects of the given type
+* **Expand Type**: Indicate to expand the graph from a visible object of the given type
+
+When clicking the **Type Full Name** field, you will see a popup with all available types in your project, just search for the one you are looking for via the search bar and double-click it to autocomplete the field or manually type in the type.
 
 ![Type Selection Popup](.docs/TypeSelectionPopup.png)
 
