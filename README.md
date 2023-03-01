@@ -17,12 +17,13 @@ The Inspector Graph is a tool to better visualize, understand and manipulate obj
   - [Inspected Object Reference](#inspected-object-reference)
   - [Zoom Controls](#zoom-controls)
 - [Inspector Window](#inspector-window)
-  - [Controls](#controls)
-    - [Window controls](#window-controls)
-    - [Toolbar](#toolbar)
-    - [Footer](#footer)
-      - [Stats](#stats)
-      - [Controls](#controls-1)
+  - [Window controls](#window-controls)
+  - [Toolbar](#toolbar)
+  - [Footer](#footer)
+    - [Object Type](#object-type)
+    - [Stats](#stats)
+    - [Reference Highlight](#reference-highlight)
+    - [Window Size Control](#window-size-control)
   - [Views](#views)
     - [Inspector Element](#inspector-element)
     - [IMGUI](#imgui)
@@ -118,10 +119,7 @@ The inspector window is a small version of the Unity inspector with extra functi
 
 ![Inspector Window](.docs/InspectorWindow.png)
 
-### Controls
-The Inspector window gives you extra controls for visualization purposes.
-
-#### Window controls
+### Window controls
 Currently, the window can be minimized or extended using the buttons at the top left corner.
 
 ![Window Controls](.docs/InspectorWindow-WindowControls.png)
@@ -134,28 +132,31 @@ Currently, the window can be minimized or extended using the buttons at the top 
 
 ![Window - Extended](.docs/InspectorWindow-Extended.png)
 
-#### Toolbar
+### Toolbar
 The toolbar provides a reference to the object being presented in the window and options to switch the representation of it (See the [Views](#views) section for more information).
 
 ![Window - Toolbar](.docs/InspectorWindow-Toolbar.png)
 
-#### Footer
+### Footer
 At the bottom of the window you will be able to see more information and controls.
 
 ![Window - Footer](.docs/InspectorWindow-Footer.png)
 
-##### Stats
-The following information is displayed at the left of the footer:
-* Name of the class that is being presented
+#### Object Type
+The object type name is shown at the left corner. When hovering, a tooltip will be displayed with the full name of the type.
+
+#### Stats
+The following information is displayed next to the object name:
 * Number of references to the object in the graph
 * Number of references from the object in the graph
 
-> Note: If there are more than one references from/to a single object to/from the represented in the window, the total number of references will be displayed in brackets (Example: `[Total: 5]`).
+> Note: If there are more than one references from/to a single object to/from the object represented in the window, the total number of references will be displayed in brackets (Example: `[Total: 5]`).
 
-##### Controls
-At the right of the footer you have the following controls
-* Button with a diverging arrow that will lock the highlight of the references to and from the object.
-* Resize control that allows you to resize the window by clicking and dragging the dotted corner.
+#### Reference Highlight
+To toggle highlight the references to and from the object represented in the window, simply press the button with a diverging arrow [ <img src="Editor/Assets/Images/Icon-SplitArrows.png" height="14"></img> ] at the right.
+
+#### Window Size Control
+To resize an inspector window, press and drag the dotted icon [ <img src="Editor/Assets/Images/Icon-Corner.png" height="14"></img> ] at right.
 
 ### Views
 The window provides different options to visualize the content. Depending on the object compatibility some options will be disabled.
@@ -195,7 +196,7 @@ The color of the arrow indicate what type of reference it is:
 * Cyan for nested prefab references
 
 #### Highlighting
-The references to, and from, a specific object will be highlighted by hovering over the header of the inspector window or by activating the highlight lock (See [Footer Controls](#controls-2))
+The references to, and from, a specific object will be highlighted by hovering over the header of the inspector window or by activating the highlight lock (See [Footer](#reference-highlight))
 
 | Reference - Normal                               | Reference - Highlighted                                    |
 | ------------------------------------------------ | ---------------------------------------------------------- |

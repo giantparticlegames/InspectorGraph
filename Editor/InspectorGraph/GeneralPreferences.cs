@@ -21,7 +21,7 @@ namespace GiantParticle.InspectorGraph
         public string LastInspectedObjectPath
         {
             get => CurrentData.LastInspectedObjectPath;
-            set { CurrentData.LastInspectedObjectPath = value; }
+            set => CurrentData.LastInspectedObjectPath = value;
         }
     }
 }

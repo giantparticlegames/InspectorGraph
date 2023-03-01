@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.Editor.Common
 {
@@ -18,11 +19,12 @@ namespace GiantParticle.InspectorGraph.Editor.Common
 
             List<Type> allTypes = new();
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies)
+            for (int i = 0; i < assemblies.Length; ++i)
             {
-                Type[] assemblyTypes = assembly.GetTypes();
-                foreach (Type assemblyType in assemblyTypes)
+                Type[] assemblyTypes = assemblies[i].GetTypes();
+                for (int t = 0; t < assemblyTypes.Length; ++t)
                 {
+                    Type assemblyType = assemblyTypes[t];
                     if (!interfaceType.IsAssignableFrom(assemblyType))
                         continue;
                     if (assemblyType.IsAbstract && !includeAbstract)
@@ -41,26 +43,28 @@ namespace GiantParticle.InspectorGraph.Editor.Common
 
             // Search in all assemblies
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies)
+            for (int i = 0; i < assemblies.Length; ++i)
             {
-                Type[] assemblyTypes = assembly.GetTypes();
-                foreach (Type assemblyType in assemblyTypes)
+                Type[] assemblyTypes = assemblies[i].GetTypes();
+                for (int t = 0; t < assemblyTypes.Length; ++t)
                 {
+                    Type assemblyType = assemblyTypes[t];
                     if (string.Equals(assemblyType.FullName, fullyQualifiedName))
                         return assemblyType;
                 }
             }
 
+            Debug.LogWarning($"Type does not exist for [{fullyQualifiedName}]");
             return null;
         }
 
         public static List<Type> ListAllTypes()
         {
-            List<Type> allTypes = new List<Type>();
+            List<Type> allTypes = new();
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies)
-                allTypes.AddRange(assembly.GetTypes());
+            for (int i = 0; i < assemblies.Length; ++i)
+                allTypes.AddRange(assemblies[i].GetTypes());
 
             return allTypes;
         }

@@ -8,38 +8,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common
 {
-    internal enum UIDocumentTypes
-    {
-        MainWindow = 1,
-        InspectorWindow = 2,
-        FilterTypeSettings = 3,
-        Settings = 4,
-        TypeOptions = 5
-    }
-
-    internal interface IUIDocumentInfo
-    {
-        UIDocumentTypes Type { get; }
-        VisualTreeAsset Asset { get; }
-    }
-
-    [Serializable]
-    internal class UIDocumentInfo : IUIDocumentInfo
-    {
-        [SerializeField]
-        private UIDocumentTypes _type;
-
-        [SerializeField]
-        private VisualTreeAsset _asset;
-
-        public UIDocumentTypes Type => _type;
-        public VisualTreeAsset Asset => _asset;
-    }
-
     internal interface IUIDocumentCatalog
     {
         IUIDocumentInfo this[UIDocumentTypes type] { get; }
@@ -95,7 +66,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
             string[] guids = AssetDatabase.FindAssets($"t:{typeof(UIDocumentCatalog).FullName}");
             if (guids == null || guids.Length <= 0)
                 throw new FileNotFoundException(
-                    $"Instance of Scriptable Object [{typeof(UIDocumentCatalog).Name}] not found in project");
+                    $"Instance of Scriptable Object [{nameof(UIDocumentCatalog)}] not found in project");
 
             // Return the first available asset
             return AssetDatabase.LoadAssetAtPath<UIDocumentCatalog>(AssetDatabase.GUIDToAssetPath(guids[0]));

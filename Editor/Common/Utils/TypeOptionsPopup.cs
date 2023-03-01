@@ -56,9 +56,11 @@ namespace GiantParticle.InspectorGraph.Editor.Common.Utils
                     _selectionCallback?.Invoke((Type)o);
                 editorWindow.Close();
             };
+            _listView.horizontalScrollingEnabled = true;
             editorWindow.rootVisualElement.Add(_listView);
 
             search.Focus();
+            base.OnOpen();
         }
 
         private VisualElement MakeItem()
@@ -85,6 +87,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common.Utils
             }
 
             // Filter
+            string searchTerm = evt.newValue;
             if (_filteredOptions == _allOptions) _filteredOptions = new List<Type>();
             _filteredOptions.Clear();
             for (int i = 0; i < _allOptions.Count; ++i)
@@ -92,7 +95,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common.Utils
                 Type type = _allOptions[i];
                 if (type == null) continue;
                 if (string.IsNullOrEmpty(type.FullName)) continue;
-                if(!type.FullName.Contains(evt.newValue)) continue;
+                if (!type.FullName.Contains(searchTerm)) continue;
 
                 _filteredOptions.Add(type);
             }
