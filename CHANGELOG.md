@@ -19,7 +19,7 @@
 
 ### Fixed
 - Fixed performance issue when displaying assets like SpriteAtlas that can reference multiple assets ([Issue #2](https://github.com/giantparticlegames/InspectorGraph/issues/2))
-- Fixed issue where the connection lines between windows where re-added every time a refresh was called
+- Fixed issue where the connection lines between windows were re-added every time a refresh was called
 - Fixed Unity warning about UI Toolkit referenced assets being moved due to absolute path declaration
 
 ### Removed
