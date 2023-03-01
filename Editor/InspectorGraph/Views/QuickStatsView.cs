@@ -1,17 +1,17 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
 using System.Collections.Generic;
 using System.Text;
 using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class QuickStatsView : VisualElement
+    internal class QuickStatsView : VisualElement
     {
         private IObjectNode Node { get; }
 

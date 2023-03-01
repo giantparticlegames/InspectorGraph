@@ -5,37 +5,39 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Common.Prefs;
 using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
-using GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
+using GiantParticle.InspectorGraph.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 
 namespace GiantParticle.InspectorGraph
 {
-    public class InspectorGraph : EditorWindow
+    internal class InspectorGraph : EditorWindow
     {
+        private const string kDocsURL = "https://github.com/giantparticlegames/InspectorGraph/blob/main/README.md";
+        private const string kReportBugURL = "https://github.com/giantparticlegames/InspectorGraph/issues/new";
+        private const string kWebsite = "https://www.giantparticlegames.com/home/inspector-graph";
+
         private const int kPositionXOffset = 80;
         private const int kPositionYOffset = 30;
         private const int kDefaultWindowMaxWidth = 400;
         private const int kDefaultWindowMaxHeight = 300;
-
-        public VisualTreeAsset WindowVisualTree;
-        public VisualTreeAsset InspectorWindowVisualTree;
 
         private ContentViewRegistry _viewRegistry = new();
         private HashSet<InspectorWindow> _waitForResize = new();
         private ScrollView _content;
         private ObjectField _refField;
 
-        private ReferenceNodeFactory _nodeFactory = new();
+        private ReferenceNodeFactory _nodeFactory;
         private IObjectNode _rootNode;
-        private Preferences _preferences;
 
         [MenuItem("Window/Giant Particle/Inspector Graph")]
         public static void ShowWindow()
@@ -50,6 +52,38 @@ namespace GiantParticle.InspectorGraph
             GlobalApplicationContext.Dispose();
         }
 
+        public void OnEnable()
+        {
+            GlobalApplicationContext.Instantiate();
+            if (!GlobalApplicationContext.Instance.Contains<IPreferenceHandler>())
+            {
+                var handler = new PreferenceHandler();
+                handler.LoadAllPreferences();
+                GlobalApplicationContext.Instance.Add<IPreferenceHandler>(handler);
+            }
+
+            if (!GlobalApplicationContext.Instance.Contains<IInspectorGraphSettings>())
+                GlobalApplicationContext.Instance.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
+
+            if (!GlobalApplicationContext.Instance.Contains<ITypeFilterHandler>())
+            {
+                var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
+                GlobalApplicationContext.Instance.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
+            }
+
+            if (_nodeFactory == null)
+            {
+                var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+                _nodeFactory = new ReferenceNodeFactory(typeFilterHandler);
+            }
+
+            if (!GlobalApplicationContext.Instance.Contains<IContentViewRegistry>())
+                GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
+
+            if (!GlobalApplicationContext.Instance.Contains<IUIDocumentCatalog>())
+                GlobalApplicationContext.Instance.Add<IUIDocumentCatalog>(UIDocumentCatalog.GetCatalog());
+        }
+
         public void OnDisable()
         {
             ClearCurrentContent();
@@ -57,14 +91,15 @@ namespace GiantParticle.InspectorGraph
 
         public void CreateGUI()
         {
-            GlobalApplicationContext.Instantiate();
-            GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
-            WindowVisualTree.CloneTree(rootVisualElement);
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
+            var layout = catalog[UIDocumentTypes.MainWindow].Asset;
+            layout.CloneTree(rootVisualElement);
 
             _content = rootVisualElement.Q<ScrollView>(nameof(_content));
 
             // Toolbar
             var viewMenu = rootVisualElement.Q<ToolbarMenu>("_viewMenu");
+            // Refresh View
             viewMenu.menu.AppendAction(
                 actionName: "Refresh",
                 action: (menuAction) =>
@@ -72,35 +107,72 @@ namespace GiantParticle.InspectorGraph
                     if (_rootNode == null) return;
                     UpdateView(_rootNode.Target);
                 });
-            viewMenu.menu.AppendSeparator();
             viewMenu.menu.AppendAction(
-                actionName: "Show/Scripts",
+                actionName: "Reset",
                 action: (menuAction) =>
                 {
-                    Type monoScriptType = typeof(MonoScript);
-                    if (_nodeFactory.ExcludedTypes.Contains(monoScriptType))
-                        _nodeFactory.ExcludedTypes.Remove(monoScriptType);
-                    else _nodeFactory.ExcludedTypes.Add(monoScriptType);
-                    // Refresh view if needed
-                    if (_rootNode != null) UpdateView(_rootNode.Target);
-                },
-                actionStatusCallback: action =>
-                {
-                    if (!_nodeFactory.ExcludedTypes.Contains(typeof(MonoScript)))
-                        return DropdownMenuAction.Status.Checked;
-                    return DropdownMenuAction.Status.Normal;
+                    if (_rootNode == null) return;
+                    CreateContentTree(_rootNode.Target);
                 });
-            viewMenu.menu.AppendAction(
-                actionName: "Show/Prefab References",
+            viewMenu.menu.AppendSeparator();
+
+            // Filters
+            var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+            foreach (ITypeFilter filter in typeFilterHandler.Filters)
+            {
+                // Show
+                viewMenu.menu.AppendAction(
+                    actionName: $"Filters/{filter.TargetType.FullName}/Show",
+                    action: (menuAction) =>
+                    {
+                        filter.ShouldShowType = !filter.ShouldShowType;
+                        // Refresh view if needed
+                        if (_rootNode != null) UpdateView(_rootNode.Target);
+                    },
+                    actionStatusCallback: action =>
+                    {
+                        if (filter.ShouldShowType)
+                            return DropdownMenuAction.Status.Checked;
+                        return DropdownMenuAction.Status.Normal;
+                    });
+                // Expand
+                viewMenu.menu.AppendAction(
+                    actionName: $"Filters/{filter.TargetType.FullName}/Expand",
+                    action: (menuAction) =>
+                    {
+                        filter.ShouldExpandType = !filter.ShouldExpandType;
+                        // Refresh view if needed
+                        if (_rootNode != null) UpdateView(_rootNode.Target);
+                    },
+                    actionStatusCallback: action =>
+                    {
+                        if (filter.ShouldExpandType)
+                            return DropdownMenuAction.Status.Checked;
+                        return DropdownMenuAction.Status.Normal;
+                    });
+            }
+
+            // Edit
+            var editMenu = rootVisualElement.Q<ToolbarMenu>("_editMenu");
+            // Open project settings
+            editMenu.menu.AppendAction(
+                actionName: "Project Settings",
                 action: (menuAction) =>
                 {
-                    _nodeFactory.ShouldProcessPrefabs = !_nodeFactory.ShouldProcessPrefabs;
-                    // Refresh view if needed
-                    if (_rootNode != null) UpdateView(_rootNode.Target);
-                },
-                actionStatusCallback: action => _nodeFactory.ShouldProcessPrefabs
-                    ? DropdownMenuAction.Status.Checked
-                    : DropdownMenuAction.Status.Normal);
+                    SettingsService.OpenProjectSettings($"{InspectorGraphSettingsRegister.kMenuPath}");
+                });
+
+            // Help
+            var helpMenu = rootVisualElement.Q<ToolbarMenu>("_helpMenu");
+            helpMenu.menu.AppendAction(
+                actionName: "Documentation",
+                action: (menuAction) => { Application.OpenURL(kDocsURL); });
+            helpMenu.menu.AppendAction(
+                actionName: "Report a bug",
+                action: (menuAction) => { Application.OpenURL(kReportBugURL); });
+            helpMenu.menu.AppendAction(
+                actionName: "Website",
+                action: (menuAction) => { Application.OpenURL(kWebsite); });
 
             // Update Reference Field
             _refField = rootVisualElement.Q<ObjectField>(nameof(_refField));
@@ -108,22 +180,18 @@ namespace GiantParticle.InspectorGraph
             _refField.RegisterCallback<ChangeEvent<Object>>(evt =>
             {
                 var assignedObject = evt.newValue;
-                if (assignedObject == null) _preferences.LastInspectedObjectPath = null;
+                IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
+                GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
+
+                if (assignedObject == null) generalPrefs.LastInspectedObjectPath = null;
                 else
                 {
                     var path = AssetDatabase.GetAssetPath(assignedObject);
-                    _preferences.LastInspectedObjectPath = path;
-                    _preferences.Save();
+                    generalPrefs.LastInspectedObjectPath = path;
+                    handler.Save<GeneralPreferences>();
                 }
 
                 CreateContentTree(assignedObject);
-            });
-
-            var resetButton = rootVisualElement.Q<ToolbarButton>("_reset");
-            resetButton.RegisterCallback<ClickEvent>(evt =>
-            {
-                if (_rootNode == null) return;
-                CreateContentTree(_rootNode.Target);
             });
 
             var footer = rootVisualElement.Q<Toolbar>("_footer");
@@ -135,10 +203,12 @@ namespace GiantParticle.InspectorGraph
 
         private void LoadPreferences()
         {
-            _preferences = Preferences.LoadPreferences();
-            if (!string.IsNullOrEmpty(_preferences.LastInspectedObjectPath))
+            IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
+
+            GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
+            if (!string.IsNullOrEmpty(generalPrefs.LastInspectedObjectPath))
             {
-                var lastObject = AssetDatabase.LoadAssetAtPath<Object>(_preferences.LastInspectedObjectPath);
+                var lastObject = AssetDatabase.LoadAssetAtPath<Object>(generalPrefs.LastInspectedObjectPath);
                 if (lastObject != null)
                     _refField.value = lastObject;
             }
@@ -288,10 +358,18 @@ namespace GiantParticle.InspectorGraph
 
         private InspectorWindow CreateWindow(IObjectNode node)
         {
+            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
             var key = node.Target;
             if (_viewRegistry.IsWindowRegisteredByTarget(key)) return null;
+            if (_viewRegistry.WindowCount > settings.MaxWindows)
+            {
+                Debug.LogWarning("Max Window limit reached");
+                return null;
+            }
 
-            var window = new InspectorWindow(node: node, visualTreeAsset: InspectorWindowVisualTree);
+            var window = new InspectorWindow(
+                node: node,
+                forceStaticPreview: _viewRegistry.WindowCount > settings.MaxPreviewWindows);
             window.style.width = new StyleLength(kDefaultWindowMaxWidth);
             window.style.maxHeight = new StyleLength(kDefaultWindowMaxHeight);
             window.style.position = new StyleEnum<Position>(Position.Absolute);
@@ -317,6 +395,9 @@ namespace GiantParticle.InspectorGraph
                 foreach (IObjectNodeReference nodeReference in node.References)
                 {
                     var targetWindow = _viewRegistry.WindowByTarget(nodeReference.TargetNode.Target);
+                    if (targetWindow == null) continue;
+                    if (_viewRegistry.ContainsConnection(sourceWindow, targetWindow)) continue;
+
                     var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
                     _content.Add(line);
                     line.SendToBack();
@@ -369,6 +450,7 @@ namespace GiantParticle.InspectorGraph
                 }
 
                 InspectorWindow window = _viewRegistry.WindowByTarget(item.Item1.Target);
+                if (window == null) continue;
                 // Avoid reposition already repositioned window
                 if (windowsVisited.Contains(window)) continue;
 

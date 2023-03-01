@@ -1,8 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <Style src="project://database/Packages/com.giantparticle.inspector_graph/Editor/InspectorGraph/InspectorGraphStyle.uss?fileID=7433441132597879392&amp;guid=112b7f4032ad6422e97b4a8906e0136b&amp;type=3#MultiInspectorWindow" />
+    <Style src="InspectorGraphStyle.uss?fileID=7433441132597879392&amp;guid=112b7f4032ad6422e97b4a8906e0136b&amp;type=3#InspectorGraphStyle" />
     <uie:Toolbar>
         <uie:ToolbarMenu display-tooltip-when-elided="true" text="View" name="_viewMenu" style="-unity-text-align: middle-left;" />
-        <uie:ToolbarButton text="Reset" display-tooltip-when-elided="true" name="_reset" style="-unity-text-align: middle-left;" />
+        <uie:ToolbarMenu display-tooltip-when-elided="true" name="_editMenu" text="Edit" style="-unity-text-align: middle-left;" />
+        <uie:ToolbarMenu display-tooltip-when-elided="true" name="_helpMenu" text="Help" style="-unity-text-align: middle-left;" />
         <ui:VisualElement style="height: 100%; position: absolute; right: 0; flex-direction: row;">
             <ui:Label text="Active Object:" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
             <uie:ObjectField name="_refField" />

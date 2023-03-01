@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace GiantParticle.InspectorGraph
 {
-    public interface IWindowData
+    internal interface IWindowData
     {
         Object Target { get; }
         SerializedObject SerializedTarget { get; }
@@ -18,7 +18,7 @@ namespace GiantParticle.InspectorGraph
         void UpdateSerializedObject(SerializedObject newSerializedObject);
     }
 
-    public class WindowData : IWindowData
+    internal class WindowData : IWindowData
     {
         public Object Target { get; }
 

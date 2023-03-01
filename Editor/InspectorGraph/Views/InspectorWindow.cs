@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -8,14 +8,14 @@ using System.Collections.Generic;
 using GiantParticle.InspectorGraph.ContentView;
 using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
-using GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using GiantParticle.InspectorGraph.ToolbarContent;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class InspectorWindow : VisualElement, IDisposable
+    internal class InspectorWindow : VisualElement, IDisposable
     {
         private class NoTypeClass
         {
@@ -35,12 +35,14 @@ namespace GiantParticle.InspectorGraph
         public event Action GUIChanged;
 
         public IObjectNode Node { get; }
+        private bool forceStaticPreviewMode;
 
 
-        public InspectorWindow(IObjectNode node, VisualTreeAsset visualTreeAsset)
+        public InspectorWindow(IObjectNode node, bool forceStaticPreview = false)
         {
             Node = node;
-            CreateLayout(visualTreeAsset);
+            forceStaticPreviewMode = forceStaticPreview;
+            CreateLayout();
             ConfigureWindowManipulation();
         }
 
@@ -50,9 +52,11 @@ namespace GiantParticle.InspectorGraph
             _stateController?.Dispose();
         }
 
-        private void CreateLayout(VisualTreeAsset visualTreeAsset)
+        private void CreateLayout()
         {
-            visualTreeAsset.CloneTree(this);
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
+            var xmlLayout = catalog[UIDocumentTypes.InspectorWindow].Asset;
+            xmlLayout.CloneTree(this);
 
             _content = this.Q<ScrollView>(nameof(_content));
             _windowContent = this.Q<VisualElement>(nameof(_windowContent));
@@ -63,7 +67,9 @@ namespace GiantParticle.InspectorGraph
             title.text = $"[{Node.Target.name}]";
 
             // Toolbar
-            var preferredMode = WindowContentFactory.PreferredViewModeForObject(Node.Target);
+            ContentViewMode preferredMode = forceStaticPreviewMode
+                ? ContentViewMode.StaticPreview
+                : WindowContentFactory.PreferredViewModeForObject(Node.Target);
             var viewModeMenu = new ViewModeMenu(Node.Target);
             viewModeMenu.ViewMode = preferredMode;
             viewModeMenu.ViewModeChanged += SwitchView;
@@ -135,7 +141,7 @@ namespace GiantParticle.InspectorGraph
             _content.contentContainer.RemoveFromClassList($"{_currentMode}");
 
             _currentMode = mode;
-            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData);
+            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData, forceStaticPreviewMode);
             _view.ContentChanged += OnContentChanged;
             _content.Add(_view);
             _content.contentContainer.AddToClassList($"{mode}");

@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.ContentView
 {
-    public abstract class BaseWindowContent : VisualElement, IDisposable
+    internal abstract class BaseWindowContent : VisualElement, IDisposable
     {
         public event Action ContentChanged;
         public abstract void Dispose();
