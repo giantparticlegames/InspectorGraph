@@ -1,23 +1,27 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes
+namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {
-    public class ReferenceNodeFactory
+    internal class ReferenceNodeFactory
     {
-        public HashSet<Type> ExcludedTypes = new() { typeof(MonoScript) };
-        public bool ShouldProcessPrefabs { get; set; }
+        private readonly Queue<ObjectNode> _queue = new();
 
-        private Queue<ObjectNode> _queue = new();
+        private readonly ITypeFilterHandler _typeFilter;
+
+        public ReferenceNodeFactory(ITypeFilterHandler filterHandler)
+        {
+            _typeFilter = filterHandler;
+        }
 
         public IObjectNode CreateGraphFromObject(Object rootObject)
         {
@@ -34,23 +38,15 @@ namespace GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes
                 if (root == null) root = node;
                 visitedObjects.Add(node.Target, node);
 
+                if (!_typeFilter.ShouldExpandObject(node.Target))
+                    continue;
+
                 // Process Object
                 if (node.Target is GameObject) ProcessGameObject(node);
                 else ProcessSerializedObject(node, node.WindowData.SerializedTarget);
             }
 
             return root;
-        }
-
-        private bool IsTypeExcluded(object objectInstance)
-        {
-            foreach (Type excludedType in ExcludedTypes)
-            {
-                if (excludedType.IsInstanceOfType(objectInstance))
-                    return true;
-            }
-
-            return false;
         }
 
         private void ProcessSerializedObject(ObjectNode parentNode, SerializedObject serializedObject,
@@ -66,7 +62,7 @@ namespace GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes
                 var reference = iterator.objectReferenceValue;
                 if (reference == null)
                     continue;
-                if (IsTypeExcluded(reference))
+                if (!_typeFilter.ShouldShowObject(reference))
                     continue;
                 if (internalReferences != null && internalReferences.Contains(reference))
                     continue;
@@ -81,13 +77,17 @@ namespace GiantParticle.InspectorGraph.Editor.MultiInspector.Data.Nodes
 
                 ObjectNode childNode = new ObjectNode(new WindowData(reference));
                 parentNode.AddNode(childNode, ReferenceType.Direct);
+
+                // Expand if indicated
+                if (!_typeFilter.ShouldExpandObject(reference))
+                    continue;
                 _queue.Enqueue(childNode);
             }
         }
 
         private void ProcessGameObject(ObjectNode rootNode)
         {
-            if (!ShouldProcessPrefabs) return;
+            if (!_typeFilter.ShouldShowObject(rootNode.Target)) return;
             if (!(rootNode.Target is GameObject rootPrefab)) return;
 
             var hierarchyMap = CreateHierarchyMap(rootPrefab, rootNode);

@@ -1,16 +1,18 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
 using System;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph
 {
-    public interface IContentViewRegistry
+    internal interface IContentViewRegistry
     {
+        int WindowCount { get; }
         InspectorWindow WindowByTarget(Object target);
         void ExecuteOnEachWindow(Action<InspectorWindow> action);
         IEnumerable<ConnectionLine> AllConnectionsRelatedToWindow(InspectorWindow window);
@@ -18,11 +20,12 @@ namespace GiantParticle.InspectorGraph
         IEnumerable<ConnectionLine> ConnectionsToWindow(InspectorWindow destination);
     }
 
-    public class ContentViewRegistry : IContentViewRegistry
+    internal class ContentViewRegistry : IContentViewRegistry
     {
         private Dictionary<Object, InspectorWindow> _windowsByObject = new();
         private HashSet<ConnectionLine> _allLines = new();
 
+        public int WindowCount => _windowsByObject.Count;
         public IEnumerable<InspectorWindow> Windows => _windowsByObject.Values;
 
         public void Clear()
@@ -78,6 +81,17 @@ namespace GiantParticle.InspectorGraph
 
         #region Connections
 
+        public bool ContainsConnection(VisualElement source, VisualElement dest)
+        {
+            foreach (ConnectionLine connectionLine in _allLines)
+            {
+                if (connectionLine.Source != source) continue;
+                if (connectionLine.Destination != dest) continue;
+                return true;
+            }
+
+            return false;
+        }
         public void RegisterConnection(ConnectionLine line)
         {
             _allLines.Add(line);

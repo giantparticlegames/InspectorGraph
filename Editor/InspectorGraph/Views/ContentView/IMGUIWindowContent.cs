@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.ContentView
 {
-    public class IMGUIWindowContent : BaseWindowContent
+    internal class IMGUIWindowContent : BaseWindowContent
     {
         private UnityEditor.Editor _editor;
         private List<UnityEditor.Editor> _editors;

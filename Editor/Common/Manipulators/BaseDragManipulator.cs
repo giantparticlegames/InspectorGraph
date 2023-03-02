@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common.Manipulators
 {
-    public abstract class BaseDragManipulator : PointerManipulator, IScalableManipulator
+    internal abstract class BaseDragManipulator : PointerManipulator, IScalableManipulator
     {
         private Vector3 _startClickPosition;
         private Vector3 _deltaClickPosition;

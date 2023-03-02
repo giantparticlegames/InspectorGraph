@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.ContentView
 {
-    public static class WindowContentFactory
+    internal static class WindowContentFactory
     {
         private static Dictionary<Type, ContentViewMode> _cachedModes = new();
 
@@ -51,7 +51,7 @@ namespace GiantParticle.InspectorGraph.ContentView
             return mode;
         }
 
-        public static BaseWindowContent CreateContent(ContentViewMode mode, IWindowData windowData)
+        public static BaseWindowContent CreateContent(ContentViewMode mode, IWindowData windowData, bool forceMini = false)
         {
             switch (mode)
             {
@@ -62,7 +62,7 @@ namespace GiantParticle.InspectorGraph.ContentView
                 case ContentViewMode.Preview:
                     return new IMGUIPreviewWindowContent(windowData);
                 case ContentViewMode.StaticPreview:
-                    return new StaticPreviewWindowContent(windowData);
+                    return new StaticPreviewWindowContent(windowData, forceMini);
             }
 
             throw new NotImplementedException($"Unhandled Content View Mode [{mode}]");

@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
 {
-    public class ContentZoomController : VisualElement
+    internal class ContentZoomController : VisualElement
     {
         private ToolbarButton _resetButton;
         private Slider _slider;

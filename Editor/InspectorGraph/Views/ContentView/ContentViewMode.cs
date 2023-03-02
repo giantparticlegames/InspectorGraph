@@ -1,5 +1,5 @@
 // ********************************
-// (C) 2022 - Giant Particle Games 
+// (C) 2022 - Giant Particle Games
 // All rights reserved.
 // ********************************
 
@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.ContentView
 {
-    public enum ContentViewMode
+    internal enum ContentViewMode
     {
         InspectorElement,
         IMGUI,
@@ -15,7 +15,7 @@ namespace GiantParticle.InspectorGraph.ContentView
         StaticPreview
     }
 
-    public static class ContentViewModeExtensions
+    internal static class ContentViewModeExtensions
     {
         public static bool IsObjectCompatible(this ContentViewMode mode, Object obj)
         {
