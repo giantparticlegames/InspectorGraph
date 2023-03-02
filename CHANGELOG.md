@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.9.0-b] TBD
+## [0.9.0-b] 2023-03-01
 
 ### Added
 - Project settings section for Inspector Graph
