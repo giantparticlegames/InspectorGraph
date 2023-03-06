@@ -12,6 +12,28 @@ namespace GiantParticle.InspectorGraph.Editor.Common
 {
     internal static class ReflectionHelper
     {
+        public static Type[] GetAllInterfaceImplementationsCurrentAssembly(Type interfaceType,
+            bool includeAbstract = false)
+        {
+            if (!interfaceType.IsInterface)
+                throw new ArgumentException($"Given type is not an interface: {interfaceType.FullName}");
+
+            Type[] assemblyTypes = typeof(ReflectionHelper).Assembly.GetTypes();
+            List<Type> allTypes = new();
+
+            for (int t = 0; t < assemblyTypes.Length; ++t)
+            {
+                Type assemblyType = assemblyTypes[t];
+                if (!interfaceType.IsAssignableFrom(assemblyType))
+                    continue;
+                if (assemblyType.IsAbstract && !includeAbstract)
+                    continue;
+                allTypes.Add(assemblyType);
+            }
+
+            return allTypes.ToArray();
+        }
+
         public static Type[] GetAllInterfaceImplementations(Type interfaceType, bool includeAbstract = false)
         {
             if (!interfaceType.IsInterface)

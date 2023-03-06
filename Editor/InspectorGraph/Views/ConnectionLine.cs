@@ -15,6 +15,7 @@ namespace GiantParticle.InspectorGraph
     {
         private static Color kTransparentWhite = new Color(1, 1, 1, 0.5f);
         private static Color kTransparentCyan = new Color(0, 1, 1, 0.5f);
+        private static Color kTransparentMagenta = new Color(1, 0, 1, 0.5f);
         private const float kArrowLength = 10f;
         private const float kArrowWidth = 10f;
 
@@ -57,6 +58,10 @@ namespace GiantParticle.InspectorGraph
                         return kTransparentWhite;
                     case ReferenceType.HierarchyEmbedded:
                         return kTransparentCyan;
+#if INSPECTOR_GRAPH_PRO
+                    case ReferenceType.Addressable:
+                        return kTransparentMagenta;
+#endif
                     default:
                         throw new NotImplementedException($"Unhandled color for reference type [{_referenceType}]");
                 }
@@ -73,6 +78,10 @@ namespace GiantParticle.InspectorGraph
                         return Color.white;
                     case ReferenceType.HierarchyEmbedded:
                         return Color.cyan;
+#if INSPECTOR_GRAPH_PRO
+                    case ReferenceType.Addressable:
+                        return Color.magenta;
+#endif
                     default:
                         throw new NotImplementedException($"Unhandled color for reference type [{_referenceType}]");
                 }

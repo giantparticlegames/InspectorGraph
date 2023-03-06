@@ -20,7 +20,7 @@ namespace GiantParticle.InspectorGraph.Common.Prefs
 
         public void LoadAllPreferences()
         {
-            Type[] prefTypes = ReflectionHelper.GetAllInterfaceImplementations(typeof(IPreference));
+            Type[] prefTypes = ReflectionHelper.GetAllInterfaceImplementationsCurrentAssembly(typeof(IPreference));
             for (int i = 0; i < prefTypes.Length; ++i)
             {
                 IPreference pref = LoadPreferences(prefTypes[i]);
