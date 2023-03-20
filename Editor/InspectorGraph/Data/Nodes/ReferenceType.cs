@@ -7,10 +7,10 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {
     public enum ReferenceType
     {
-        Direct,
-        HierarchyEmbedded,
+        Direct = 0,
+        NestedPrefab = 1,
 #if INSPECTOR_GRAPH_PRO
-        Addressable
+        Addressable = 2
 #endif
     }
 }

@@ -11,6 +11,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common
         InspectorWindow = 2,
         FilterTypeSettings = 3,
         Settings = 4,
-        TypeOptions = 5
+        TypeOptions = 5,
+        ReferenceColorSettings = 6
     }
 }

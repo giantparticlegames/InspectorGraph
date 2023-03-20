@@ -38,6 +38,15 @@ namespace GiantParticle.InspectorGraph.Settings
             var filterListField = rootElement.Q<PropertyField>("_filterListField");
             filterListField.bindingPath = nameof(settings._filters);
             filterListField.Bind(serializedSettings);
+
+            var colorsContainer = rootElement.Q<Foldout>("_referenceColorsContainer");
+            var serializedProperty = serializedSettings.FindProperty(nameof(settings._referenceColors));
+            for (int i = 0; i < settings.ReferenceColorSettings.Count; ++i)
+            {
+                var propertyField = new PropertyField(serializedProperty.GetArrayElementAtIndex(i));
+                propertyField.Bind(serializedSettings);
+                colorsContainer.Add(propertyField);
+            }
         }
     }
 }

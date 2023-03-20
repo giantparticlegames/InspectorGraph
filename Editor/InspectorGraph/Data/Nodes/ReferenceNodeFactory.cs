@@ -134,7 +134,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
                 if (!map.ContainsKey(assetPath))
                 {
                     ObjectNode node = new ObjectNode(new WindowData(currentGameObject));
-                    parentNode.AddNode(node, ReferenceType.HierarchyEmbedded);
+                    parentNode.AddNode(node, ReferenceType.NestedPrefab);
                     map.Add(assetPath, node);
                 }
 

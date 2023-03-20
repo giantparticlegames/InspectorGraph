@@ -17,7 +17,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
 
         public bool ShouldShowType { get; set; }
 
-        public TypeFilterByName(FilterTypeSettings filterTypeSettings)
+        public TypeFilterByName(IFilterTypeSettings filterTypeSettings)
         {
             TargetType = ReflectionHelper.GetTypeByName(filterTypeSettings.FullyQualifiedName);
             ShouldShowType = filterTypeSettings.ShowType;

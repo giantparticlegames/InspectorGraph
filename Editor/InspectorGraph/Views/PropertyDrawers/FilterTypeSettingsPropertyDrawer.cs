@@ -15,19 +15,11 @@ using GiantParticle.InspectorGraph.Editor.Common.Utils;
 namespace GiantParticle.InspectorGraph.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(FilterTypeSettings))]
-    internal class FilterTypeSettingsPropertyDrawer : PropertyDrawer
+    internal class FilterTypeSettingsPropertyDrawer : BasePropertyDrawer
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var root = new VisualElement();
-            var layout = UIDocumentCatalog.GetCatalog()[UIDocumentTypes.FilterTypeSettings].Asset;
-            layout.CloneTree(root);
-            CreateFields(root, property);
+        protected override UIDocumentTypes DocumentType => UIDocumentTypes.FilterTypeSettings;
 
-            return root;
-        }
-
-        private void CreateFields(VisualElement root, SerializedProperty property)
+        protected override void CreateFields(VisualElement root, SerializedProperty property)
         {
             TextField field = root.Q<TextField>("_fullyQualifiedName");
             field.Bind(property.serializedObject);

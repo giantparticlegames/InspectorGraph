@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,14 +15,18 @@ namespace GiantParticle.InspectorGraph.Settings
     {
         int MaxPreviewWindows { get; }
         int MaxWindows { get; }
-        IReadOnlyList<FilterTypeSettings> TypeFilters { get; }
+        IReadOnlyList<IFilterTypeSettings> TypeFilters { get; }
+        IReadOnlyList<IReferenceColorSettings> ReferenceColorSettings { get; }
+
+        IReferenceColorSettings GetReferenceColor(ReferenceType type);
     }
 
-    internal class InspectorGraphSettings : ScriptableObject, IInspectorGraphSettings
+    internal partial class InspectorGraphSettings : ScriptableObject, IInspectorGraphSettings
     {
         public const string kDefaultSettingsLocation =
             "Assets/Editor/com.giantparticle.inspector_graph/InspectorGraphSettings.asset";
 
+        [Header("Visualization Settings")]
         [SerializeField]
         internal int _maxPreviewWindows = 50;
 
@@ -29,11 +34,52 @@ namespace GiantParticle.InspectorGraph.Settings
         internal int _maxWindows = 100;
 
         [SerializeField]
+        internal List<ReferenceColorSettings> _referenceColors;
+
+        [Header("Inspector Window Settings")]
+        [SerializeField]
         internal List<FilterTypeSettings> _filters;
 
         public int MaxPreviewWindows => _maxPreviewWindows;
         public int MaxWindows => _maxWindows;
-        public IReadOnlyList<FilterTypeSettings> TypeFilters => _filters;
+        public IReadOnlyList<IFilterTypeSettings> TypeFilters => _filters;
+        public IReadOnlyList<IReferenceColorSettings> ReferenceColorSettings => _referenceColors;
+
+        public IReferenceColorSettings GetReferenceColor(ReferenceType type)
+        {
+            // Assume the order is the same as the enum values
+            return _referenceColors[(int)type];
+        }
+
+        private void OnEnable()
+        {
+            EnsureDefaultFilters();
+            EnsureDefaultReferenceColors();
+        }
+
+        private partial void EnsureDefaultReferenceColors();
+
+        private void EnsureDefaultFilters()
+        {
+            if (_filters == null) _filters = new List<FilterTypeSettings>();
+            if (_filters.Count <= 0)
+            {
+                _filters.Add(new FilterTypeSettings(
+                    fullyQualifiedName: typeof(GameObject).FullName,
+                    showType: true,
+                    expandType: false));
+                _filters.Add(new FilterTypeSettings(
+                    fullyQualifiedName: typeof(MonoScript).FullName,
+                    showType: false,
+                    expandType: false
+                ));
+                _filters.Add(new FilterTypeSettings(
+                    fullyQualifiedName: "UnityEngine.U2D.SpriteAtlas",
+                    showType: true,
+                    expandType: false
+                ));
+            }
+        }
 
         internal static InspectorGraphSettings GetSettings()
         {
@@ -47,21 +93,8 @@ namespace GiantParticle.InspectorGraph.Settings
 
             // Create default settings
             settings = CreateInstance<InspectorGraphSettings>();
-            settings._filters = new List<FilterTypeSettings>
-            {
-                new FilterTypeSettings()
-                {
-                    FullyQualifiedName = "UnityEngine.GameObject", ShowType = true, ExpandType = false
-                },
-                new FilterTypeSettings()
-                {
-                    FullyQualifiedName = "UnityEditor.MonoScript", ShowType = false, ExpandType = false
-                },
-                new FilterTypeSettings()
-                {
-                    FullyQualifiedName = "UnityEngine.U2D.SpriteAtlas", ShowType = true, ExpandType = false
-                },
-            };
+            settings.EnsureDefaultFilters();
+            settings.EnsureDefaultReferenceColors();
             Directory.CreateDirectory(Path.GetDirectoryName(kDefaultSettingsLocation));
             // Save
             AssetDatabase.CreateAsset(settings, kDefaultSettingsLocation);
