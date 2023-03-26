@@ -57,7 +57,7 @@ namespace GiantParticle.InspectorGraph.Settings
             EnsureDefaultReferenceColors();
         }
 
-        private partial void EnsureDefaultReferenceColors();
+        partial void EnsureDefaultReferenceColors();
 
         private void EnsureDefaultFilters()
         {

@@ -21,6 +21,9 @@ namespace GiantParticle.InspectorGraph.Editor.Common
     //     menuName = "GiantParticle/Inspector Graph/Create UI Document Catalog")]
     internal class UIDocumentCatalog : ScriptableObject, IUIDocumentCatalog
     {
+        [SerializeField, HideInInspector]
+        private bool _isPro;
+
         [SerializeField]
         private UIDocumentInfo[] _entries;
 
@@ -67,6 +70,14 @@ namespace GiantParticle.InspectorGraph.Editor.Common
             if (guids == null || guids.Length <= 0)
                 throw new FileNotFoundException(
                     $"Instance of Scriptable Object [{nameof(UIDocumentCatalog)}] not found in project");
+
+#if INSPECTOR_GRAPH_PRO
+            for (int i = 0; i < guids.Length; ++i)
+            {
+                var catalog = AssetDatabase.LoadAssetAtPath<UIDocumentCatalog>(AssetDatabase.GUIDToAssetPath(guids[i]));
+                if (catalog._isPro) return catalog;
+            }
+#endif
 
             // Return the first available asset
             return AssetDatabase.LoadAssetAtPath<UIDocumentCatalog>(AssetDatabase.GUIDToAssetPath(guids[0]));

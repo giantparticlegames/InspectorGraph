@@ -11,17 +11,17 @@ namespace GiantParticle.InspectorGraph
     [Serializable]
     internal class GeneralPreferencesData
     {
-        public string LastInspectedObjectPath;
+        public string LastInspectedObjectGUID;
     }
 
     internal class GeneralPreferences : BasePreference<GeneralPreferencesData>
     {
         public override string Key => "General";
 
-        public string LastInspectedObjectPath
+        public string LastInspectedObjectGUID
         {
-            get => CurrentData.LastInspectedObjectPath;
-            set => CurrentData.LastInspectedObjectPath = value;
+            get => CurrentData.LastInspectedObjectGUID;
+            set => CurrentData.LastInspectedObjectGUID = value;
         }
     }
 }

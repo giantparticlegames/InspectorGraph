@@ -31,3 +31,6 @@ MonoBehaviour:
   - _type: 6
     _asset: {fileID: 9197481963319205126, guid: 8f09da1e31a1e4b4ca1ccf5ef6a9a17c,
       type: 3}
+  - _type: 101
+    _asset: {fileID: 9197481963319205126, guid: f44953b13973641c7b39115367805c6d,
+      type: 3}
