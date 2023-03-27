@@ -158,7 +158,7 @@ namespace GiantParticle.InspectorGraph
             });
         }
 
-        public void LoadSavedLastObject()
+        public void LoadPreferences()
         {
             // Load last saved object
             IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
@@ -172,9 +172,12 @@ namespace GiantParticle.InspectorGraph
             if (lastObject == null) return;
 
             _objectField.value = lastObject;
+
+            LoadAutoSelectionPreferences();
         }
 
         partial void ConfigureAutoSelection();
+        partial void LoadAutoSelectionPreferences();
         partial void OnDispose();
     }
 }

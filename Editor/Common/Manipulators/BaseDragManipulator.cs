@@ -8,11 +8,23 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common.Manipulators
 {
+    /// <summary>
+    /// Button id.
+    /// <a href="https://docs.unity3d.com/ScriptReference/UIElements.PointerEventBase_1-button.html">See PointerEventBase doc</a>
+    /// </summary>
+    internal enum ManipulatorButton
+    {
+        Left = 0,
+        Right = 1,
+        Middle = 2
+    }
+
     internal abstract class BaseDragManipulator : PointerManipulator, IScalableManipulator
     {
         private Vector3 _startClickPosition;
         private Vector3 _deltaClickPosition;
         private bool _enabled;
+        private ManipulatorButton _activatorButton;
 
         protected Vector3 StartPosition => _startClickPosition;
 
@@ -29,9 +41,10 @@ namespace GiantParticle.InspectorGraph.Editor.Common.Manipulators
             set => _movementScale = value;
         }
 
-        protected BaseDragManipulator(VisualElement handle)
+        protected BaseDragManipulator(VisualElement handle, ManipulatorButton activatorButton = ManipulatorButton.Left)
         {
             this.target = handle;
+            _activatorButton = activatorButton;
         }
 
         protected override void RegisterCallbacksOnTarget()
@@ -56,6 +69,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common.Manipulators
         {
             if (_enabled) return;
             if (target.HasPointerCapture(evt.pointerId)) return;
+            if (_activatorButton != (ManipulatorButton)evt.button) return;
 
             _startClickPosition = evt.position;
             target.CapturePointer(evt.pointerId);

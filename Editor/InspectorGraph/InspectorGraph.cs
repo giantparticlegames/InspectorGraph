@@ -29,7 +29,8 @@ namespace GiantParticle.InspectorGraph
 
         private ContentViewRegistry _viewRegistry = new();
         private HashSet<InspectorWindow> _waitForResize = new();
-        private ScrollView _content;
+        private VisualElement _windowView;
+        private VisualElement _content;
         private InspectorGraphToolbar _toolbar;
 
         private ReferenceNodeFactory _nodeFactory;
@@ -92,7 +93,8 @@ namespace GiantParticle.InspectorGraph
             var layout = catalog[UIDocumentTypes.MainWindow].Asset;
             layout.CloneTree(rootVisualElement);
 
-            _content = rootVisualElement.Q<ScrollView>(nameof(_content));
+            _windowView = rootVisualElement.Q<VisualElement>(nameof(_windowView));
+            _content = rootVisualElement.Q<VisualElement>(nameof(_content));
 
             _toolbar = new InspectorGraphToolbar(new InspectorGraphToolbarConfig()
             {
@@ -102,9 +104,10 @@ namespace GiantParticle.InspectorGraph
             toolbarContainer.Add(_toolbar);
 
             var footer = rootVisualElement.Q<Toolbar>("_footer");
-            footer.Add(new ContentZoomController(_content.contentContainer));
+            footer.Add(new ContentZoomController(_content));
+            var moveManipulator = new DragManipulator(_windowView, _content, ManipulatorButton.Middle);
 
-            _toolbar.LoadSavedLastObject();
+            _toolbar.LoadPreferences();
         }
 
         private void ClearCurrentContent()
@@ -372,14 +375,14 @@ namespace GiantParticle.InspectorGraph
                 windowsVisited.Add(window);
             }
 
-            _content.contentContainer.ResizeToFit<InspectorWindow>();
+            _content.ResizeToFit<InspectorWindow>();
         }
 
         private void OnInspectorWindowMoved(VisualElement window)
         {
             if (window is InspectorWindow inspectorWindow)
                 inspectorWindow.Node.WindowData.HasBeenManuallyMoved = true;
-            _content.contentContainer.ResizeToFit<InspectorWindow>();
+            _content.ResizeToFit<InspectorWindow>();
         }
     }
 }

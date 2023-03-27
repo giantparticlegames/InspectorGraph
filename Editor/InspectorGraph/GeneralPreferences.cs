@@ -9,12 +9,12 @@ using GiantParticle.InspectorGraph.Common.Prefs;
 namespace GiantParticle.InspectorGraph
 {
     [Serializable]
-    internal class GeneralPreferencesData
+    internal partial class GeneralPreferencesData
     {
         public string LastInspectedObjectGUID;
     }
 
-    internal class GeneralPreferences : BasePreference<GeneralPreferencesData>
+    internal partial class GeneralPreferences : BasePreference<GeneralPreferencesData>
     {
         public override string Key => "General";
 

@@ -66,7 +66,9 @@ namespace GiantParticle.InspectorGraph.Common.Prefs
 
         private static void Save(IPreference preference)
         {
-            EditorPrefs.SetString(GenerateKey(preference), JsonUtility.ToJson(preference.Data));
+            string key = GenerateKey(preference);
+            string data = JsonUtility.ToJson(preference.Data);
+            EditorPrefs.SetString(key, data);
         }
 
         private static string GenerateKey(IPreference preference)
