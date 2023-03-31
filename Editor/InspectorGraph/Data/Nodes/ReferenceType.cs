@@ -4,11 +4,17 @@
 // ********************************
 
 using System;
+using GiantParticle.InspectorGraph.Editor.Common;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {
+    internal interface IExtendedReferenceType
+    {
+        string ToStringRepresentation(int value);
+    }
+
     [Serializable]
-    internal partial struct ReferenceType
+    internal struct ReferenceType
     {
         public const int kDirectValue = 1;
         public static readonly ReferenceType Direct = kDirectValue;
@@ -35,11 +41,15 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
                     return "Nested Prefab Reference";
             }
 
-            string retValue = "N/A";
-            ToStringExtended(ref retValue);
-            return retValue;
-        }
+            var instances = ReflectionHelper.InstantiateAllImplementations<IExtendedReferenceType>();
+            for (int i = 0; i < instances.Length; ++i)
+            {
+                var result = instances[i].ToStringRepresentation(Value);
+                if (string.IsNullOrEmpty(result)) continue;
+                return result;
+            }
 
-        partial void ToStringExtended(ref string text);
+            return "N/A";
+        }
     }
 }

@@ -23,24 +23,34 @@ namespace GiantParticle.InspectorGraph
         public Action<Object> CreateCallback;
     }
 
-    internal partial class InspectorGraphToolbar : VisualElement, IDisposable
+    internal interface IInspectorGraphToolbarExtension : IDisposable
+    {
+        void Configure(VisualElement root);
+        void LoadPreferences();
+    }
+
+    internal class InspectorGraphToolbar : VisualElement, IDisposable
     {
         private const string kDocsURL = "https://github.com/giantparticlegames/InspectorGraph/blob/main/README.md";
         private const string kReportBugURL = "https://github.com/giantparticlegames/InspectorGraph/issues/new";
         private const string kWebsite = "https://www.giantparticlegames.com/home/inspector-graph";
         private InspectorGraphToolbarConfig _config;
         private ObjectField _objectField;
+        private IInspectorGraphToolbarExtension[] _extensions;
 
         public InspectorGraphToolbar(InspectorGraphToolbarConfig config)
         {
             _config = config;
+            _extensions = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphToolbarExtension>();
             LoadLayout();
             ConfigureUI();
         }
 
         public void Dispose()
         {
-            OnDispose();
+            if (_extensions != null)
+                for (int i = 0; i < _extensions.Length; ++i)
+                    _extensions[i].Dispose();
         }
 
         private void LoadLayout()
@@ -57,7 +67,9 @@ namespace GiantParticle.InspectorGraph
             ConfigureHelpMenu();
 
             ConfigureActiveObject();
-            ConfigureAutoSelection();
+            if (_extensions != null)
+                for (int i = 0; i < _extensions.Length; ++i)
+                    _extensions[i].Configure(this);
         }
 
         private void ConfigureViewMenu()
@@ -173,11 +185,9 @@ namespace GiantParticle.InspectorGraph
 
             _objectField.value = lastObject;
 
-            LoadAutoSelectionPreferences();
+            if (_extensions != null)
+                for (int i = 0; i < _extensions.Length; ++i)
+                    _extensions[i].LoadPreferences();
         }
-
-        partial void ConfigureAutoSelection();
-        partial void LoadAutoSelectionPreferences();
-        partial void OnDispose();
     }
 }

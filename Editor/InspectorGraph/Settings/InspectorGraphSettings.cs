@@ -5,6 +5,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using UnityEditor;
 using UnityEngine;
@@ -21,7 +22,12 @@ namespace GiantParticle.InspectorGraph.Settings
         IReferenceColorSettings GetReferenceColor(ReferenceType type);
     }
 
-    internal partial class InspectorGraphSettings : ScriptableObject, IInspectorGraphSettings
+    internal interface IExtendedInspectorGraphSettings
+    {
+        void AddExtendedReferenceColors(List<ReferenceColorSettings> referenceColors);
+    }
+
+    internal class InspectorGraphSettings : ScriptableObject, IInspectorGraphSettings
     {
         public const string kDefaultSettingsLocation =
             "Assets/Editor/com.giantparticle.inspector_graph/InspectorGraphSettings.asset";
@@ -76,10 +82,10 @@ namespace GiantParticle.InspectorGraph.Settings
                     highlightedColor: new Color(0, 1, 1, 1)));
             }
 
-            AddExtendedReferenceColors();
+            var extendedInstances = ReflectionHelper.InstantiateAllImplementations<IExtendedInspectorGraphSettings>();
+            for (int i = 0; i < extendedInstances.Length; ++i)
+                extendedInstances[i].AddExtendedReferenceColors(_referenceColors);
         }
-
-        partial void AddExtendedReferenceColors();
 
         private void EnsureDefaultFilters()
         {
