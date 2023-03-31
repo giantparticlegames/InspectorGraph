@@ -35,13 +35,13 @@ namespace GiantParticle.InspectorGraph
         public event Action GUIChanged;
 
         public IObjectNode Node { get; }
-        private bool forceStaticPreviewMode;
+        private bool _forceStaticPreviewMode;
 
 
         public InspectorWindow(IObjectNode node, bool forceStaticPreview = false)
         {
             Node = node;
-            forceStaticPreviewMode = forceStaticPreview;
+            _forceStaticPreviewMode = forceStaticPreview;
             CreateLayout();
             ConfigureWindowManipulation();
         }
@@ -54,8 +54,8 @@ namespace GiantParticle.InspectorGraph
 
         private void CreateLayout()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
-            var xmlLayout = catalog[UIDocumentTypes.InspectorWindow].Asset;
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<InspectorWindowUIDocumentType>>();
+            var xmlLayout = catalog[InspectorWindowUIDocumentType.InspectorWindow].Asset;
             xmlLayout.CloneTree(this);
 
             _content = this.Q<ScrollView>(nameof(_content));
@@ -67,7 +67,7 @@ namespace GiantParticle.InspectorGraph
             title.text = $"[{Node.Target.name}]";
 
             // Toolbar
-            ContentViewMode preferredMode = forceStaticPreviewMode
+            ContentViewMode preferredMode = _forceStaticPreviewMode
                 ? ContentViewMode.StaticPreview
                 : WindowContentFactory.PreferredViewModeForObject(Node.Target);
             var viewModeMenu = new ViewModeMenu(Node.Target);
@@ -141,7 +141,7 @@ namespace GiantParticle.InspectorGraph
             _content.contentContainer.RemoveFromClassList($"{_currentMode}");
 
             _currentMode = mode;
-            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData, forceStaticPreviewMode);
+            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData, _forceStaticPreviewMode);
             _view.ContentChanged += OnContentChanged;
             _content.Add(_view);
             _content.contentContainer.AddToClassList($"{mode}");

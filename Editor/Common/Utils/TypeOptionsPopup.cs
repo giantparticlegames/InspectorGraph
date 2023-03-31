@@ -41,7 +41,7 @@ namespace GiantParticle.InspectorGraph.Editor.Common.Utils
 
         public override void OnOpen()
         {
-            var visualTree = UIDocumentCatalog.GetCatalog()[UIDocumentTypes.TypeOptions].Asset;
+            var visualTree = SettingsUIDocumentCatalog.GetCatalog()[SettingsUIDocumentType.FilterTypeOptions].Asset;
             visualTree.CloneTree(editorWindow.rootVisualElement);
 
             ToolbarSearchField search = editorWindow.rootVisualElement.Q<ToolbarSearchField>("_searchField");

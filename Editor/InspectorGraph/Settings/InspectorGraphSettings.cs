@@ -48,7 +48,7 @@ namespace GiantParticle.InspectorGraph.Settings
         public IReferenceColorSettings GetReferenceColor(ReferenceType type)
         {
             // Assume the order is the same as the enum values
-            return _referenceColors[(int)type];
+            return _referenceColors[type - 1];
         }
 
         private void OnEnable()
@@ -57,7 +57,29 @@ namespace GiantParticle.InspectorGraph.Settings
             EnsureDefaultReferenceColors();
         }
 
-        partial void EnsureDefaultReferenceColors();
+        private void EnsureDefaultReferenceColors()
+        {
+            if (_referenceColors == null) _referenceColors = new List<ReferenceColorSettings>();
+            if (_referenceColors.Count < ReferenceType.Direct)
+            {
+                _referenceColors.Add(new ReferenceColorSettings(
+                    referenceType: ReferenceType.Direct,
+                    normalColor: new Color(1, 1, 1, 0.5f),
+                    highlightedColor: new Color(1, 1, 1, 1)));
+            }
+
+            if (_referenceColors.Count < ReferenceType.NestedPrefab)
+            {
+                _referenceColors.Add(new ReferenceColorSettings(
+                    referenceType: ReferenceType.NestedPrefab,
+                    normalColor: new Color(0, 1, 1, 0.5f),
+                    highlightedColor: new Color(0, 1, 1, 1)));
+            }
+
+            AddExtendedReferenceColors();
+        }
+
+        partial void AddExtendedReferenceColors();
 
         private void EnsureDefaultFilters()
         {

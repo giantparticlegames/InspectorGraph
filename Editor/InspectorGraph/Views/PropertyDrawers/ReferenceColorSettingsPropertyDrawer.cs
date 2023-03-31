@@ -4,6 +4,7 @@
 // ********************************
 
 using GiantParticle.InspectorGraph.Editor.Common;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using GiantParticle.InspectorGraph.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -14,12 +15,14 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
     [CustomPropertyDrawer(typeof(ReferenceColorSettings))]
     internal class ReferenceColorSettingsPropertyDrawer : BasePropertyDrawer
     {
-        protected override UIDocumentTypes DocumentType => UIDocumentTypes.ReferenceColorSettings;
+        protected override SettingsUIDocumentType DocumentType => SettingsUIDocumentType.ReferenceColorSettings;
 
         protected override void CreateFields(VisualElement root, SerializedProperty property)
         {
             Label field = root.Q<Label>("_referenceTypeLabel");
-            field.Bind(property.serializedObject);
+            SerializedProperty refType = property.FindPropertyRelative("_referenceType.Value");
+            var refTypeValue = new ReferenceType(refType.intValue);
+            field.text = refTypeValue.ToString();
 
             ColorField normalColorField = root.Q<ColorField>("_normalColorField");
             normalColorField.Bind(property.serializedObject);

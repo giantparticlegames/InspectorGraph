@@ -9,22 +9,24 @@ using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Editor.Common
 {
-    internal interface IUIDocumentInfo
+    internal interface IUIDocumentInfo<TEnum>
+        where TEnum : Enum
     {
-        UIDocumentTypes Type { get; }
+        TEnum Type { get; }
         VisualTreeAsset Asset { get; }
     }
 
     [Serializable]
-    internal class UIDocumentInfo : IUIDocumentInfo
+    internal abstract class BaseUIDocumentInfo<TEnum> : IUIDocumentInfo<TEnum>
+        where TEnum : Enum
     {
         [SerializeField]
-        private UIDocumentTypes _type;
+        private TEnum _type;
 
         [SerializeField]
         private VisualTreeAsset _asset;
 
-        public UIDocumentTypes Type => _type;
+        public TEnum Type => _type;
         public VisualTreeAsset Asset => _asset;
     }
 }

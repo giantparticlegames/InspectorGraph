@@ -53,33 +53,38 @@ namespace GiantParticle.InspectorGraph
         public void OnEnable()
         {
             GlobalApplicationContext.Instantiate();
-            if (!GlobalApplicationContext.Instance.Contains<IPreferenceHandler>())
+            IApplicationContext context = GlobalApplicationContext.Instance;
+            if (!context.Contains<IPreferenceHandler>())
             {
                 var handler = new PreferenceHandler();
                 handler.LoadAllPreferences();
-                GlobalApplicationContext.Instance.Add<IPreferenceHandler>(handler);
+                context.Add<IPreferenceHandler>(handler);
             }
 
-            if (!GlobalApplicationContext.Instance.Contains<IInspectorGraphSettings>())
-                GlobalApplicationContext.Instance.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
+            if (!context.Contains<IInspectorGraphSettings>())
+                context.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
 
-            if (!GlobalApplicationContext.Instance.Contains<ITypeFilterHandler>())
+            if (!context.Contains<ITypeFilterHandler>())
             {
-                var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
-                GlobalApplicationContext.Instance.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
+                var settings = context.Get<IInspectorGraphSettings>();
+                context.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
             }
 
             if (_nodeFactory == null)
             {
-                var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+                var typeFilterHandler = context.Get<ITypeFilterHandler>();
                 _nodeFactory = new ReferenceNodeFactory(typeFilterHandler);
             }
 
-            if (!GlobalApplicationContext.Instance.Contains<IContentViewRegistry>())
-                GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
+            if (!context.Contains<IContentViewRegistry>())
+                context.Add<IContentViewRegistry>(_viewRegistry);
 
-            if (!GlobalApplicationContext.Instance.Contains<IUIDocumentCatalog>())
-                GlobalApplicationContext.Instance.Add<IUIDocumentCatalog>(UIDocumentCatalog.GetCatalog());
+            // UI Catalogs
+            if (!context.Contains<IUIDocumentCatalog<MainWindowUIDocumentType>>())
+                context.Add<IUIDocumentCatalog<MainWindowUIDocumentType>>(MainWindowUIDocumentCatalog.GetCatalog());
+            if (!context.Contains<IUIDocumentCatalog<InspectorWindowUIDocumentType>>())
+                context.Add<IUIDocumentCatalog<InspectorWindowUIDocumentType>>(InspectorWindowUIDocumentCatalog
+                    .GetCatalog());
         }
 
         public void OnDisable()
@@ -89,8 +94,8 @@ namespace GiantParticle.InspectorGraph
 
         public void CreateGUI()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
-            var layout = catalog[UIDocumentTypes.MainWindow].Asset;
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
+            var layout = catalog[MainWindowUIDocumentType.MainWindow].Asset;
             layout.CloneTree(rootVisualElement);
 
             _windowView = rootVisualElement.Q<VisualElement>(nameof(_windowView));

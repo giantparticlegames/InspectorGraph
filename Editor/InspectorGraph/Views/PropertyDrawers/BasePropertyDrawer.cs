@@ -11,12 +11,12 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
 {
     internal abstract class BasePropertyDrawer : PropertyDrawer
     {
-        protected abstract UIDocumentTypes DocumentType { get; }
+        protected abstract SettingsUIDocumentType DocumentType { get; }
 
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             var root = new VisualElement();
-            var layout = UIDocumentCatalog.GetCatalog()[DocumentType].Asset;
+            var layout = SettingsUIDocumentCatalog.GetCatalog()[DocumentType].Asset;
             layout.CloneTree(root);
             CreateFields(root, property);
 

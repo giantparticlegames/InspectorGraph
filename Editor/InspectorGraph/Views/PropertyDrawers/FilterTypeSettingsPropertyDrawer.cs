@@ -17,7 +17,7 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
     [CustomPropertyDrawer(typeof(FilterTypeSettings))]
     internal class FilterTypeSettingsPropertyDrawer : BasePropertyDrawer
     {
-        protected override UIDocumentTypes DocumentType => UIDocumentTypes.FilterTypeSettings;
+        protected override SettingsUIDocumentType DocumentType => SettingsUIDocumentType.FilterTypeSettings;
 
         protected override void CreateFields(VisualElement root, SerializedProperty property)
         {

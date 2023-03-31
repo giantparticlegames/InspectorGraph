@@ -21,7 +21,7 @@ namespace GiantParticle.InspectorGraph.Settings
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
             var settings = InspectorGraphSettings.GetSettings();
-            var settingsLayout = UIDocumentCatalog.GetCatalog()[UIDocumentTypes.Settings].Asset;
+            var settingsLayout = SettingsUIDocumentCatalog.GetCatalog()[SettingsUIDocumentType.SettingsPanel].Asset;
 
             settingsLayout.CloneTree(rootElement);
 

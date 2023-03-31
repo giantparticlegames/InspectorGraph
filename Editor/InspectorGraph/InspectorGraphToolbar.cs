@@ -45,8 +45,8 @@ namespace GiantParticle.InspectorGraph
 
         private void LoadLayout()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
-            IUIDocumentInfo info = catalog[UIDocumentTypes.MainWindowToolbar];
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
+            IUIDocumentInfo<MainWindowUIDocumentType> info = catalog[MainWindowUIDocumentType.MainWindowToolbar];
             info.Asset.CloneTree(this);
         }
 
