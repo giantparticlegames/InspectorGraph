@@ -3,6 +3,7 @@
 // All rights reserved.
 // ********************************
 
+using System;
 using System.Reflection;
 using GiantParticle.InspectorGraph.Editor.Data;
 using UnityEditor;
@@ -19,7 +20,7 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
         public IMGUIPreviewWindowContent(IWindowData windowData)
         {
             _editor = UnityEditor.Editor.CreateEditor(windowData.Target);
-            ApplyHackForMaterialEditor();
+            ApplyHacksForEditor();
 
             windowData.UpdateSerializedObject(_editor.serializedObject);
             _view = new IMGUIContainer(DrawEditorPreview);
@@ -42,23 +43,48 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
         private void DrawEditorPreview()
         {
             // TODO: Adjust space
-            var rect = EditorGUILayout.BeginHorizontal();
+            var settingsRect = EditorGUILayout.BeginHorizontal();
             _editor.OnPreviewSettings();
             EditorGUILayout.EndHorizontal();
-            _editor.OnPreviewGUI(new Rect(0, rect.height,
-                localBound.width, localBound.height - rect.height), GUIStyle.none);
+
+            var previewRect = new Rect(0, settingsRect.height,
+                localBound.width, localBound.height - settingsRect.height);
+            // _editor.OnPreviewGUI(previewRect, GUIStyle.none);
+            _editor.OnInteractivePreviewGUI(previewRect, GUIStyle.none);
+
+            if (ShouldRefreshConstantly())
+                MarkDirtyRepaint();
         }
 
-        private void ApplyHackForMaterialEditor()
+        private void ApplyHacksForEditor()
         {
-            if (!(_editor is MaterialEditor materialEditor)) return;
-
+            // [MaterialEditor]
             // This hack is to enable changing the shape of the preview mesh, otherwise
             // the mesh will not change when toggling the shape button.
-            var property = typeof(MaterialEditor).GetProperty("firstInspectedEditor",
-                BindingFlags.NonPublic | BindingFlags.Default | BindingFlags.Instance);
-            if (property == null) return;
-            property.SetValue(materialEditor, true);
+            if (_editor is MaterialEditor materialEditor)
+            {
+                var property = typeof(MaterialEditor).GetProperty("firstInspectedEditor",
+                    BindingFlags.NonPublic | BindingFlags.Default | BindingFlags.Instance);
+                if (property == null) return;
+                property.SetValue(materialEditor, true);
+                return;
+            }
+
+            // [AnimationClipEditor]
+            // This hack is to enable preview without crashes
+            if (string.Equals(_editor.GetType().Name, "AnimationClipEditor"))
+            {
+                Type editorType = _editor.GetType();
+                MethodInfo method = editorType.GetMethod("Init",
+                    BindingFlags.NonPublic | BindingFlags.Default | BindingFlags.Instance);
+                method.Invoke(_editor, null);
+            }
+        }
+
+        private bool ShouldRefreshConstantly()
+        {
+            if (string.Equals(_editor.GetType().Name, "AnimationClipEditor")) return true;
+            return false;
         }
     }
 }
