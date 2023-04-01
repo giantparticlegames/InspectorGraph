@@ -12,9 +12,9 @@ namespace GiantParticle.InspectorGraph.Editor
 {
     internal static class ReflectionHelper
     {
-        public static TInterface[] InstantiateAllImplementations<TInterface>(bool allAssemblies = false)
+        public static TInterface[] InstantiateAllImplementations<TInterface>(bool scanAllAssemblies = false)
         {
-            Type[] types = allAssemblies
+            Type[] types = scanAllAssemblies
                 ? GetAllInterfaceImplementationsCurrentAssembly(typeof(TInterface))
                 : GetAllInterfaceImplementations(typeof(TInterface));
 
