@@ -4,12 +4,12 @@
 // ********************************
 
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Common;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Settings
+namespace GiantParticle.InspectorGraph.Editor.Settings
 {
     internal class InspectorGraphSettingsProvider : SettingsProvider
     {
@@ -21,7 +21,7 @@ namespace GiantParticle.InspectorGraph.Settings
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
             var settings = InspectorGraphSettings.GetSettings();
-            var settingsLayout = UIDocumentCatalog.GetCatalog()[UIDocumentTypes.Settings].Asset;
+            var settingsLayout = SettingsUIDocumentCatalog.GetCatalog()[SettingsUIDocumentType.SettingsPanel].Asset;
 
             settingsLayout.CloneTree(rootElement);
 
@@ -38,6 +38,15 @@ namespace GiantParticle.InspectorGraph.Settings
             var filterListField = rootElement.Q<PropertyField>("_filterListField");
             filterListField.bindingPath = nameof(settings._filters);
             filterListField.Bind(serializedSettings);
+
+            var colorsContainer = rootElement.Q<Foldout>("_referenceColorsContainer");
+            var serializedProperty = serializedSettings.FindProperty(nameof(settings._referenceColors));
+            for (int i = 0; i < settings.ReferenceColorSettings.Count; ++i)
+            {
+                var propertyField = new PropertyField(serializedProperty.GetArrayElementAtIndex(i));
+                propertyField.Bind(serializedSettings);
+                colorsContainer.Add(propertyField);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,10 +18,24 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
         private readonly Queue<ObjectNode> _queue = new();
 
         private readonly ITypeFilterHandler _typeFilter;
+        private readonly List<ISerializedPropertyProcessor> _propertyProcessors;
 
         public ReferenceNodeFactory(ITypeFilterHandler filterHandler)
         {
             _typeFilter = filterHandler;
+            _propertyProcessors = new List<ISerializedPropertyProcessor>();
+            // Get all implementations
+            ISerializedPropertyProcessor[] processors = ReflectionHelper.InstantiateAllImplementations<ISerializedPropertyProcessor>();
+            for (int i = 0; i < processors.Length; ++i)
+            {
+                var processor = processors[i];
+                processor.FilterHandler = filterHandler;
+                processor.NodeQueue = _queue;
+                _propertyProcessors.Add(processor);
+            }
+
+            // Sort by priority
+            _propertyProcessors.Sort((processor, propertyProcessor) => processor.Priority - propertyProcessor.Priority);
         }
 
         public IObjectNode CreateGraphFromObject(Object rootObject)
@@ -56,32 +71,13 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
             var iterator = serializedObject.GetIterator();
             while (iterator.NextVisible(true))
             {
-                if (iterator.propertyType != SerializedPropertyType.ObjectReference)
-                    continue;
-
-                var reference = iterator.objectReferenceValue;
-                if (reference == null)
-                    continue;
-                if (!_typeFilter.ShouldShowObject(reference))
-                    continue;
-                if (internalReferences != null && internalReferences.Contains(reference))
-                    continue;
-
-                // Translate component reference to Prefab
-                if (reference is Component)
+                // Iterate over processors
+                for (int i = 0; i < _propertyProcessors.Count; ++i)
                 {
-                    string prefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(reference);
-                    if (!string.IsNullOrEmpty(prefabPath))
-                        reference = AssetDatabase.LoadAssetAtPath<Object>(prefabPath);
+                    var processor = _propertyProcessors[i];
+                    if (processor.ProcessSerializedProperty(iterator, parentNode, internalReferences))
+                        break;
                 }
-
-                ObjectNode childNode = new ObjectNode(new WindowData(reference));
-                parentNode.AddNode(childNode, ReferenceType.Direct);
-
-                // Expand if indicated
-                if (!_typeFilter.ShouldExpandObject(reference))
-                    continue;
-                _queue.Enqueue(childNode);
             }
         }
 
@@ -136,7 +132,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
                 if (!map.ContainsKey(assetPath))
                 {
                     ObjectNode node = new ObjectNode(new WindowData(currentGameObject));
-                    parentNode.AddNode(node, ReferenceType.HierarchyEmbedded);
+                    parentNode.AddNode(node, ReferenceType.NestedPrefab);
                     map.Add(assetPath, node);
                 }
 

@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <uie:Toolbar>
+        <uie:ToolbarMenu display-tooltip-when-elided="true" text="View" name="_viewMenu" style="-unity-text-align: middle-left;" />
+        <uie:ToolbarMenu display-tooltip-when-elided="true" name="_editMenu" text="Edit" style="-unity-text-align: middle-left;" />
+        <uie:ToolbarMenu display-tooltip-when-elided="true" name="_helpMenu" text="Help" style="-unity-text-align: middle-left;" />
+        <ui:VisualElement name="_activeObjectContainer" style="height: 100%; position: absolute; right: 0; flex-direction: row;">
+            <ui:Label text="Active Object:" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+            <uie:ObjectField name="_refField" />
+        </ui:VisualElement>
+    </uie:Toolbar>
+</ui:UXML>

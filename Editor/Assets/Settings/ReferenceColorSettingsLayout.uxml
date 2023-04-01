@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="background-color: rgb(70, 70, 70); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+        <ui:Label text="Label" display-tooltip-when-elided="true" name="_referenceTypeLabel" style="-unity-font-style: bold;" />
+        <uie:ColorField label="Normal Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="_normalColorField" binding-path="_normalColor" />
+        <uie:ColorField label="Highlighted Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="_highlightedColorField" binding-path="_highlightedColor" />
+    </ui:VisualElement>
+</ui:UXML>

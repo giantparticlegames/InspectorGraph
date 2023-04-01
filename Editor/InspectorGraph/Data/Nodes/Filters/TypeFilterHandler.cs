@@ -5,7 +5,7 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Editor.Settings;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
 {
