@@ -7,7 +7,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace GiantParticle.InspectorGraph.Settings
+namespace GiantParticle.InspectorGraph.Editor.Settings
 {
     internal interface IFilterTypeSettings
     {

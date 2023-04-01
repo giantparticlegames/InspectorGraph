@@ -5,10 +5,11 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Editor.Data;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.ContentView
+namespace GiantParticle.InspectorGraph.Editor.ContentView
 {
     internal static class WindowContentFactory
     {

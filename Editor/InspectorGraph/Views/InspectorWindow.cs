@@ -5,15 +5,15 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.ContentView;
-using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
+using GiantParticle.InspectorGraph.Editor.ContentView;
+using GiantParticle.InspectorGraph.Editor.Manipulators;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
-using GiantParticle.InspectorGraph.ToolbarContent;
+using GiantParticle.InspectorGraph.Editor.ToolbarContent;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor.Views
 {
     internal class InspectorWindow : VisualElement, IDisposable
     {

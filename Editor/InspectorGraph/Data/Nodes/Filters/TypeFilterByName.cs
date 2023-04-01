@@ -4,8 +4,7 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Editor.Settings;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
 {

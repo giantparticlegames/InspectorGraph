@@ -3,11 +3,11 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Common;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.PropertyDrawers
+namespace GiantParticle.InspectorGraph.Editor.PropertyDrawers
 {
     internal abstract class BasePropertyDrawer : PropertyDrawer
     {

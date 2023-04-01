@@ -4,7 +4,6 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.Common;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
 {

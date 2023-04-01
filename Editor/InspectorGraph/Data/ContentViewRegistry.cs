@@ -5,10 +5,11 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Editor.Views;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor.Data
 {
     internal interface IContentViewRegistry
     {

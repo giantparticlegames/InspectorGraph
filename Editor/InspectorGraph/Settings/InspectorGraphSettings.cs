@@ -5,12 +5,11 @@
 
 using System.Collections.Generic;
 using System.IO;
-using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using UnityEditor;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Settings
+namespace GiantParticle.InspectorGraph.Editor.Settings
 {
     internal interface IInspectorGraphSettings
     {

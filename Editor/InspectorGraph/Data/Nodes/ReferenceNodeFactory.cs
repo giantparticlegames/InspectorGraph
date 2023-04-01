@@ -5,9 +5,8 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Common;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes.SPropertyProcessors;
+using GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -19,18 +18,17 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
         private readonly Queue<ObjectNode> _queue = new();
 
         private readonly ITypeFilterHandler _typeFilter;
-        private readonly List<ISPropertyProcessor> _propertyProcessors;
+        private readonly List<ISerializedPropertyProcessor> _propertyProcessors;
 
         public ReferenceNodeFactory(ITypeFilterHandler filterHandler)
         {
             _typeFilter = filterHandler;
-            _propertyProcessors = new List<ISPropertyProcessor>();
+            _propertyProcessors = new List<ISerializedPropertyProcessor>();
             // Get all implementations
-            Type[] types =
-                ReflectionHelper.GetAllInterfaceImplementationsCurrentAssembly(typeof(ISPropertyProcessor));
-            for (int i = 0; i < types.Length; ++i)
+            ISerializedPropertyProcessor[] processors = ReflectionHelper.InstantiateAllImplementations<ISerializedPropertyProcessor>();
+            for (int i = 0; i < processors.Length; ++i)
             {
-                var processor = (ISPropertyProcessor)Activator.CreateInstance(types[i]);
+                var processor = processors[i];
                 processor.FilterHandler = filterHandler;
                 processor.NodeQueue = _queue;
                 _propertyProcessors.Add(processor);

@@ -7,7 +7,7 @@ using System;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Settings
+namespace GiantParticle.InspectorGraph.Editor.Settings
 {
     internal interface IReferenceColorSettings
     {

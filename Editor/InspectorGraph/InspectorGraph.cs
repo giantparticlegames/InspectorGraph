@@ -5,12 +5,14 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Common.Prefs;
-using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
+using GiantParticle.InspectorGraph.Editor.Data;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Editor.Manipulators;
+using GiantParticle.InspectorGraph.Editor.Preferences;
+using GiantParticle.InspectorGraph.Editor.Settings;
+using GiantParticle.InspectorGraph.Editor.Views;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -18,7 +20,7 @@ using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor
 {
     internal class InspectorGraph : EditorWindow
     {

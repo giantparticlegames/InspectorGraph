@@ -3,14 +3,14 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Common;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Editor.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.PropertyDrawers
+namespace GiantParticle.InspectorGraph.Editor.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(ReferenceColorSettings))]
     internal class ReferenceColorSettingsPropertyDrawer : BasePropertyDrawer
