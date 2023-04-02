@@ -42,7 +42,7 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
 
         private static bool IsPreviewCompatible(UnityEditor.Editor editor)
         {
-            // Hack for AnimationClipEditor. If not checked the `HasPreviewGUI` function will
+            // Hack for AnimationClipEditor. If not checked, the `HasPreviewGUI` function will
             // throw an exception
             if (string.Equals(editor.GetType().Name, "AnimationClipEditor")) return true;
             return editor.HasPreviewGUI();

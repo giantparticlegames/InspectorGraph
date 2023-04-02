@@ -49,7 +49,6 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
 
             var previewRect = new Rect(0, settingsRect.height,
                 localBound.width, localBound.height - settingsRect.height);
-            // _editor.OnPreviewGUI(previewRect, GUIStyle.none);
             _editor.OnInteractivePreviewGUI(previewRect, GUIStyle.none);
 
             if (ShouldRefreshConstantly())
