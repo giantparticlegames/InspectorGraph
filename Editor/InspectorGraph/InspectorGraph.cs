@@ -172,6 +172,7 @@ namespace GiantParticle.InspectorGraph.Editor
         private void ResetView()
         {
             if (_rootNode == null) return;
+            _content.transform.position = Vector3.zero;
             CreateContentTree(_rootNode.Target);
         }
 
