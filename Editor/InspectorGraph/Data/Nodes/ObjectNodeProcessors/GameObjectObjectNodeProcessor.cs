@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -16,40 +15,14 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
     {
         public override Type TargetType => typeof(GameObject);
 
-        private void PreProcessTarget(ObjectNode node)
-        {
-            // Check if it's a Project Prefab
-            var path = AssetDatabase.GetAssetPath(node.Target);
-            if (string.IsNullOrEmpty(path)) return;
-
-            // Check if it's an imported model
-            var importer = AssetImporter.GetAtPath(path);
-            if (!(importer is ModelImporter modelImporter)) return;
-
-            // Scan for animations
-            TakeInfo[] takes = modelImporter.importedTakeInfos;
-            for (int i = 0; i < takes.Length; ++i)
-            {
-                var method = typeof(ModelImporter).GetMethod("GetPreviewAnimationClipForTake",
-                    BindingFlags.NonPublic | BindingFlags.Default | BindingFlags.Instance);
-                var clip = method.Invoke(modelImporter, new[] { takes[i].name });
-                if (clip == null) continue;
-                if (!(clip is AnimationClip animationClip)) continue;
-
-                // Add to root
-                ObjectNode childNode = new ObjectNode(new WindowData(animationClip));
-                node.AddNode(childNode, ReferenceType.Direct);
-            }
-        }
-
         public override void ProcessNode(ObjectNode node)
         {
             if (!(node.Target is GameObject rootPrefab)) return;
 
             var hierarchyMap = CreateHierarchyMap(rootPrefab, node);
-            var allInternalComponents = GetAllComponentsAsObjects(rootPrefab);
-
-            PreProcessTarget(node);
+            HashSet<Object> internalReferences = new();
+            internalReferences.UnionWith(GetAllComponentsAsObjects(rootPrefab));
+            internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedTarget));
 
             Queue<GameObject> gameObjectQueue = new();
             gameObjectQueue.Enqueue(rootPrefab);
@@ -70,7 +43,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
                     ProcessAllVisibleSerializedProperties(
                         parentNode: parentNode,
                         serializedObject: serializedComponent,
-                        excludeReferences: allInternalComponents);
+                        excludeReferences: internalReferences);
                 }
 
                 // Check child GameObjects

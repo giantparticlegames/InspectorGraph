@@ -3,6 +3,7 @@
 // All rights reserved.
 // ********************************
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
@@ -50,10 +51,22 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
         public IReadOnlyList<IFilterTypeSettings> TypeFilters => _filters;
         public IReadOnlyList<IReferenceColorSettings> ReferenceColorSettings => _referenceColors;
 
+        [NonSerialized]
+        private Dictionary<ReferenceType, IReferenceColorSettings> _referenceColorMap;
+
         public IReferenceColorSettings GetReferenceColor(ReferenceType type)
         {
-            // Assume the order is the same as the enum values
-            return _referenceColors[type - 1];
+            if (_referenceColorMap == null)
+            {
+                _referenceColorMap = new Dictionary<ReferenceType, IReferenceColorSettings>();
+                for (int i = 0; i < _referenceColors.Count; ++i)
+                {
+                    ReferenceColorSettings referenceColor = _referenceColors[i];
+                    _referenceColorMap.Add(referenceColor.ReferenceType, referenceColor);
+                }
+            }
+
+            return _referenceColorMap[type];
         }
 
         private void OnEnable()
@@ -65,7 +78,8 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
         private void EnsureDefaultReferenceColors()
         {
             if (_referenceColors == null) _referenceColors = new List<ReferenceColorSettings>();
-            if (_referenceColors.Count < ReferenceType.Direct)
+
+            if (!_referenceColors.Exists(settings => settings.ReferenceType == ReferenceType.Direct))
             {
                 _referenceColors.Add(new ReferenceColorSettings(
                     referenceType: ReferenceType.Direct,
@@ -73,7 +87,7 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
                     highlightedColor: new Color(1, 1, 1, 1)));
             }
 
-            if (_referenceColors.Count < ReferenceType.NestedPrefab)
+            if (!_referenceColors.Exists(settings => settings.ReferenceType == ReferenceType.NestedPrefab))
             {
                 _referenceColors.Add(new ReferenceColorSettings(
                     referenceType: ReferenceType.NestedPrefab,

@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors;
 using UnityEditor;
 using Object = UnityEngine.Object;
@@ -13,6 +14,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
 {
     internal abstract class BaseObjectNodeProcessor : IObjectNodeProcessor
     {
+        private static readonly Regex PointerRegex = new Regex("PPtr<.*>", RegexOptions.Compiled);
         public abstract Type TargetType { get; }
         protected IReadOnlyList<ISerializedPropertyProcessor> PropertyProcessors { get; private set; }
 
@@ -22,6 +24,44 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
         }
 
         public abstract void ProcessNode(ObjectNode node);
+
+        protected static HashSet<Object> CreateInternalReferenceSet(SerializedObject serializedObject)
+        {
+            var objectSet = new HashSet<Object>();
+            objectSet.Add(serializedObject.targetObject);
+
+            string objectPath = AssetDatabase.GetAssetPath(serializedObject.targetObject);
+            if (string.IsNullOrEmpty(objectPath))
+                return objectSet;
+
+            Queue<SerializedObject> objectQueue = new Queue<SerializedObject>();
+            objectQueue.Enqueue(serializedObject);
+
+            while (objectQueue.Count > 0)
+            {
+                var currentObject = objectQueue.Dequeue();
+                // Iterate fields
+                var refIterator = currentObject.GetIterator();
+                while (refIterator.Next(true))
+                {
+                    // Check only PPtr<*> types, otherwise we will see errors in the console
+                    if (!PointerRegex.IsMatch(refIterator.type)) continue;
+
+                    var objReference = refIterator.objectReferenceValue;
+                    if (objReference == null) continue;
+                    if (objectSet.Contains(objReference)) continue;
+
+                    var refPath = AssetDatabase.GetAssetPath(objReference);
+                    if (string.IsNullOrEmpty(refPath)) continue;
+                    if (!string.Equals(objectPath, refPath)) continue;
+
+                    objectSet.Add(objReference);
+                    objectQueue.Enqueue(new SerializedObject(objReference));
+                }
+            }
+
+            return objectSet;
+        }
 
         protected void ProcessAllVisibleSerializedProperties(ObjectNode parentNode, SerializedObject serializedObject,
             HashSet<Object> excludeReferences = null)
@@ -67,15 +107,26 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
             ObjectNode node)
         {
             SerializedObject serializedObject = node.WindowData.SerializedTarget;
-            SerializedProperty iterator = serializedObject.GetIterator();
-            while (iterator.NextVisible(true))
+
+            Queue<SerializedObject> queue = new Queue<SerializedObject>();
+            HashSet<Object> internalReferences = CreateInternalReferenceSet(serializedObject);
+            foreach (Object internalObject in internalReferences)
+                queue.Enqueue(new SerializedObject(internalObject));
+
+            // Scan all internal objects
+            while (queue.Count > 0)
             {
-                // Iterate over processors
-                for (int i = 0; i < propertyProcessors.Count; ++i)
+                SerializedObject currentObject = queue.Dequeue();
+                SerializedProperty iterator = currentObject.GetIterator();
+                while (iterator.NextVisible(true))
                 {
-                    var processor = propertyProcessors[i];
-                    if (processor.ProcessSerializedProperty(iterator, node, null))
-                        break;
+                    // Iterate over processors
+                    for (int i = 0; i < propertyProcessors.Count; ++i)
+                    {
+                        var processor = propertyProcessors[i];
+                        if (processor.ProcessSerializedProperty(iterator, node, internalReferences))
+                            break;
+                    }
                 }
             }
         }
