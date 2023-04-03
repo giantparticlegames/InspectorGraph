@@ -23,7 +23,12 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
             if (mode == ContentViewMode.Preview)
             {
                 var tmpEditor = UnityEditor.Editor.CreateEditor(obj);
-                bool isCompatible = tmpEditor.HasPreviewGUI();
+                bool isCompatible = false;
+                // Hack for AnimationClipEditor. If not checked, the `HasPreviewGUI` function will
+                // throw an exception
+                if (string.Equals(tmpEditor.GetType().Name, "AnimationClipEditor")) isCompatible = true;
+                else isCompatible = tmpEditor.HasPreviewGUI();
+
                 UnityEditor.Editor.DestroyImmediate(tmpEditor);
                 return isCompatible;
             }
