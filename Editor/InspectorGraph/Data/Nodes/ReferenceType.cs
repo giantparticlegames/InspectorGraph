@@ -15,9 +15,9 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
     [Serializable]
     internal struct ReferenceType
     {
-        public const int kDirectValue = 1;
+        private const int kDirectValue = 1;
         public static readonly ReferenceType Direct = kDirectValue;
-        public const int kNestedPrefabValue = 2;
+        private const int kNestedPrefabValue = 2;
         public static readonly ReferenceType NestedPrefab = kNestedPrefabValue;
 
         public int Value;
