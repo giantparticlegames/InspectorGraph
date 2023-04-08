@@ -19,7 +19,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
         {
             if (!(node.Target is GameObject rootPrefab)) return;
 
-            var hierarchyMap = CreateHierarchyMap(rootPrefab, node);
+            Dictionary<string, ObjectNode> hierarchyMap = CreateHierarchyMap(rootPrefab, node);
             HashSet<Object> internalReferences = new();
             internalReferences.UnionWith(GetAllComponentsAsObjects(rootPrefab));
             internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedTarget));
@@ -35,10 +35,9 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
                 for (int i = 0; i < components.Length; ++i)
                 {
                     var currentComponent = components[i];
-                    string componentPrefabSource =
-                        PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(currentComponent);
+                    string componentAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(currentComponent);
 
-                    var parentNode = hierarchyMap[componentPrefabSource];
+                    var parentNode = hierarchyMap[componentAssetPath];
                     var serializedComponent = new SerializedObject(currentComponent);
                     ProcessAllVisibleSerializedProperties(
                         parentNode: parentNode,

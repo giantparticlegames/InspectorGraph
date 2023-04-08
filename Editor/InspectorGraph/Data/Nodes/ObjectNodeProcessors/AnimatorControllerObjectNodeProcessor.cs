@@ -15,7 +15,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
     /// The AnimatorController structure is similar to a GameObject in the sense that it contains references to objects
     /// that are declared inside the same file, hence, we need to extract and scan all those objects to properly detect
     /// references to other files like AnimationClips.
-    /// One main difference with other objects is that it's references are all hidden.
+    /// One main difference with other objects is that its references are all hidden.
     /// </summary>
     internal class AnimatorControllerObjectNodeProcessor : BaseObjectNodeProcessor
     {

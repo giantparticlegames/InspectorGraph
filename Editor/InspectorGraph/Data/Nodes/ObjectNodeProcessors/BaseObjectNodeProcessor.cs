@@ -14,7 +14,9 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
 {
     internal abstract class BaseObjectNodeProcessor : IObjectNodeProcessor
     {
+        private const string kBuiltInResources = "Resources";
         private static readonly Regex PointerRegex = new Regex("PPtr<.*>", RegexOptions.Compiled);
+
         public abstract Type TargetType { get; }
         protected IReadOnlyList<ISerializedPropertyProcessor> PropertyProcessors { get; private set; }
 
@@ -53,6 +55,9 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
 
                     var refPath = AssetDatabase.GetAssetPath(objReference);
                     if (string.IsNullOrEmpty(refPath)) continue;
+                    // If it's a built-in resource we do not consider any as internal reference
+                    if (refPath.StartsWith(kBuiltInResources)) continue;
+                    // If the asset path is different than the parent, is not an internal reference
                     if (!string.Equals(objectPath, refPath)) continue;
 
                     objectSet.Add(objReference);
@@ -117,6 +122,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
             while (queue.Count > 0)
             {
                 SerializedObject currentObject = queue.Dequeue();
+                // Scan all internal values
                 SerializedProperty iterator = currentObject.GetIterator();
                 while (iterator.NextVisible(true))
                 {
