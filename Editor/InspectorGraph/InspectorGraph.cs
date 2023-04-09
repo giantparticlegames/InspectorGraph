@@ -397,6 +397,7 @@ namespace GiantParticle.InspectorGraph.Editor
             }
 
             _content.ResizeToFit<InspectorWindow>();
+            UpdateWindowVisibility();
         }
 
         private void OnInspectorWindowMoved(VisualElement window)
