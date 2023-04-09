@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using GiantParticle.InspectorGraph.Editor.ContentView;
 using GiantParticle.InspectorGraph.Editor.Manipulators;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Settings;
 using GiantParticle.InspectorGraph.Editor.ToolbarContent;
 using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using UnityEditor.UIElements;
@@ -44,6 +45,7 @@ namespace GiantParticle.InspectorGraph.Editor.Views
             _forceStaticPreviewMode = forceStaticPreview;
             CreateLayout();
             ConfigureWindowManipulation();
+            UpdateSettings();
         }
 
         public void Dispose()
@@ -86,11 +88,6 @@ namespace GiantParticle.InspectorGraph.Editor.Views
             SwitchView(preferredMode);
         }
 
-        public void UpdateView()
-        {
-            _quickStatsView.UpdateView();
-        }
-
         private void ConfigureWindowManipulation()
         {
             var header = this.Q<VisualElement>("_header");
@@ -124,6 +121,21 @@ namespace GiantParticle.InspectorGraph.Editor.Views
             // Front
             var bringToFront = new BringToFrontManipulator(this);
             _manipulators.Add(bringToFront);
+        }
+
+        private void UpdateSettings()
+        {
+            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
+            var sizeSettings = settings.GetSizeForWindowViewMode(_currentMode);
+            this.style.width = new StyleLength(sizeSettings.Size.x);
+            this.style.maxHeight = new StyleLength(sizeSettings.Size.y);
+            if (_currentMode == ContentViewMode.Preview || _currentMode == ContentViewMode.StaticPreview)
+                this.style.height = new StyleLength(sizeSettings.Size.y);
+        }
+
+        public void UpdateView()
+        {
+            _quickStatsView.UpdateView();
         }
 
         public void DisposeContent()

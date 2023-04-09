@@ -26,8 +26,6 @@ namespace GiantParticle.InspectorGraph.Editor
     {
         private const int kPositionXOffset = 80;
         private const int kPositionYOffset = 30;
-        private const int kDefaultWindowMaxWidth = 400;
-        private const int kDefaultWindowMaxHeight = 300;
 
         private ContentViewRegistry _viewRegistry = new();
         private HashSet<InspectorWindow> _waitForResize = new();
@@ -287,8 +285,6 @@ namespace GiantParticle.InspectorGraph.Editor
             var window = new InspectorWindow(
                 node: node,
                 forceStaticPreview: _viewRegistry.WindowCount > settings.MaxPreviewWindows);
-            window.style.width = new StyleLength(kDefaultWindowMaxWidth);
-            window.style.maxHeight = new StyleLength(kDefaultWindowMaxHeight);
             window.style.position = new StyleEnum<Position>(Position.Absolute);
 
             _content.Add(window);
@@ -348,6 +344,7 @@ namespace GiantParticle.InspectorGraph.Editor
             queue.Enqueue(new Tuple<IObjectNode, int>(_rootNode, 0));
             HashSet<InspectorWindow> windowsVisited = new();
 
+            List<float> maxWidthPerLevel = new List<float>();
             float currentY = 0;
             int currentLevel = 0;
             while (queue.Count > 0)
@@ -371,11 +368,21 @@ namespace GiantParticle.InspectorGraph.Editor
                 // Avoid reposition already repositioned window
                 if (windowsVisited.Contains(window)) continue;
 
+                // Store max width
+                if (maxWidthPerLevel.Count > level)
+                    maxWidthPerLevel[level] = Math.Max(maxWidthPerLevel[level], window.contentRect.width);
+                else
+                    maxWidthPerLevel.Add(window.contentRect.width);
+
                 // Avoid moving manually moved window
                 if (!window.Node.WindowData.HasBeenManuallyMoved)
                 {
+                    float newPositionX = 0;
+                    for (int i = 0; i < level; ++i)
+                        newPositionX += maxWidthPerLevel[i] + kPositionXOffset;
+
                     window.transform.position = new Vector3(
-                        x: level * (kDefaultWindowMaxWidth + kPositionXOffset),
+                        x: newPositionX,
                         y: currentY,
                         z: 0);
                 }

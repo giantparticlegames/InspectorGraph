@@ -17,6 +17,11 @@
             <ui:Label text="Indicate the colors for the lines that represent references" display-tooltip-when-elided="true" style="white-space: normal;" />
             <uie:PropertyField name="_referenceColorsField" label="Reference Colors" />
             <ui:Foldout text="Colors" name="_referenceColorsContainer" style="-unity-font-style: normal;" />
+            <ui:VisualElement>
+                <ui:Label text="Default Window Size" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
+                <ui:Label text="Indicate the default window size for each view mode" display-tooltip-when-elided="true" style="white-space: normal;" />
+                <ui:Foldout name="_defaultWindowSizes" text="Sizes" />
+            </ui:VisualElement>
         </ui:GroupBox>
         <ui:GroupBox>
             <ui:Label text="Filters" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
