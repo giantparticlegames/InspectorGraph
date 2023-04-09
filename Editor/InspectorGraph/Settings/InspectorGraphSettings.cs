@@ -142,12 +142,12 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
             }
             if (!_defaultWindowSize.Exists(settings => settings.Mode == ContentViewMode.StaticPreview))
             {
-                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.InspectorElement,
+                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.StaticPreview,
                     size: new Vector2Int(300, 130)));
             }
             if (!_defaultWindowSize.Exists(settings => settings.Mode == ContentViewMode.IMGUI))
             {
-                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.InspectorElement,
+                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.IMGUI,
                     size: new Vector2Int(400, 300)));
             }
         }
