@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using GiantParticle.InspectorGraph.Editor.ContentView;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using UnityEditor;
 using UnityEngine;
@@ -18,8 +19,10 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
         int MaxWindows { get; }
         IReadOnlyList<IFilterTypeSettings> TypeFilters { get; }
         IReadOnlyList<IReferenceColorSettings> ReferenceColorSettings { get; }
+        IReadOnlyList<IInspectorWindowSizeSettings> InspectorWindowSizeSettings { get; }
 
         IReferenceColorSettings GetReferenceColor(ReferenceType type);
+        IInspectorWindowSizeSettings GetSizeForWindowViewMode(ContentViewMode mode);
     }
 
     internal interface IExtendedInspectorGraphSettings
@@ -46,13 +49,20 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
         [SerializeField]
         internal List<FilterTypeSettings> _filters;
 
+        [SerializeField]
+        internal List<InspectorWindowSizeSettings> _defaultWindowSize;
+
         public int MaxPreviewWindows => _maxPreviewWindows;
         public int MaxWindows => _maxWindows;
         public IReadOnlyList<IFilterTypeSettings> TypeFilters => _filters;
         public IReadOnlyList<IReferenceColorSettings> ReferenceColorSettings => _referenceColors;
+        public IReadOnlyList<IInspectorWindowSizeSettings> InspectorWindowSizeSettings => _defaultWindowSize;
 
         [NonSerialized]
         private Dictionary<ReferenceType, IReferenceColorSettings> _referenceColorMap;
+
+        [NonSerialized]
+        private Dictionary<ContentViewMode, IInspectorWindowSizeSettings> _windowSizeMap;
 
         public IReferenceColorSettings GetReferenceColor(ReferenceType type)
         {
@@ -69,10 +79,26 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
             return _referenceColorMap[type];
         }
 
+        public IInspectorWindowSizeSettings GetSizeForWindowViewMode(ContentViewMode mode)
+        {
+            if (_windowSizeMap == null)
+            {
+                _windowSizeMap = new Dictionary<ContentViewMode, IInspectorWindowSizeSettings>();
+                for (int i = 0; i < _defaultWindowSize.Count; ++i)
+                {
+                    InspectorWindowSizeSettings windowSize = _defaultWindowSize[i];
+                    _windowSizeMap.Add(windowSize.Mode, windowSize);
+                }
+            }
+
+            return _windowSizeMap[mode];
+        }
+
         private void OnEnable()
         {
             EnsureDefaultFilters();
             EnsureDefaultReferenceColors();
+            EnsureDefaultWindowSizes();
         }
 
         private void EnsureDefaultReferenceColors()
@@ -98,6 +124,32 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
             var extendedInstances = ReflectionHelper.InstantiateAllImplementations<IExtendedInspectorGraphSettings>();
             for (int i = 0; i < extendedInstances.Length; ++i)
                 extendedInstances[i].AddExtendedReferenceColors(_referenceColors);
+        }
+
+        private void EnsureDefaultWindowSizes()
+        {
+            if (_defaultWindowSize == null) _defaultWindowSize = new List<InspectorWindowSizeSettings>();
+
+            if (!_defaultWindowSize.Exists(settings => settings.Mode == ContentViewMode.Preview))
+            {
+                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.Preview,
+                    size: new Vector2Int(300, 300)));
+            }
+            if (!_defaultWindowSize.Exists(settings => settings.Mode == ContentViewMode.InspectorElement))
+            {
+                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.InspectorElement,
+                    size: new Vector2Int(300, 300)));
+            }
+            if (!_defaultWindowSize.Exists(settings => settings.Mode == ContentViewMode.StaticPreview))
+            {
+                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.InspectorElement,
+                    size: new Vector2Int(300, 130)));
+            }
+            if (!_defaultWindowSize.Exists(settings => settings.Mode == ContentViewMode.IMGUI))
+            {
+                _defaultWindowSize.Add(new InspectorWindowSizeSettings(mode: ContentViewMode.InspectorElement,
+                    size: new Vector2Int(400, 300)));
+            }
         }
 
         private void EnsureDefaultFilters()
@@ -136,6 +188,7 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
             settings = CreateInstance<InspectorGraphSettings>();
             settings.EnsureDefaultFilters();
             settings.EnsureDefaultReferenceColors();
+            settings.EnsureDefaultWindowSizes();
             Directory.CreateDirectory(Path.GetDirectoryName(kDefaultSettingsLocation));
             // Save
             AssetDatabase.CreateAsset(settings, kDefaultSettingsLocation);

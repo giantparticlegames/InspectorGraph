@@ -40,12 +40,21 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
             filterListField.Bind(serializedSettings);
 
             var colorsContainer = rootElement.Q<Foldout>("_referenceColorsContainer");
-            var serializedProperty = serializedSettings.FindProperty(nameof(settings._referenceColors));
+            var refColorsSerializedProperty = serializedSettings.FindProperty(nameof(settings._referenceColors));
             for (int i = 0; i < settings.ReferenceColorSettings.Count; ++i)
             {
-                var propertyField = new PropertyField(serializedProperty.GetArrayElementAtIndex(i));
+                var propertyField = new PropertyField(refColorsSerializedProperty.GetArrayElementAtIndex(i));
                 propertyField.Bind(serializedSettings);
                 colorsContainer.Add(propertyField);
+            }
+
+            var defaultSizesList = rootElement.Q<Foldout>("_defaultWindowSizes");
+            var windowSizesSerializedProperty = serializedSettings.FindProperty(nameof(settings._defaultWindowSize));
+            for (int i = 0; i < settings.ReferenceColorSettings.Count; ++i)
+            {
+                var propertyField = new PropertyField(windowSizesSerializedProperty.GetArrayElementAtIndex(i));
+                propertyField.Bind(serializedSettings);
+                defaultSizesList.Add(propertyField);
             }
         }
     }

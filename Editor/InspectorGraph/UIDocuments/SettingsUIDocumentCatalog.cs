@@ -13,7 +13,8 @@ namespace GiantParticle.InspectorGraph.Editor.UIDocuments
         SettingsPanel = 1,
         ReferenceColorSettings = 100,
         FilterTypeSettings = 200,
-        FilterTypeOptions = 201
+        FilterTypeOptions = 201,
+        WindowSizeSettings = 300
     }
 
     [Serializable]
