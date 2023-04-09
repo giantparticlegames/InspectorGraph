@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.10.0-b] 2023-04-08
+
+## Added
+* **Settings**
+    * Added option to change reference arrows color in settings
+    * Added Settings for default inspector window size based on view mode
+    * Made settings panel scrollable
+
+## Changed
+* Excluded references to same asset from the visualization (Example: `Texture2D` references from `Sprite`)
+* **Project**
+    * Organized files into a more understandable structure
+    * Renamed namespaces for consistency
+    * Split `UIDocumentCatalog` into separate catalogs based on context:
+        * `InspectorWindowUIDocumentCatalog` for Floating Inspector Window related UI
+        * `MainWindowUIDocumentCatalog` for Main Inspector Graph Window related UI
+        * `SettingsUIDocumentCatalog` for Settings related UI
+        * Refactored InspectorGraph window toolbar into own class `InspectorGraphToolbar`
+* **UI**
+    * Changed way to move around the graph from using scrollbars to drag with middle button
+
+## Fixed
+* Changed saved last inspected object by path to by GUID
+* Added Workaround to properly display Animation Previews
+* Fixed missing connection lines when toggling `view > expand` on filters
+* Optimized rendering by hiding Inspector windows that are not visible within the viewport
+
 ## [0.9.0-b] 2023-03-01
 
 ### Added

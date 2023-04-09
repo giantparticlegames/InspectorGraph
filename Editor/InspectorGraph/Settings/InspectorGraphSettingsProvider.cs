@@ -50,7 +50,7 @@ namespace GiantParticle.InspectorGraph.Editor.Settings
 
             var defaultSizesList = rootElement.Q<Foldout>("_defaultWindowSizes");
             var windowSizesSerializedProperty = serializedSettings.FindProperty(nameof(settings._defaultWindowSize));
-            for (int i = 0; i < settings.ReferenceColorSettings.Count; ++i)
+            for (int i = 0; i < settings.InspectorWindowSizeSettings.Count; ++i)
             {
                 var propertyField = new PropertyField(windowSizesSerializedProperty.GetArrayElementAtIndex(i));
                 propertyField.Bind(serializedSettings);

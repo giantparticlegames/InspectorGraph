@@ -33,11 +33,15 @@ The Inspector Graph is a tool to better visualize, understand and manipulate obj
     - [Highlighting](#highlighting)
 
 ## Main Features
-* Object display as individual floating window
+* Floating inspector window per object
 * Multiple View modes available per object
+  * Direct Reference
+  * Nested Prefab
 * Visual representation of references from and to objects
 * In-Place field editing
 * Zoom control for better visualization
+* Per project settings with customization options
+* Object type filtering
 * and more...
 
 ## Change log
@@ -50,9 +54,11 @@ By default, the data is saved in your project under `Assets/Editor/com.giantpart
 
 ![Project Settings](.docs/ProjectSettings.png)
 
-### General settings
+### Visualization settings
 * **Max Windows**: Indicate the maximum number of Inspector Windows that will be displayed. `100` is the maximum limit, otherwise Unity starts to complain about it.
 * **Max Preview Windows**: Indicate the maximum number of windows that can display the Preview Mode. After this number is reached, new windows will be forced to display a static preview (Icon based on the object type). This is to avoid potential performance issues, feel free to change this value if your computer is capable and/or your project is not that resource intensive.
+* **Diagram Connection Colors**: Indicate the colors used for each representation of a reference.
+* **Default Window Size**: Indicate the default size of each Inspector Window based on the View Mode
 
 ### Filters
 Filters are an easy way to control the visibility or expansion of objects of certain types. In this section you can add or remove filters based on your preferences and the types available in your project.
