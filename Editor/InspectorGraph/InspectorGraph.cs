@@ -108,9 +108,13 @@ namespace GiantParticle.InspectorGraph.Editor
             var toolbarContainer = rootVisualElement.Q<VisualElement>("_toolbarContainer");
             toolbarContainer.Add(_toolbar);
 
+            var zoomController = new ContentZoomController(_content);
             var footer = rootVisualElement.Q<Toolbar>("_footer");
-            footer.Add(new ContentZoomController(_content));
+            footer.Add(zoomController);
+            zoomController.ZoomLevelChanged += element => UpdateWindowVisibility();
+
             var moveManipulator = new DragManipulator(_windowView, _content, ManipulatorButton.Middle);
+            moveManipulator.PositionChanged += element => UpdateWindowVisibility();
 
             _toolbar.LoadPreferences();
         }
@@ -309,13 +313,14 @@ namespace GiantParticle.InspectorGraph.Editor
                 {
                     var targetWindow = _viewRegistry.WindowByTarget(nodeReference.TargetNode.Target);
                     if (targetWindow == null) continue;
-                    if (_viewRegistry.ContainsConnection(sourceWindow, targetWindow)) continue;
-
-                    var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
-                    _content.Add(line);
-                    line.SendToBack();
-                    // Register line
-                    _viewRegistry.RegisterConnection(line);
+                    if (!_viewRegistry.ContainsConnection(sourceWindow, targetWindow))
+                    {
+                        var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
+                        _content.Add(line);
+                        line.SendToBack();
+                        // Register line
+                        _viewRegistry.RegisterConnection(line);
+                    }
 
                     queue.Enqueue(nodeReference.TargetNode);
                 }
@@ -399,6 +404,14 @@ namespace GiantParticle.InspectorGraph.Editor
             if (window is InspectorWindow inspectorWindow)
                 inspectorWindow.Node.WindowData.HasBeenManuallyMoved = true;
             _content.ResizeToFit<InspectorWindow>();
+        }
+
+        private void UpdateWindowVisibility()
+        {
+            _viewRegistry.ExecuteOnEachWindow(window =>
+            {
+                window.visible = _windowView.worldBound.Overlaps(window.worldBound);
+            });
         }
     }
 }
