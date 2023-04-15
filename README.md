@@ -7,7 +7,7 @@ The Inspector Graph is a tool to better visualize, understand and manipulate obj
 - [Main Features](#main-features)
 - [Change log](#change-log)
 - [Project Settings](#project-settings)
-  - [General settings](#general-settings)
+  - [Visualization settings](#visualization-settings)
   - [Filters](#filters)
 - [Main Window](#main-window)
   - [View Menu](#view-menu)
