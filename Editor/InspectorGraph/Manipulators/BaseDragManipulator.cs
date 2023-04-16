@@ -97,8 +97,7 @@ namespace GiantParticle.InspectorGraph.Editor.Manipulators
             bool activate = false;
             for (int i = 0; i < _activators.Length; ++i)
             {
-                ActivatorCombination combination = _activators[i];
-                if (combination.ShouldActivate(evt))
+                if (_activators[i].ShouldActivate(evt))
                 {
                     activate = true;
                     break;
