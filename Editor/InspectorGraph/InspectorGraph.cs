@@ -117,7 +117,11 @@ namespace GiantParticle.InspectorGraph.Editor
                 new[]
                 {
                     new ActivatorCombination(ManipulatorButton.Middle),
-                    new ActivatorCombination(ManipulatorButton.Left, EventModifiers.Command | EventModifiers.Alt)
+                    Application.platform == RuntimePlatform.OSXEditor
+                        ? new ActivatorCombination(ManipulatorButton.Left,
+                            EventModifiers.Alt | EventModifiers.Command)
+                        : new ActivatorCombination(ManipulatorButton.Left,
+                            EventModifiers.Alt | EventModifiers.Control)
                 });
             moveManipulator.PositionChanged += element => UpdateWindowVisibility();
 
