@@ -17,8 +17,8 @@ namespace GiantParticle.InspectorGraph.Editor.Manipulators
         private bool _enabled;
 
         public DragManipulator(VisualElement handle, VisualElement target,
-            ManipulatorButton activatorButton = ManipulatorButton.Left) :
-            base(handle, activatorButton)
+            ActivatorCombination[] activators = null) :
+            base(handle, activators)
         {
             _dragTarget = target;
         }

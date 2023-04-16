@@ -19,12 +19,37 @@ namespace GiantParticle.InspectorGraph.Editor.Manipulators
         Middle = 2
     }
 
+    internal struct ActivatorCombination
+    {
+        public ManipulatorButton MouseButton;
+        public EventModifiers Modifiers;
+
+        public ActivatorCombination(ManipulatorButton mouseButton)
+        {
+            MouseButton = mouseButton;
+            Modifiers = EventModifiers.None;
+        }
+
+        public ActivatorCombination(ManipulatorButton mouseButton, EventModifiers modifiers)
+        {
+            MouseButton = mouseButton;
+            Modifiers = modifiers;
+        }
+
+        public bool ShouldActivate(PointerDownEvent evt)
+        {
+            if (Modifiers != EventModifiers.None && Modifiers != evt.modifiers) return false;
+            if (MouseButton == (ManipulatorButton)evt.button) return true;
+            return false;
+        }
+    }
+
     internal abstract class BaseDragManipulator : PointerManipulator, IScalableManipulator
     {
         private Vector3 _startClickPosition;
         private Vector3 _deltaClickPosition;
         private bool _enabled;
-        private ManipulatorButton _activatorButton;
+        private ActivatorCombination[] _activators;
 
         protected Vector3 StartPosition => _startClickPosition;
 
@@ -41,10 +66,10 @@ namespace GiantParticle.InspectorGraph.Editor.Manipulators
             set => _movementScale = value;
         }
 
-        protected BaseDragManipulator(VisualElement handle, ManipulatorButton activatorButton = ManipulatorButton.Left)
+        protected BaseDragManipulator(VisualElement handle, ActivatorCombination[] activators = null)
         {
             this.target = handle;
-            _activatorButton = activatorButton;
+            _activators = activators ?? new[] { new ActivatorCombination(ManipulatorButton.Left) };
         }
 
         protected override void RegisterCallbacksOnTarget()
@@ -69,7 +94,17 @@ namespace GiantParticle.InspectorGraph.Editor.Manipulators
         {
             if (_enabled) return;
             if (target.HasPointerCapture(evt.pointerId)) return;
-            if (_activatorButton != (ManipulatorButton)evt.button) return;
+            bool activate = false;
+            for (int i = 0; i < _activators.Length; ++i)
+            {
+                if (_activators[i].ShouldActivate(evt))
+                {
+                    activate = true;
+                    break;
+                }
+            }
+
+            if (!activate) return;
 
             _startClickPosition = evt.position;
             target.CapturePointer(evt.pointerId);
