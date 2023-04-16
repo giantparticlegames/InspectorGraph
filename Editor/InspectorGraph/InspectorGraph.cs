@@ -113,7 +113,12 @@ namespace GiantParticle.InspectorGraph.Editor
             footer.Add(zoomController);
             zoomController.ZoomLevelChanged += element => UpdateWindowVisibility();
 
-            var moveManipulator = new DragManipulator(_windowView, _content, ManipulatorButton.Middle);
+            var moveManipulator = new DragManipulator(_windowView, _content,
+                new[]
+                {
+                    new ActivatorCombination(ManipulatorButton.Middle),
+                    new ActivatorCombination(ManipulatorButton.Left, EventModifiers.Command | EventModifiers.Alt)
+                });
             moveManipulator.PositionChanged += element => UpdateWindowVisibility();
 
             _toolbar.LoadPreferences();
