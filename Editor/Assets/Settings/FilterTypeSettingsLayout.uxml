@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:TextField picking-mode="Ignore" label="Type Full Name" name="_fullyQualifiedName" binding-path="_fullyQualifiedName" tooltip="Fully Qualified Name of the Type" />
+    <ui:VisualElement style="flex-direction: column;">
+        <ui:Toggle label="Display Type" binding-path="_showType" tooltip="Indicate to display objects of this type in the visualization" name="_showType" />
+        <ui:Toggle label="Expand Type" binding-path="_expandType" tooltip="Indicate to expand the graph from objects of this type (Object must be visible)" name="_expandType" />
+    </ui:VisualElement>
+</ui:UXML>

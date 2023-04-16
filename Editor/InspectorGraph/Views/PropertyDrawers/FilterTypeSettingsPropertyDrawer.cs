@@ -3,31 +3,22 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Editor.Settings;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using PopupWindow = UnityEditor.PopupWindow;
-using GiantParticle.InspectorGraph.Editor.Common.Utils;
 
-namespace GiantParticle.InspectorGraph.PropertyDrawers
+namespace GiantParticle.InspectorGraph.Editor.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(FilterTypeSettings))]
-    internal class FilterTypeSettingsPropertyDrawer : PropertyDrawer
+    internal class FilterTypeSettingsPropertyDrawer : BasePropertyDrawer
     {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            var root = new VisualElement();
-            var layout = UIDocumentCatalog.GetCatalog()[UIDocumentTypes.FilterTypeSettings].Asset;
-            layout.CloneTree(root);
-            CreateFields(root, property);
+        protected override SettingsUIDocumentType DocumentType => SettingsUIDocumentType.FilterTypeSettings;
 
-            return root;
-        }
-
-        private void CreateFields(VisualElement root, SerializedProperty property)
+        protected override void CreateFields(VisualElement root, SerializedProperty property)
         {
             TextField field = root.Q<TextField>("_fullyQualifiedName");
             field.Bind(property.serializedObject);
@@ -36,7 +27,7 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
             {
                 PopupWindow.Show(
                     new Rect(evt.position, Vector2.zero),
-                    new TypeOptionsPopup(ReflectionHelper.ListAllTypes(), type => field.value = type.FullName));
+                    new FilterTypeOptionsPopup(ReflectionHelper.ListAllTypes(), type => field.value = type.FullName));
             });
 
             Toggle showToggle = root.Q<Toggle>("_showType");

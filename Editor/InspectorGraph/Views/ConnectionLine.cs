@@ -3,18 +3,16 @@
 // All rights reserved.
 // ********************************
 
-using System;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
+using GiantParticle.InspectorGraph.Editor.Settings;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor.Views
 {
     internal class ConnectionLine : VisualElement
     {
-        private static Color kTransparentWhite = new Color(1, 1, 1, 0.5f);
-        private static Color kTransparentCyan = new Color(0, 1, 1, 0.5f);
         private const float kArrowLength = 10f;
         private const float kArrowWidth = 10f;
 
@@ -35,63 +33,32 @@ namespace GiantParticle.InspectorGraph
         public int ForceHighlightCount { get; set; }
 
         private ViewMode _mode;
-        private ReferenceType _referenceType;
+        private IReferenceColorSettings _colorSettings;
 
         public ConnectionLine(VisualElement source, VisualElement dest, ReferenceType refType) : base()
         {
             Source = source;
             Destination = dest;
-            _referenceType = refType;
+            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
+            _colorSettings = settings.GetReferenceColor(refType);
 
             var line = new IMGUIContainer(DrawLine);
             this.Add(line);
-        }
-
-        private Color NormalColor
-        {
-            get
-            {
-                switch (_referenceType)
-                {
-                    case ReferenceType.Direct:
-                        return kTransparentWhite;
-                    case ReferenceType.HierarchyEmbedded:
-                        return kTransparentCyan;
-                    default:
-                        throw new NotImplementedException($"Unhandled color for reference type [{_referenceType}]");
-                }
-            }
-        }
-
-        private Color HighlightColor
-        {
-            get
-            {
-                switch (_referenceType)
-                {
-                    case ReferenceType.Direct:
-                        return Color.white;
-                    case ReferenceType.HierarchyEmbedded:
-                        return Color.cyan;
-                    default:
-                        throw new NotImplementedException($"Unhandled color for reference type [{_referenceType}]");
-                }
-            }
         }
 
         private void DrawLine()
         {
             Handles.BeginGUI();
             float thickness = 1;
-            Color lineColor = NormalColor;
+            Color lineColor = _colorSettings.NormalColor;
             switch (Mode)
             {
                 case ViewMode.Normal:
-                    lineColor = NormalColor;
+                    lineColor = _colorSettings.NormalColor;
                     thickness = 1;
                     break;
                 case ViewMode.Highlighted:
-                    lineColor = HighlightColor;
+                    lineColor = _colorSettings.HighlightedColor;
                     thickness = 2;
                     break;
             }

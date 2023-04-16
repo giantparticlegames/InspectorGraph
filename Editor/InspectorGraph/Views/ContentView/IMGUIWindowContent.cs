@@ -4,11 +4,12 @@
 // ********************************
 
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Editor.Data;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.ContentView
+namespace GiantParticle.InspectorGraph.Editor.ContentView
 {
     internal class IMGUIWindowContent : BaseWindowContent
     {

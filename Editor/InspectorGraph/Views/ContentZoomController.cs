@@ -3,16 +3,18 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
+using System;
+using GiantParticle.InspectorGraph.Editor.Data;
+using GiantParticle.InspectorGraph.Editor.Manipulators;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor
 {
     internal class ContentZoomController : VisualElement
     {
+        public event Action<VisualElement> ZoomLevelChanged;
         private ToolbarButton _resetButton;
         private Slider _slider;
         private readonly VisualElement _zoomTarget;
@@ -61,6 +63,7 @@ namespace GiantParticle.InspectorGraph
             });
 
             _zoomTarget.transform.scale = new Vector3(scale, scale, 1);
+            ZoomLevelChanged?.Invoke(_zoomTarget);
         }
     }
 }

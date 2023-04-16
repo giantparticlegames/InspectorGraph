@@ -5,10 +5,11 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Editor.Data;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.ContentView
+namespace GiantParticle.InspectorGraph.Editor.ContentView
 {
     internal static class WindowContentFactory
     {
@@ -23,8 +24,7 @@ namespace GiantParticle.InspectorGraph.ContentView
             var inspector = UnityEditor.Editor.CreateEditor(target);
 
             // Prefer Preview over everything else
-            bool isPreviewCompatible = inspector.HasPreviewGUI();
-            if (isPreviewCompatible)
+            if (IsPreviewCompatible(inspector))
                 return ReturnMode(targetType, ContentViewMode.Preview, inspector);
 
             // Create inspector
@@ -40,6 +40,14 @@ namespace GiantParticle.InspectorGraph.ContentView
             return ReturnMode(targetType, ContentViewMode.StaticPreview, inspector);
         }
 
+        private static bool IsPreviewCompatible(UnityEditor.Editor editor)
+        {
+            // Hack for AnimationClipEditor. If not checked, the `HasPreviewGUI` function will
+            // throw an exception
+            if (string.Equals(editor.GetType().Name, "AnimationClipEditor")) return true;
+            return editor.HasPreviewGUI();
+        }
+
         private static ContentViewMode ReturnMode(Type objectType, ContentViewMode mode,
             UnityEditor.Editor inspector = null)
         {
@@ -51,7 +59,8 @@ namespace GiantParticle.InspectorGraph.ContentView
             return mode;
         }
 
-        public static BaseWindowContent CreateContent(ContentViewMode mode, IWindowData windowData, bool forceMini = false)
+        public static BaseWindowContent CreateContent(ContentViewMode mode, IWindowData windowData,
+            bool forceMini = false)
         {
             switch (mode)
             {

@@ -5,12 +5,14 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Common.Prefs;
-using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
+using GiantParticle.InspectorGraph.Editor.Data;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Editor.Manipulators;
+using GiantParticle.InspectorGraph.Editor.Preferences;
+using GiantParticle.InspectorGraph.Editor.Settings;
+using GiantParticle.InspectorGraph.Editor.Views;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -18,23 +20,18 @@ using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor
 {
     internal class InspectorGraph : EditorWindow
     {
-        private const string kDocsURL = "https://github.com/giantparticlegames/InspectorGraph/blob/main/README.md";
-        private const string kReportBugURL = "https://github.com/giantparticlegames/InspectorGraph/issues/new";
-        private const string kWebsite = "https://www.giantparticlegames.com/home/inspector-graph";
-
         private const int kPositionXOffset = 80;
         private const int kPositionYOffset = 30;
-        private const int kDefaultWindowMaxWidth = 400;
-        private const int kDefaultWindowMaxHeight = 300;
 
         private ContentViewRegistry _viewRegistry = new();
         private HashSet<InspectorWindow> _waitForResize = new();
-        private ScrollView _content;
-        private ObjectField _refField;
+        private VisualElement _windowView;
+        private VisualElement _content;
+        private InspectorGraphToolbar _toolbar;
 
         private ReferenceNodeFactory _nodeFactory;
         private IObjectNode _rootNode;
@@ -49,39 +46,45 @@ namespace GiantParticle.InspectorGraph
         public void OnDestroy()
         {
             ClearCurrentContent();
+            _toolbar.Dispose();
             GlobalApplicationContext.Dispose();
         }
 
         public void OnEnable()
         {
             GlobalApplicationContext.Instantiate();
-            if (!GlobalApplicationContext.Instance.Contains<IPreferenceHandler>())
+            IApplicationContext context = GlobalApplicationContext.Instance;
+            if (!context.Contains<IPreferenceHandler>())
             {
                 var handler = new PreferenceHandler();
                 handler.LoadAllPreferences();
-                GlobalApplicationContext.Instance.Add<IPreferenceHandler>(handler);
+                context.Add<IPreferenceHandler>(handler);
             }
 
-            if (!GlobalApplicationContext.Instance.Contains<IInspectorGraphSettings>())
-                GlobalApplicationContext.Instance.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
+            if (!context.Contains<IInspectorGraphSettings>())
+                context.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
 
-            if (!GlobalApplicationContext.Instance.Contains<ITypeFilterHandler>())
+            if (!context.Contains<ITypeFilterHandler>())
             {
-                var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
-                GlobalApplicationContext.Instance.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
+                var settings = context.Get<IInspectorGraphSettings>();
+                context.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
             }
 
             if (_nodeFactory == null)
             {
-                var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+                var typeFilterHandler = context.Get<ITypeFilterHandler>();
                 _nodeFactory = new ReferenceNodeFactory(typeFilterHandler);
             }
 
-            if (!GlobalApplicationContext.Instance.Contains<IContentViewRegistry>())
-                GlobalApplicationContext.Instance.Add<IContentViewRegistry>(_viewRegistry);
+            if (!context.Contains<IContentViewRegistry>())
+                context.Add<IContentViewRegistry>(_viewRegistry);
 
-            if (!GlobalApplicationContext.Instance.Contains<IUIDocumentCatalog>())
-                GlobalApplicationContext.Instance.Add<IUIDocumentCatalog>(UIDocumentCatalog.GetCatalog());
+            // UI Catalogs
+            if (!context.Contains<IUIDocumentCatalog<MainWindowUIDocumentType>>())
+                context.Add<IUIDocumentCatalog<MainWindowUIDocumentType>>(MainWindowUIDocumentCatalog.GetCatalog());
+            if (!context.Contains<IUIDocumentCatalog<InspectorWindowUIDocumentType>>())
+                context.Add<IUIDocumentCatalog<InspectorWindowUIDocumentType>>(InspectorWindowUIDocumentCatalog
+                    .GetCatalog());
         }
 
         public void OnDisable()
@@ -91,127 +94,29 @@ namespace GiantParticle.InspectorGraph
 
         public void CreateGUI()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
-            var layout = catalog[UIDocumentTypes.MainWindow].Asset;
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
+            var layout = catalog[MainWindowUIDocumentType.MainWindow].Asset;
             layout.CloneTree(rootVisualElement);
 
-            _content = rootVisualElement.Q<ScrollView>(nameof(_content));
+            _windowView = rootVisualElement.Q<VisualElement>(nameof(_windowView));
+            _content = rootVisualElement.Q<VisualElement>(nameof(_content));
 
-            // Toolbar
-            var viewMenu = rootVisualElement.Q<ToolbarMenu>("_viewMenu");
-            // Refresh View
-            viewMenu.menu.AppendAction(
-                actionName: "Refresh",
-                action: (menuAction) =>
-                {
-                    if (_rootNode == null) return;
-                    UpdateView(_rootNode.Target);
-                });
-            viewMenu.menu.AppendAction(
-                actionName: "Reset",
-                action: (menuAction) =>
-                {
-                    if (_rootNode == null) return;
-                    CreateContentTree(_rootNode.Target);
-                });
-            viewMenu.menu.AppendSeparator();
-
-            // Filters
-            var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
-            foreach (ITypeFilter filter in typeFilterHandler.Filters)
+            _toolbar = new InspectorGraphToolbar(new InspectorGraphToolbarConfig()
             {
-                // Show
-                viewMenu.menu.AppendAction(
-                    actionName: $"Filters/{filter.TargetType.FullName}/Show",
-                    action: (menuAction) =>
-                    {
-                        filter.ShouldShowType = !filter.ShouldShowType;
-                        // Refresh view if needed
-                        if (_rootNode != null) UpdateView(_rootNode.Target);
-                    },
-                    actionStatusCallback: action =>
-                    {
-                        if (filter.ShouldShowType)
-                            return DropdownMenuAction.Status.Checked;
-                        return DropdownMenuAction.Status.Normal;
-                    });
-                // Expand
-                viewMenu.menu.AppendAction(
-                    actionName: $"Filters/{filter.TargetType.FullName}/Expand",
-                    action: (menuAction) =>
-                    {
-                        filter.ShouldExpandType = !filter.ShouldExpandType;
-                        // Refresh view if needed
-                        if (_rootNode != null) UpdateView(_rootNode.Target);
-                    },
-                    actionStatusCallback: action =>
-                    {
-                        if (filter.ShouldExpandType)
-                            return DropdownMenuAction.Status.Checked;
-                        return DropdownMenuAction.Status.Normal;
-                    });
-            }
-
-            // Edit
-            var editMenu = rootVisualElement.Q<ToolbarMenu>("_editMenu");
-            // Open project settings
-            editMenu.menu.AppendAction(
-                actionName: "Project Settings",
-                action: (menuAction) =>
-                {
-                    SettingsService.OpenProjectSettings($"{InspectorGraphSettingsRegister.kMenuPath}");
-                });
-
-            // Help
-            var helpMenu = rootVisualElement.Q<ToolbarMenu>("_helpMenu");
-            helpMenu.menu.AppendAction(
-                actionName: "Documentation",
-                action: (menuAction) => { Application.OpenURL(kDocsURL); });
-            helpMenu.menu.AppendAction(
-                actionName: "Report a bug",
-                action: (menuAction) => { Application.OpenURL(kReportBugURL); });
-            helpMenu.menu.AppendAction(
-                actionName: "Website",
-                action: (menuAction) => { Application.OpenURL(kWebsite); });
-
-            // Update Reference Field
-            _refField = rootVisualElement.Q<ObjectField>(nameof(_refField));
-            _refField.objectType = typeof(Object);
-            _refField.RegisterCallback<ChangeEvent<Object>>(evt =>
-            {
-                var assignedObject = evt.newValue;
-                IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
-                GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
-
-                if (assignedObject == null) generalPrefs.LastInspectedObjectPath = null;
-                else
-                {
-                    var path = AssetDatabase.GetAssetPath(assignedObject);
-                    generalPrefs.LastInspectedObjectPath = path;
-                    handler.Save<GeneralPreferences>();
-                }
-
-                CreateContentTree(assignedObject);
+                CreateCallback = CreateContentTree, ResetCallback = ResetView, UpdateCallback = UpdateView
             });
+            var toolbarContainer = rootVisualElement.Q<VisualElement>("_toolbarContainer");
+            toolbarContainer.Add(_toolbar);
 
+            var zoomController = new ContentZoomController(_content);
             var footer = rootVisualElement.Q<Toolbar>("_footer");
-            footer.Add(new ContentZoomController(_content.contentContainer));
+            footer.Add(zoomController);
+            zoomController.ZoomLevelChanged += element => UpdateWindowVisibility();
 
-            // Load Last assigned reference
-            LoadPreferences();
-        }
+            var moveManipulator = new DragManipulator(_windowView, _content, ManipulatorButton.Middle);
+            moveManipulator.PositionChanged += element => UpdateWindowVisibility();
 
-        private void LoadPreferences()
-        {
-            IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
-
-            GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
-            if (!string.IsNullOrEmpty(generalPrefs.LastInspectedObjectPath))
-            {
-                var lastObject = AssetDatabase.LoadAssetAtPath<Object>(generalPrefs.LastInspectedObjectPath);
-                if (lastObject != null)
-                    _refField.value = lastObject;
-            }
+            _toolbar.LoadPreferences();
         }
 
         private void ClearCurrentContent()
@@ -266,10 +171,24 @@ namespace GiantParticle.InspectorGraph
             window.GUIChanged -= OnWindowGUIChanged;
         }
 
+        private void ResetView()
+        {
+            if (_rootNode == null) return;
+            _content.transform.position = Vector3.zero;
+            CreateContentTree(_rootNode.Target);
+        }
+
         private void CreateContentTree(Object referenceObject)
         {
+            _content.transform.position = Vector3.zero;
             ClearCurrentContent();
             UpdateView(referenceObject);
+        }
+
+        private void UpdateView()
+        {
+            if (_rootNode == null) return;
+            UpdateView(_rootNode.Target);
         }
 
         private void UpdateView(Object referenceObject)
@@ -370,8 +289,6 @@ namespace GiantParticle.InspectorGraph
             var window = new InspectorWindow(
                 node: node,
                 forceStaticPreview: _viewRegistry.WindowCount > settings.MaxPreviewWindows);
-            window.style.width = new StyleLength(kDefaultWindowMaxWidth);
-            window.style.maxHeight = new StyleLength(kDefaultWindowMaxHeight);
             window.style.position = new StyleEnum<Position>(Position.Absolute);
 
             _content.Add(window);
@@ -396,13 +313,14 @@ namespace GiantParticle.InspectorGraph
                 {
                     var targetWindow = _viewRegistry.WindowByTarget(nodeReference.TargetNode.Target);
                     if (targetWindow == null) continue;
-                    if (_viewRegistry.ContainsConnection(sourceWindow, targetWindow)) continue;
-
-                    var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
-                    _content.Add(line);
-                    line.SendToBack();
-                    // Register line
-                    _viewRegistry.RegisterConnection(line);
+                    if (!_viewRegistry.ContainsConnection(sourceWindow, targetWindow))
+                    {
+                        var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
+                        _content.Add(line);
+                        line.SendToBack();
+                        // Register line
+                        _viewRegistry.RegisterConnection(line);
+                    }
 
                     queue.Enqueue(nodeReference.TargetNode);
                 }
@@ -431,6 +349,7 @@ namespace GiantParticle.InspectorGraph
             queue.Enqueue(new Tuple<IObjectNode, int>(_rootNode, 0));
             HashSet<InspectorWindow> windowsVisited = new();
 
+            List<float> maxWidthPerLevel = new List<float>();
             float currentY = 0;
             int currentLevel = 0;
             while (queue.Count > 0)
@@ -454,11 +373,21 @@ namespace GiantParticle.InspectorGraph
                 // Avoid reposition already repositioned window
                 if (windowsVisited.Contains(window)) continue;
 
+                // Store max width
+                if (maxWidthPerLevel.Count > level)
+                    maxWidthPerLevel[level] = Math.Max(maxWidthPerLevel[level], window.contentRect.width);
+                else
+                    maxWidthPerLevel.Add(window.contentRect.width);
+
                 // Avoid moving manually moved window
                 if (!window.Node.WindowData.HasBeenManuallyMoved)
                 {
+                    float newPositionX = 0;
+                    for (int i = 0; i < level; ++i)
+                        newPositionX += maxWidthPerLevel[i] + kPositionXOffset;
+
                     window.transform.position = new Vector3(
-                        x: level * (kDefaultWindowMaxWidth + kPositionXOffset),
+                        x: newPositionX,
                         y: currentY,
                         z: 0);
                 }
@@ -467,14 +396,23 @@ namespace GiantParticle.InspectorGraph
                 windowsVisited.Add(window);
             }
 
-            _content.contentContainer.ResizeToFit<InspectorWindow>();
+            _content.ResizeToFit<InspectorWindow>();
+            UpdateWindowVisibility();
         }
 
         private void OnInspectorWindowMoved(VisualElement window)
         {
             if (window is InspectorWindow inspectorWindow)
                 inspectorWindow.Node.WindowData.HasBeenManuallyMoved = true;
-            _content.contentContainer.ResizeToFit<InspectorWindow>();
+            _content.ResizeToFit<InspectorWindow>();
+        }
+
+        private void UpdateWindowVisibility()
+        {
+            _viewRegistry.ExecuteOnEachWindow(window =>
+            {
+                window.visible = _windowView.worldBound.Overlaps(window.worldBound);
+            });
         }
     }
 }

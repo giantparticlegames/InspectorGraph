@@ -6,7 +6,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor.Data
 {
     internal interface IWindowData
     {

@@ -5,15 +5,16 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.ContentView;
-using GiantParticle.InspectorGraph.Editor.Common;
-using GiantParticle.InspectorGraph.Editor.Common.Manipulators;
+using GiantParticle.InspectorGraph.Editor.ContentView;
+using GiantParticle.InspectorGraph.Editor.Manipulators;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
-using GiantParticle.InspectorGraph.ToolbarContent;
+using GiantParticle.InspectorGraph.Editor.Settings;
+using GiantParticle.InspectorGraph.Editor.ToolbarContent;
+using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph
+namespace GiantParticle.InspectorGraph.Editor.Views
 {
     internal class InspectorWindow : VisualElement, IDisposable
     {
@@ -35,15 +36,16 @@ namespace GiantParticle.InspectorGraph
         public event Action GUIChanged;
 
         public IObjectNode Node { get; }
-        private bool forceStaticPreviewMode;
+        private bool _forceStaticPreviewMode;
 
 
         public InspectorWindow(IObjectNode node, bool forceStaticPreview = false)
         {
             Node = node;
-            forceStaticPreviewMode = forceStaticPreview;
+            _forceStaticPreviewMode = forceStaticPreview;
             CreateLayout();
             ConfigureWindowManipulation();
+            UpdateSettings();
         }
 
         public void Dispose()
@@ -54,8 +56,8 @@ namespace GiantParticle.InspectorGraph
 
         private void CreateLayout()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog>();
-            var xmlLayout = catalog[UIDocumentTypes.InspectorWindow].Asset;
+            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<InspectorWindowUIDocumentType>>();
+            var xmlLayout = catalog[InspectorWindowUIDocumentType.InspectorWindow].Asset;
             xmlLayout.CloneTree(this);
 
             _content = this.Q<ScrollView>(nameof(_content));
@@ -67,7 +69,7 @@ namespace GiantParticle.InspectorGraph
             title.text = $"[{Node.Target.name}]";
 
             // Toolbar
-            ContentViewMode preferredMode = forceStaticPreviewMode
+            ContentViewMode preferredMode = _forceStaticPreviewMode
                 ? ContentViewMode.StaticPreview
                 : WindowContentFactory.PreferredViewModeForObject(Node.Target);
             var viewModeMenu = new ViewModeMenu(Node.Target);
@@ -84,11 +86,6 @@ namespace GiantParticle.InspectorGraph
             _footer.Add(_quickStatsView);
 
             SwitchView(preferredMode);
-        }
-
-        public void UpdateView()
-        {
-            _quickStatsView.UpdateView();
         }
 
         private void ConfigureWindowManipulation()
@@ -126,6 +123,21 @@ namespace GiantParticle.InspectorGraph
             _manipulators.Add(bringToFront);
         }
 
+        private void UpdateSettings()
+        {
+            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
+            var sizeSettings = settings.GetSizeForWindowViewMode(_currentMode);
+            this.style.width = new StyleLength(sizeSettings.Size.x);
+            this.style.maxHeight = new StyleLength(sizeSettings.Size.y);
+            if (_currentMode == ContentViewMode.Preview || _currentMode == ContentViewMode.StaticPreview)
+                this.style.height = new StyleLength(sizeSettings.Size.y);
+        }
+
+        public void UpdateView()
+        {
+            _quickStatsView.UpdateView();
+        }
+
         public void DisposeContent()
         {
             if (_view == null) return;
@@ -141,7 +153,7 @@ namespace GiantParticle.InspectorGraph
             _content.contentContainer.RemoveFromClassList($"{_currentMode}");
 
             _currentMode = mode;
-            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData, forceStaticPreviewMode);
+            _view = WindowContentFactory.CreateContent(_currentMode, Node.WindowData, _forceStaticPreviewMode);
             _view.ContentChanged += OnContentChanged;
             _content.Add(_view);
             _content.contentContainer.AddToClassList($"{mode}");

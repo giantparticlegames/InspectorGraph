@@ -4,12 +4,12 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.ContentView;
+using GiantParticle.InspectorGraph.Editor.ContentView;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.ToolbarContent
+namespace GiantParticle.InspectorGraph.Editor.ToolbarContent
 {
     internal class ViewModeMenu : ToolbarMenu
     {
