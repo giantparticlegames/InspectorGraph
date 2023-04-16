@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.10.1-b] 2023-04-16
+
+## Fixed
+* Fixed issue where trackpads cannot move the graph due to the lack of middle button. Now there are two (2) options to move graph that follow [shortcut conventions](https://docs.unity3d.com/Manual/SceneViewNavigation.html):
+    * Using mouse middle button
+    * [macOS] Using combination of mouse left button + Option Key + Command key
+    * [Windows | Linux] Using combination of mouse left button + Alt Key + Control key
+* Removed attribute to create UI Document Catalogs from general public. This is only for internal use.
+
 ## [0.10.0-b] 2023-04-08
 
 ## Added

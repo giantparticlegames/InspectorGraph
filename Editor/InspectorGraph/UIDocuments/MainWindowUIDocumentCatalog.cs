@@ -19,9 +19,11 @@ namespace GiantParticle.InspectorGraph.Editor.UIDocuments
     {
     }
 
+#if GIANT_PARTICLE_DEVELOPMENT
     [CreateAssetMenu(
         fileName = "MainWindowUIDocumentCatalog",
         menuName = "Giant Particle/Inspector Graph/UI Document Catalogs/Create Main Window Catalog")]
+#endif
     internal class MainWindowUIDocumentCatalog :
         BaseUIDocumentCatalog<MainWindowUIDocumentType, MainWindowUIDocumentInfo>
     {
