@@ -52,6 +52,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
             {
                 var processor = processors[i];
                 processor.SetPropertyProcessors(_propertyProcessors);
+                if (processor is ITypeFilter filterProcessor) filterProcessor.FilterHandler = _typeFilter;
                 if (processor.TargetType == null)
                 {
                     Debug.LogError($"Object Node Processor [{processor.GetType()}] noes not have a target type");

@@ -14,6 +14,10 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
 {
     internal class IMGUIPreviewWindowContent : BaseWindowContent
     {
+        private const BindingFlags kStandardFlags = BindingFlags.NonPublic
+                                                    | BindingFlags.Default
+                                                    | BindingFlags.Instance;
+
         private UnityEditor.Editor _editor;
         private IMGUIContainer _view;
 
@@ -62,8 +66,9 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
             // the mesh will not change when toggling the shape button.
             if (_editor is MaterialEditor materialEditor)
             {
-                var property = typeof(MaterialEditor).GetProperty("firstInspectedEditor",
-                    BindingFlags.NonPublic | BindingFlags.Default | BindingFlags.Instance);
+                var property = typeof(MaterialEditor).GetProperty(
+                    name: "firstInspectedEditor",
+                    bindingAttr: kStandardFlags);
                 if (property == null) return;
                 property.SetValue(materialEditor, true);
                 return;
@@ -74,9 +79,10 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
             if (string.Equals(_editor.GetType().Name, "AnimationClipEditor"))
             {
                 Type editorType = _editor.GetType();
-                MethodInfo method = editorType.GetMethod("Init",
-                    BindingFlags.NonPublic | BindingFlags.Default | BindingFlags.Instance);
-                method.Invoke(_editor, null);
+                MethodInfo initMethod = editorType.GetMethod(
+                    name: "Init",
+                    bindingAttr: kStandardFlags);
+                if (initMethod != null) initMethod.Invoke(_editor, null);
             }
         }
 

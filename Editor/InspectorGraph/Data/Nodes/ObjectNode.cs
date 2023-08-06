@@ -45,9 +45,10 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
         public void AddNode(ObjectNode objectNode, ReferenceType refType)
         {
             var key = objectNode.Target;
-            if (_references.ContainsKey(key) && _references[key].ContainsKey(refType))
+            if (_references.ContainsKey(key))
             {
-                _references[key][refType].RefCount++;
+                if (_references[key].ContainsKey(refType)) _references[key][refType].RefCount++;
+                else _references[key].Add(refType, new ObjectNodeReference(objectNode, refType));
                 return;
             }
 
