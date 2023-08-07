@@ -11,7 +11,8 @@ namespace GiantParticle.InspectorGraph.Editor.UIDocuments
     internal enum MainWindowUIDocumentType
     {
         MainWindow = 1,
-        MainWindowToolbar = 100
+        MainWindowToolbar = 100,
+        MainWindowFooter = 200,
     }
 
     [Serializable]

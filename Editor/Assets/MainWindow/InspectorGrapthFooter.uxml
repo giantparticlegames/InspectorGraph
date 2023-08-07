@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <uie:Toolbar>
+        <uie:ToolbarButton text="Reset" display-tooltip-when-elided="true" name="_resetZoomButton" tooltip="Reset Zoom to 1x" style="-unity-text-align: middle-left;" />
+        <ui:Slider picking-mode="Ignore" label="Zoom x1" value="42" high-value="2" low-value="0.1" name="_zoomSlider" style="-unity-text-align: middle-left;" />
+    </uie:Toolbar>
+</ui:UXML>

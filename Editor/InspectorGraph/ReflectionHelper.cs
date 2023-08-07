@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using GiantParticle.InspectorGraph.Editor.Plugins;
 using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.Editor

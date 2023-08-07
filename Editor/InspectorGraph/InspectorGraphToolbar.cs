@@ -7,6 +7,7 @@ using System;
 using GiantParticle.InspectorGraph.Editor.Preferences;
 using GiantParticle.InspectorGraph.Editor.UIDocuments;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
+using GiantParticle.InspectorGraph.Editor.Plugins;
 using GiantParticle.InspectorGraph.Editor.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -23,25 +24,18 @@ namespace GiantParticle.InspectorGraph.Editor
         public Action<Object> CreateCallback;
     }
 
-    internal interface IInspectorGraphToolbarExtension : IDisposable
-    {
-        void Configure(VisualElement root);
-        void LoadPreferences();
-    }
-
-    internal class InspectorGraphToolbar : VisualElement, IDisposable
+    internal partial class InspectorGraphToolbar : VisualElement, IDisposable
     {
         private const string kDocsURL = "https://github.com/giantparticlegames/InspectorGraph/blob/main/README.md";
         private const string kReportBugURL = "https://github.com/giantparticlegames/InspectorGraph/issues/new";
         private const string kWebsite = "https://www.giantparticlegames.com/home/inspector-graph";
         private InspectorGraphToolbarConfig _config;
-        private ObjectField _objectField;
-        private IInspectorGraphToolbarExtension[] _extensions;
+        private IInspectorGraphToolbarPlugin[] _extensions;
 
         public InspectorGraphToolbar(InspectorGraphToolbarConfig config)
         {
             _config = config;
-            _extensions = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphToolbarExtension>();
+            _extensions = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphToolbarPlugin>();
             LoadLayout();
             ConfigureUI();
         }
@@ -58,6 +52,7 @@ namespace GiantParticle.InspectorGraph.Editor
             var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
             IUIDocumentInfo<MainWindowUIDocumentType> info = catalog[MainWindowUIDocumentType.MainWindowToolbar];
             info.Asset.CloneTree(this);
+            AssignVisualElements();
         }
 
         private void ConfigureUI()
@@ -69,27 +64,26 @@ namespace GiantParticle.InspectorGraph.Editor
             ConfigureActiveObject();
             if (_extensions != null)
                 for (int i = 0; i < _extensions.Length; ++i)
-                    _extensions[i].Configure(this);
+                    _extensions[i].ConfigureView(this);
         }
 
         private void ConfigureViewMenu()
         {
-            var viewMenu = this.Q<ToolbarMenu>("_viewMenu");
             // Refresh View
-            viewMenu.menu.AppendAction(
+            _viewMenu.menu.AppendAction(
                 actionName: "Refresh",
                 action: (menuAction) => _config.UpdateCallback?.Invoke());
-            viewMenu.menu.AppendAction(
+            _viewMenu.menu.AppendAction(
                 actionName: "Reset",
                 action: (menuAction) => _config.ResetCallback?.Invoke());
-            viewMenu.menu.AppendSeparator();
+            _viewMenu.menu.AppendSeparator();
 
             // Filters
             var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
             foreach (ITypeFilter filter in typeFilterHandler.Filters)
             {
                 // Show
-                viewMenu.menu.AppendAction(
+                _viewMenu.menu.AppendAction(
                     actionName: $"Filters/{filter.TargetType.FullName}/Show",
                     action: (menuAction) =>
                     {
@@ -104,7 +98,7 @@ namespace GiantParticle.InspectorGraph.Editor
                         return DropdownMenuAction.Status.Normal;
                     });
                 // Expand
-                viewMenu.menu.AppendAction(
+                _viewMenu.menu.AppendAction(
                     actionName: $"Filters/{filter.TargetType.FullName}/Expand",
                     action: (menuAction) =>
                     {
@@ -123,9 +117,8 @@ namespace GiantParticle.InspectorGraph.Editor
 
         private void ConfigureEditMenu()
         {
-            var editMenu = this.Q<ToolbarMenu>("_editMenu");
             // Open project settings
-            editMenu.menu.AppendAction(
+            _editMenu.menu.AppendAction(
                 actionName: "Project Settings",
                 action: (menuAction) =>
                 {
@@ -135,23 +128,21 @@ namespace GiantParticle.InspectorGraph.Editor
 
         private void ConfigureHelpMenu()
         {
-            var helpMenu = this.Q<ToolbarMenu>("_helpMenu");
-            helpMenu.menu.AppendAction(
+            _helpMenu.menu.AppendAction(
                 actionName: "Documentation",
                 action: (menuAction) => { Application.OpenURL(kDocsURL); });
-            helpMenu.menu.AppendAction(
+            _helpMenu.menu.AppendAction(
                 actionName: "Report a bug",
                 action: (menuAction) => { Application.OpenURL(kReportBugURL); });
-            helpMenu.menu.AppendAction(
+            _helpMenu.menu.AppendAction(
                 actionName: "Website",
                 action: (menuAction) => { Application.OpenURL(kWebsite); });
         }
 
         private void ConfigureActiveObject()
         {
-            _objectField = this.Q<ObjectField>("_refField");
-            _objectField.objectType = typeof(Object);
-            _objectField.RegisterCallback<ChangeEvent<Object>>(evt =>
+            _refField.objectType = typeof(Object);
+            _refField.RegisterCallback<ChangeEvent<Object>>(evt =>
             {
                 var assignedObject = evt.newValue;
                 IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
@@ -183,11 +174,11 @@ namespace GiantParticle.InspectorGraph.Editor
             var lastObject = AssetDatabase.LoadAssetAtPath<Object>(path);
             if (lastObject == null) return;
 
-            _objectField.value = lastObject;
+            _refField.value = lastObject;
 
             if (_extensions != null)
                 for (int i = 0; i < _extensions.Length; ++i)
-                    _extensions[i].LoadPreferences();
+                    _extensions[i].ConfigurePreferences(handler);
         }
     }
 }

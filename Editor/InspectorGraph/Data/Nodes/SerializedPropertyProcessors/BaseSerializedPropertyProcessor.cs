@@ -14,7 +14,11 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProce
     {
         public abstract int Priority { get; }
         public Queue<ObjectNode> NodeQueue { get; set; }
-        public ITypeFilterHandler FilterHandler { get; set; }
+
+        public ITypeFilterHandler FilterHandler
+        {
+            get => GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+        }
 
         public abstract bool ProcessSerializedProperty(SerializedProperty property, ObjectNode parentNode,
             ICollection<Object> excludeSet);

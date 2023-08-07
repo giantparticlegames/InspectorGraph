@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors
 {
-    internal interface ISerializedPropertyProcessor : ITypeFilter
+    internal interface ISerializedPropertyProcessor
     {
         int Priority { get; }
         Queue<ObjectNode> NodeQueue { get; set; }

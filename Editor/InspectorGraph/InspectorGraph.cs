@@ -10,11 +10,11 @@ using GiantParticle.InspectorGraph.Editor.Data;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes;
 using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
 using GiantParticle.InspectorGraph.Editor.Manipulators;
+using GiantParticle.InspectorGraph.Editor.Plugins;
 using GiantParticle.InspectorGraph.Editor.Preferences;
 using GiantParticle.InspectorGraph.Editor.Settings;
 using GiantParticle.InspectorGraph.Editor.Views;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -22,19 +22,19 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.Editor
 {
-    internal class InspectorGraph : EditorWindow
+    internal partial class InspectorGraph : EditorWindow
     {
         private const int kPositionXOffset = 80;
         private const int kPositionYOffset = 30;
 
         private ContentViewRegistry _viewRegistry = new();
         private HashSet<InspectorWindow> _waitForResize = new();
-        private VisualElement _windowView;
-        private VisualElement _content;
         private InspectorGraphToolbar _toolbar;
+        private InspectorGraphFooter _footer;
 
         private ReferenceNodeFactory _nodeFactory;
         private IObjectNode _rootNode;
+        private IInspectorGraphPlugin[] _plugins;
 
         [MenuItem("Window/Giant Particle/Inspector Graph")]
         public static void ShowWindow()
@@ -92,26 +92,23 @@ namespace GiantParticle.InspectorGraph.Editor
             ClearCurrentContent();
         }
 
-        public void CreateGUI()
+        private void CreateGUI()
         {
             var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
             var layout = catalog[MainWindowUIDocumentType.MainWindow].Asset;
             layout.CloneTree(rootVisualElement);
-
-            _windowView = rootVisualElement.Q<VisualElement>(nameof(_windowView));
-            _content = rootVisualElement.Q<VisualElement>(nameof(_content));
+            AssignVisualElements();
+            _plugins = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphPlugin>();
 
             _toolbar = new InspectorGraphToolbar(new InspectorGraphToolbarConfig()
             {
                 CreateCallback = CreateContentTree, ResetCallback = ResetView, UpdateCallback = UpdateView
             });
-            var toolbarContainer = rootVisualElement.Q<VisualElement>("_toolbarContainer");
-            toolbarContainer.Add(_toolbar);
+            _toolbarContainer.Add(_toolbar);
 
-            var zoomController = new ContentZoomController(_content);
-            var footer = rootVisualElement.Q<Toolbar>("_footer");
-            footer.Add(zoomController);
-            zoomController.ZoomLevelChanged += element => UpdateWindowVisibility();
+            _footer = new InspectorGraphFooter();
+            _footerContainer.Add(_footer);
+            _footer.ZoomLevelChanged += OnZoomLevelChanged;
 
             var moveManipulator = new DragManipulator(_windowView, _content,
                 new[]
@@ -124,6 +121,14 @@ namespace GiantParticle.InspectorGraph.Editor
                             EventModifiers.Alt | EventModifiers.Control)
                 });
             moveManipulator.PositionChanged += element => UpdateWindowVisibility();
+
+            if (_plugins != null)
+            {
+                for (int p = 0; p < _plugins.Length; ++p)
+                {
+                    _plugins[p].ConfigureView(rootVisualElement);
+                }
+            }
 
             _toolbar.LoadPreferences();
         }
@@ -414,6 +419,24 @@ namespace GiantParticle.InspectorGraph.Editor
             if (window is InspectorWindow inspectorWindow)
                 inspectorWindow.Node.WindowData.HasBeenManuallyMoved = true;
             _content.ResizeToFit<InspectorWindow>();
+        }
+
+        private void OnZoomLevelChanged(float zoomScale)
+        {
+            // Update Content Scale
+            _content.transform.scale = new Vector3(zoomScale, zoomScale, 1);
+
+            // Update Scalables
+            _viewRegistry.ExecuteOnEachWindow((window) =>
+            {
+                for (int i = 0; i < window.Manipulators.Count; ++i)
+                {
+                    var manipulator = window.Manipulators[i];
+                    if (manipulator is IScalableManipulator scalableManipulator)
+                        scalableManipulator.Scale = zoomScale;
+                }
+            });
+            UpdateWindowVisibility();
         }
 
         private void UpdateWindowVisibility()
