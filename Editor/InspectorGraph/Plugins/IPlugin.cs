@@ -4,9 +4,9 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.Preferences;
+using GiantParticle.InspectorGraph.Preferences;
 
-namespace GiantParticle.InspectorGraph.Editor.Plugins
+namespace GiantParticle.InspectorGraph.Plugins
 {
     /// <summary>
     /// Base Plugin interface

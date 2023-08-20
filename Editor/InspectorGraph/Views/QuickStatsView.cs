@@ -5,10 +5,10 @@
 
 using System.Collections.Generic;
 using System.Text;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes;
+using GiantParticle.InspectorGraph.Data.Nodes;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Views
+namespace GiantParticle.InspectorGraph.Views
 {
     internal class QuickStatsView : VisualElement
     {

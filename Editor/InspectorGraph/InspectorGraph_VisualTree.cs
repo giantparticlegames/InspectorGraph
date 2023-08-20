@@ -5,7 +5,7 @@
 
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal partial class InspectorGraph
     {

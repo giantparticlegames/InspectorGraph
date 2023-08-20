@@ -4,10 +4,10 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes;
+using GiantParticle.InspectorGraph.Data.Nodes;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Settings
+namespace GiantParticle.InspectorGraph.Settings
 {
     internal interface IReferenceColorSettings
     {

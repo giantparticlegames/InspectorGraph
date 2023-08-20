@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Views
+namespace GiantParticle.InspectorGraph.Views
 {
     internal class WindowStateController : IDisposable
     {

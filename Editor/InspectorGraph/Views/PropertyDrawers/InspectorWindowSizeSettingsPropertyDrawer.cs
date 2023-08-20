@@ -3,14 +3,14 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.ContentView;
-using GiantParticle.InspectorGraph.Editor.Settings;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
+using GiantParticle.InspectorGraph.ContentView;
+using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.UIDocuments;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.PropertyDrawers
+namespace GiantParticle.InspectorGraph.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(InspectorWindowSizeSettings))]
     internal class InspectorWindowSizeSettingsPropertyDrawer : BasePropertyDrawer

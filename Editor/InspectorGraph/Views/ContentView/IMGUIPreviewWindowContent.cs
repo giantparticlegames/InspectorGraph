@@ -5,12 +5,12 @@
 
 using System;
 using System.Reflection;
-using GiantParticle.InspectorGraph.Editor.Data;
+using GiantParticle.InspectorGraph.Data;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal class IMGUIPreviewWindowContent : BaseWindowContent
     {

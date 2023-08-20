@@ -3,15 +3,15 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Settings;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
+using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.UIDocuments;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using PopupWindow = UnityEditor.PopupWindow;
 
-namespace GiantParticle.InspectorGraph.Editor.PropertyDrawers
+namespace GiantParticle.InspectorGraph.PropertyDrawers
 {
     [CustomPropertyDrawer(typeof(FilterTypeSettings))]
     internal class FilterTypeSettingsPropertyDrawer : BasePropertyDrawer

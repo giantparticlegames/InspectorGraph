@@ -4,18 +4,18 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.Preferences;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
-using GiantParticle.InspectorGraph.Editor.Plugins;
-using GiantParticle.InspectorGraph.Editor.Settings;
+using GiantParticle.InspectorGraph.Preferences;
+using GiantParticle.InspectorGraph.UIDocuments;
+using GiantParticle.InspectorGraph.Data.Graph.Filters;
+using GiantParticle.InspectorGraph.Plugins;
+using GiantParticle.InspectorGraph.Settings;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal class InspectorGraphToolbarConfig
     {

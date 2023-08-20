@@ -4,12 +4,12 @@
 // ********************************
 
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
+using GiantParticle.InspectorGraph.UIDocuments;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Settings
+namespace GiantParticle.InspectorGraph.Settings
 {
     internal class InspectorGraphSettingsProvider : SettingsProvider
     {

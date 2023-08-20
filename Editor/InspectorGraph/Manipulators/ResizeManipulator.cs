@@ -7,7 +7,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Manipulators
+namespace GiantParticle.InspectorGraph.Manipulators
 {
     internal class ResizeManipulator : BaseDragManipulator
     {

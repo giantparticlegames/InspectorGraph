@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal interface IApplicationContext
     {

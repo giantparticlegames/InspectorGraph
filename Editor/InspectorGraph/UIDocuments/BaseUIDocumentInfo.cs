@@ -7,7 +7,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.UIDocuments
+namespace GiantParticle.InspectorGraph.UIDocuments
 {
     internal interface IUIDocumentInfo<TEnum>
         where TEnum : Enum

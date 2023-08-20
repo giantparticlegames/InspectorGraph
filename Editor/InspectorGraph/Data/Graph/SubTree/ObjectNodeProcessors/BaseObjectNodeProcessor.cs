@@ -6,11 +6,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors;
+using GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors;
+using GiantParticle.InspectorGraph.Data.Nodes;
 using UnityEditor;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
+namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 {
     internal abstract class BaseObjectNodeProcessor : IObjectNodeProcessor
     {

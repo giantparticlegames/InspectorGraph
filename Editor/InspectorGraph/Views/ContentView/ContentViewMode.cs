@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal enum ContentViewMode
     {

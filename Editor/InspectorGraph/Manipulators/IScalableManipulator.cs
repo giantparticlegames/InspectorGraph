@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Manipulators
+namespace GiantParticle.InspectorGraph.Manipulators
 {
     internal interface IScalableManipulator
     {

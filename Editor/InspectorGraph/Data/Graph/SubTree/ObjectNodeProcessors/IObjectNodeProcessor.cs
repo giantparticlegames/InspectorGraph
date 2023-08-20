@@ -5,9 +5,10 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors;
+using GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors;
+using GiantParticle.InspectorGraph.Data.Nodes;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
+namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 {
     internal interface IObjectNodeProcessor
     {

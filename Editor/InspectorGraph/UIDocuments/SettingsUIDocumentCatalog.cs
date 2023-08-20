@@ -6,7 +6,7 @@
 using System;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.UIDocuments
+namespace GiantParticle.InspectorGraph.UIDocuments
 {
     internal enum SettingsUIDocumentType
     {

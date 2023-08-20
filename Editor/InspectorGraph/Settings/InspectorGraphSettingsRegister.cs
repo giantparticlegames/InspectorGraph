@@ -5,7 +5,7 @@
 
 using UnityEditor;
 
-namespace GiantParticle.InspectorGraph.Editor.Settings
+namespace GiantParticle.InspectorGraph.Settings
 {
     internal static class InspectorGraphSettingsRegister
     {

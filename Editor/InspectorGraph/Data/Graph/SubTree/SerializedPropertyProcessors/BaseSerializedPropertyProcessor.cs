@@ -4,14 +4,16 @@
 // ********************************
 
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
+using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using UnityEditor;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors
+namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors
 {
     internal abstract class BaseSerializedPropertyProcessor : ISerializedPropertyProcessor
     {
+        // TODO: Move this to an Attribute
         public abstract int Priority { get; }
         public Queue<ObjectNode> NodeQueue { get; set; }
 

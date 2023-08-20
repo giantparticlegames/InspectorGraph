@@ -5,22 +5,24 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
-using GiantParticle.InspectorGraph.Editor.Data;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters;
-using GiantParticle.InspectorGraph.Editor.Manipulators;
-using GiantParticle.InspectorGraph.Editor.Plugins;
-using GiantParticle.InspectorGraph.Editor.Preferences;
-using GiantParticle.InspectorGraph.Editor.Settings;
-using GiantParticle.InspectorGraph.Editor.Views;
+using System.Threading.Tasks;
+using GiantParticle.InspectorGraph.UIDocuments;
+using GiantParticle.InspectorGraph.Data;
+using GiantParticle.InspectorGraph.Data.Graph;
+using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Data.Graph.Filters;
+using GiantParticle.InspectorGraph.Manipulators;
+using GiantParticle.InspectorGraph.Plugins;
+using GiantParticle.InspectorGraph.Preferences;
+using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Views;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal partial class InspectorGraph : EditorWindow
     {
@@ -32,9 +34,19 @@ namespace GiantParticle.InspectorGraph.Editor
         private InspectorGraphToolbar _toolbar;
         private InspectorGraphFooter _footer;
 
-        private ReferenceNodeFactory _nodeFactory;
+        private IGraphFactory[] _graphFactories;
+        private int _selectedFactory;
         private IObjectNode _rootNode;
         private IInspectorGraphPlugin[] _plugins;
+
+        private IGraphFactory ActiveGraphFactory
+        {
+            get
+            {
+                if (_graphFactories.Length <= 1) return _graphFactories[0];
+                return _graphFactories[_selectedFactory];
+            }
+        }
 
         [MenuItem("Window/Giant Particle/Inspector Graph")]
         public static void ShowWindow()
@@ -70,10 +82,11 @@ namespace GiantParticle.InspectorGraph.Editor
                 context.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
             }
 
-            if (_nodeFactory == null)
+            if (_graphFactories == null)
             {
-                var typeFilterHandler = context.Get<ITypeFilterHandler>();
-                _nodeFactory = new ReferenceNodeFactory(typeFilterHandler);
+                _graphFactories = ReflectionHelper.InstantiateAllImplementations<IGraphFactory>();
+                Array.Sort(_graphFactories,
+                    (factoryA, factoryB) => { return factoryA.DisplayPriority - factoryB.DisplayPriority; });
             }
 
             if (!context.Contains<IContentViewRegistry>())
@@ -94,6 +107,9 @@ namespace GiantParticle.InspectorGraph.Editor
 
         private void CreateGUI()
         {
+            // TODO: Remove
+            TaskScheduler.UnobservedTaskException += (sender, args) => { Debug.LogException(args.Exception); };
+
             var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
             var layout = catalog[MainWindowUIDocumentType.MainWindow].Asset;
             layout.CloneTree(rootVisualElement);
@@ -208,7 +224,12 @@ namespace GiantParticle.InspectorGraph.Editor
         private void UpdateView(Object referenceObject)
         {
             if (referenceObject == null) return;
-            _rootNode = _nodeFactory.CreateGraphFromObject(referenceObject);
+            _rootNode = ActiveGraphFactory.CreateGraphFromObject(referenceObject);
+            ProcessNewGraph();
+        }
+
+        private void ProcessNewGraph()
+        {
             GlobalApplicationContext.Instance.Remove<IObjectNode>();
             GlobalApplicationContext.Instance.Add<IObjectNode>(_rootNode);
 

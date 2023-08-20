@@ -5,7 +5,7 @@
 
 using System;
 
-namespace GiantParticle.InspectorGraph.Editor.Preferences
+namespace GiantParticle.InspectorGraph.Preferences
 {
     internal abstract class BasePreference<T> : IPreference
     {

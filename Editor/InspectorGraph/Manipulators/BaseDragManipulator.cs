@@ -6,7 +6,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Manipulators
+namespace GiantParticle.InspectorGraph.Manipulators
 {
     /// <summary>
     /// Button id.

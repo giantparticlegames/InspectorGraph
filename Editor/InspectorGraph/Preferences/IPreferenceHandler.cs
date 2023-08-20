@@ -3,7 +3,7 @@
 // All rights reserved.
 // ********************************
 
-namespace GiantParticle.InspectorGraph.Editor.Preferences
+namespace GiantParticle.InspectorGraph.Preferences
 {
     internal interface IPreferenceHandler
     {

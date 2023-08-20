@@ -5,7 +5,7 @@
 
 using System;
 
-namespace GiantParticle.InspectorGraph.Editor.Preferences
+namespace GiantParticle.InspectorGraph.Preferences
 {
     [Serializable]
     internal class GeneralPreferencesData

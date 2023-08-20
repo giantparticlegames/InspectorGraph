@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Preferences
+namespace GiantParticle.InspectorGraph.Preferences
 {
     internal class PreferenceHandler : IPreferenceHandler
     {

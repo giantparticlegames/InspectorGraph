@@ -3,13 +3,13 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Data.Nodes;
-using GiantParticle.InspectorGraph.Editor.Settings;
+using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Settings;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Views
+namespace GiantParticle.InspectorGraph.Views
 {
     internal class ConnectionLine : VisualElement
     {

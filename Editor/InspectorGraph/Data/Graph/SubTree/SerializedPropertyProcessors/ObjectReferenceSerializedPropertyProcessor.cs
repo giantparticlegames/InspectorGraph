@@ -4,10 +4,11 @@
 // ********************************
 
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Data.Nodes;
 using UnityEditor;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.SerializedPropertyProcessors
+namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors
 {
     internal class ObjectReferenceSerializedPropertyProcessor : BaseSerializedPropertyProcessor
     {

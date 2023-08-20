@@ -5,13 +5,13 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
+using GiantParticle.InspectorGraph.UIDocuments;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.PropertyDrawers
+namespace GiantParticle.InspectorGraph.PropertyDrawers
 {
     internal class FilterTypeOptionsPopup : PopupWindowContent
     {

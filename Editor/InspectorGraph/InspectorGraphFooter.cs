@@ -4,10 +4,10 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
+using GiantParticle.InspectorGraph.UIDocuments;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal partial class InspectorGraphFooter : VisualElement
     {

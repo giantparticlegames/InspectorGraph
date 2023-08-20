@@ -4,10 +4,10 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.ContentView;
+using GiantParticle.InspectorGraph.ContentView;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Settings
+namespace GiantParticle.InspectorGraph.Settings
 {
     internal interface IInspectorWindowSizeSettings
     {

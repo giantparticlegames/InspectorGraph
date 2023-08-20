@@ -3,7 +3,7 @@
 // All rights reserved.
 // ********************************
 
-namespace GiantParticle.InspectorGraph.Editor.Plugins
+namespace GiantParticle.InspectorGraph.Plugins
 {
     internal interface IInspectorGraphPlugin : IConfigurableView
     {

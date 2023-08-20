@@ -5,7 +5,7 @@
 
 using System;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
+namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 {
     internal interface ITypeFilter
     {

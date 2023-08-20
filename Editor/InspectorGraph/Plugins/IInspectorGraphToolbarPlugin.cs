@@ -5,7 +5,7 @@
 
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Plugins
+namespace GiantParticle.InspectorGraph.Plugins
 {
     /// <summary>
     /// Interface for Plugins that will go on the main Toolbar

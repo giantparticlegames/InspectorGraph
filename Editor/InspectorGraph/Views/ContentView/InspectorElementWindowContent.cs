@@ -3,10 +3,10 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Data;
+using GiantParticle.InspectorGraph.Data;
 using UnityEditor.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal class InspectorElementWindowContent : BaseWindowContent
     {

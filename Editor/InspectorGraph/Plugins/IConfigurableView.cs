@@ -5,7 +5,7 @@
 
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Plugins
+namespace GiantParticle.InspectorGraph.Plugins
 {
     /// <summary>
     /// Interface to allow for a Plugin to configure its view

@@ -5,11 +5,12 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Data.Nodes;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
+namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 {
     internal class GameObjectObjectNodeProcessor : BaseObjectNodeProcessor
     {

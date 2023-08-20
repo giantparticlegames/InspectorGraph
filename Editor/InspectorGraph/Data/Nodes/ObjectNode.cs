@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
+namespace GiantParticle.InspectorGraph.Data.Nodes
 {
     internal interface IObjectNode
     {

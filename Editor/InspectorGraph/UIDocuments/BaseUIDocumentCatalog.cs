@@ -9,7 +9,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.UIDocuments
+namespace GiantParticle.InspectorGraph.UIDocuments
 {
     internal interface IUIDocumentCatalog<TEnum>
         where TEnum : Enum

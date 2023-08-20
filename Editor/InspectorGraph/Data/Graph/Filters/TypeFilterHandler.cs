@@ -5,9 +5,9 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Settings;
+using GiantParticle.InspectorGraph.Settings;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.Filters
+namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 {
     internal interface ITypeFilterHandler
     {

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal class InspectorElementObserver
     {

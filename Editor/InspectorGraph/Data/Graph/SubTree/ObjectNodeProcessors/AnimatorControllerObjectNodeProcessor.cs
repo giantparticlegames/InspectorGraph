@@ -5,11 +5,12 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Data.Nodes;
 using UnityEditor;
 using UnityEditor.Animations;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes.ObjectNodeProcessors
+namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 {
     /// <summary>
     /// The AnimatorController structure is similar to a GameObject in the sense that it contains references to objects
