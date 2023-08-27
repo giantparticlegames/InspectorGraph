@@ -6,11 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GiantParticle.InspectorGraph.CustomAttributes;
 using GiantParticle.InspectorGraph.UIDocuments;
 using GiantParticle.InspectorGraph.Data;
 using GiantParticle.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
+using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Manipulators;
 using GiantParticle.InspectorGraph.Plugins;
 using GiantParticle.InspectorGraph.Preferences;
@@ -34,19 +36,8 @@ namespace GiantParticle.InspectorGraph
         private InspectorGraphToolbar _toolbar;
         private InspectorGraphFooter _footer;
 
-        private IGraphFactory[] _graphFactories;
-        private int _selectedFactory;
         private IObjectNode _rootNode;
         private IInspectorGraphPlugin[] _plugins;
-
-        private IGraphFactory ActiveGraphFactory
-        {
-            get
-            {
-                if (_graphFactories.Length <= 1) return _graphFactories[0];
-                return _graphFactories[_selectedFactory];
-            }
-        }
 
         [MenuItem("Window/Giant Particle/Inspector Graph")]
         public static void ShowWindow()
@@ -82,12 +73,8 @@ namespace GiantParticle.InspectorGraph
                 context.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
             }
 
-            if (_graphFactories == null)
-            {
-                _graphFactories = ReflectionHelper.InstantiateAllImplementations<IGraphFactory>();
-                Array.Sort(_graphFactories,
-                    (factoryA, factoryB) => { return factoryA.DisplayPriority - factoryB.DisplayPriority; });
-            }
+            if (!context.Contains<IGraphController>())
+                context.Add<IGraphController>(new GraphController());
 
             if (!context.Contains<IContentViewRegistry>())
                 context.Add<IContentViewRegistry>(_viewRegistry);
@@ -115,6 +102,8 @@ namespace GiantParticle.InspectorGraph
             layout.CloneTree(rootVisualElement);
             AssignVisualElements();
             _plugins = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphPlugin>();
+            ProcessPlugins(plugin => plugin.Initialize());
+
 
             _toolbar = new InspectorGraphToolbar(new InspectorGraphToolbarConfig()
             {
@@ -138,15 +127,19 @@ namespace GiantParticle.InspectorGraph
                 });
             moveManipulator.PositionChanged += element => UpdateWindowVisibility();
 
-            if (_plugins != null)
-            {
-                for (int p = 0; p < _plugins.Length; ++p)
-                {
-                    _plugins[p].ConfigureView(rootVisualElement);
-                }
-            }
+            ProcessPlugins(plugin => plugin.ConfigureView(rootVisualElement));
 
             _toolbar.LoadPreferences();
+        }
+
+        private void ProcessPlugins(Action<IInspectorGraphPlugin> pluginAction)
+        {
+            if (_plugins == null) return;
+
+            for (int p = 0; p < _plugins.Length; ++p)
+            {
+                pluginAction.Invoke(_plugins[p]);
+            }
         }
 
         private void ClearCurrentContent()
@@ -224,8 +217,12 @@ namespace GiantParticle.InspectorGraph
         private void UpdateView(Object referenceObject)
         {
             if (referenceObject == null) return;
-            _rootNode = ActiveGraphFactory.CreateGraphFromObject(referenceObject);
-            ProcessNewGraph();
+            var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
+            controller.ActiveFactory.CreateGraphFromObject(referenceObject, node =>
+            {
+                _rootNode = node;
+                ProcessNewGraph();
+            });
         }
 
         private void ProcessNewGraph()

@@ -3,16 +3,15 @@
 // All rights reserved.
 // ********************************
 
+using System;
 using GiantParticle.InspectorGraph.Data.Nodes;
-using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.Data.Graph
 {
     internal interface IGraphFactory
     {
-        // TODO: Move this to an Attribute
-        int DisplayPriority { get; }
-        string DisplayName { get; }
         IObjectNode CreateGraphFromObject(Object rootObject);
+        void CreateGraphFromObject(Object rootObject, Action<IObjectNode> callback);
     }
 }

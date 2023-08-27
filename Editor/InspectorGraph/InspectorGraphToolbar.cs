@@ -4,9 +4,11 @@
 // ********************************
 
 using System;
+using GiantParticle.InspectorGraph.CustomAttributes;
 using GiantParticle.InspectorGraph.Preferences;
 using GiantParticle.InspectorGraph.UIDocuments;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
+using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Plugins;
 using GiantParticle.InspectorGraph.Settings;
 using UnityEditor;
@@ -61,6 +63,7 @@ namespace GiantParticle.InspectorGraph
             ConfigureEditMenu();
             ConfigureHelpMenu();
 
+            ConfigureActiveMode();
             ConfigureActiveObject();
             if (_extensions != null)
                 for (int i = 0; i < _extensions.Length; ++i)
@@ -137,6 +140,30 @@ namespace GiantParticle.InspectorGraph
             _helpMenu.menu.AppendAction(
                 actionName: "Website",
                 action: (menuAction) => { Application.OpenURL(kWebsite); });
+        }
+
+        private void ConfigureActiveMode()
+        {
+            var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
+            _inspectionModeDropdown.choices.Clear();
+            for (int i = 0; i < controller.AvailableFactories.Length; ++i)
+            {
+                var factory = controller.AvailableFactories[i];
+                var displayName = (EditorDisplayNameAttribute)Attribute.GetCustomAttribute(
+                    element: factory.GetType(),
+                    attributeType: typeof(EditorDisplayNameAttribute));
+                _inspectionModeDropdown.choices.Add(displayName.DisplayName);
+            }
+
+            _inspectionModeDropdown.index = 0;
+
+            _inspectionModeDropdown.visible = _inspectionModeDropdown.choices.Count > 1;
+            _inspectionModeDropdown.RegisterValueChangedCallback(evt =>
+            {
+                int index = _inspectionModeDropdown.choices.IndexOf(evt.newValue);
+                controller.SelectFactory(index);
+                _config?.ResetCallback.Invoke();
+            });
         }
 
         private void ConfigureActiveObject()

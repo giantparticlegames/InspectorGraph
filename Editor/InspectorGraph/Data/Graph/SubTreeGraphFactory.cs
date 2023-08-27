@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.CustomAttributes;
 using GiantParticle.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors;
 using GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors;
@@ -14,15 +15,14 @@ using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.Data
 {
+    [EditorDisplayPriority(0)]
+    [EditorDisplayName("References From Object")]
     internal class SubTreeGraphFactory : BaseGraphFactory
     {
         private readonly Queue<ObjectNode> _queue = new();
 
         private readonly IReadOnlyList<ISerializedPropertyProcessor> _propertyProcessors;
         private readonly IReadOnlyDictionary<Type, IObjectNodeProcessor> _objectNodeProcessors;
-
-        public override int DisplayPriority => 0;
-        public override string DisplayName => "References From Object";
 
         public SubTreeGraphFactory()
         {
@@ -99,6 +99,12 @@ namespace GiantParticle.InspectorGraph.Data
             }
 
             return root;
+        }
+
+        public override void CreateGraphFromObject(Object rootObject, Action<IObjectNode> callback)
+        {
+            var node = CreateGraphFromObject(rootObject);
+            callback?.Invoke(node);
         }
     }
 }

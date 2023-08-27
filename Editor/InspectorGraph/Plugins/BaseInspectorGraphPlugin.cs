@@ -7,5 +7,6 @@ namespace GiantParticle.InspectorGraph.Plugins
 {
     internal interface IInspectorGraphPlugin : IConfigurableView
     {
+        void Initialize();
     }
 }
