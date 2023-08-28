@@ -7,11 +7,11 @@ using System;
 
 namespace GiantParticle.InspectorGraph.CustomAttributes
 {
-    public class EditorDisplayPriorityAttribute : Attribute
+    public class InternalPriorityAttribute : Attribute
     {
         public int Priority { get; }
 
-        public EditorDisplayPriorityAttribute(int priority)
+        public InternalPriorityAttribute(int priority)
         {
             Priority = priority;
         }

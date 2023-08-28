@@ -12,7 +12,6 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProc
 {
     internal interface ISerializedPropertyProcessor
     {
-        int Priority { get; }
         Queue<ObjectNode> NodeQueue { get; set; }
 
         bool ProcessSerializedProperty(SerializedProperty property, ObjectNode parentNode,

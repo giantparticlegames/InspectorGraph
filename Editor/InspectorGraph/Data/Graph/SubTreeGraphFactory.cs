@@ -10,13 +10,14 @@ using GiantParticle.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors;
 using GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors;
 using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Operations;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace GiantParticle.InspectorGraph.Data
 {
-    [EditorDisplayPriority(0)]
-    [EditorDisplayName("References From Object")]
+    [InternalPriority(0)]
+    [EditorDisplayName("View References From Object")]
     internal class SubTreeGraphFactory : BaseGraphFactory
     {
         private readonly Queue<ObjectNode> _queue = new();
@@ -42,7 +43,7 @@ namespace GiantParticle.InspectorGraph.Data
             }
 
             // Sort by priority
-            processors.Sort((processor, propertyProcessor) => processor.Priority - propertyProcessor.Priority);
+            processors.Sort(ReflectionHelper.CompareByPriority);
             return processors;
         }
 
@@ -72,7 +73,7 @@ namespace GiantParticle.InspectorGraph.Data
             return objectNodeProcessors;
         }
 
-        public override IObjectNode CreateGraphFromObject(Object rootObject)
+        public override IOperation<IObjectNode> CreateGraphFromObject(Object rootObject)
         {
             _queue.Enqueue(new ObjectNode(new WindowData(rootObject)));
 
@@ -98,13 +99,7 @@ namespace GiantParticle.InspectorGraph.Data
                 else BaseObjectNodeProcessor.ProcessSerializedProperties(_propertyProcessors, node);
             }
 
-            return root;
-        }
-
-        public override void CreateGraphFromObject(Object rootObject, Action<IObjectNode> callback)
-        {
-            var node = CreateGraphFromObject(rootObject);
-            callback?.Invoke(node);
+            return new Operation<IObjectNode>() { Progress = 1, Result = root, State = OperationState.Finished };
         }
     }
 }

@@ -6,14 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GiantParticle.InspectorGraph.CustomAttributes;
 using GiantParticle.InspectorGraph.UIDocuments;
 using GiantParticle.InspectorGraph.Data;
-using GiantParticle.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Manipulators;
+using GiantParticle.InspectorGraph.Operations;
 using GiantParticle.InspectorGraph.Plugins;
 using GiantParticle.InspectorGraph.Preferences;
 using GiantParticle.InspectorGraph.Settings;
@@ -36,6 +35,7 @@ namespace GiantParticle.InspectorGraph
         private InspectorGraphToolbar _toolbar;
         private InspectorGraphFooter _footer;
 
+        private IOperation<IObjectNode> _currentOperation;
         private IObjectNode _rootNode;
         private IInspectorGraphPlugin[] _plugins;
 
@@ -217,16 +217,45 @@ namespace GiantParticle.InspectorGraph
         private void UpdateView(Object referenceObject)
         {
             if (referenceObject == null) return;
+            if (_currentOperation != null) return;
+
             var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
-            controller.ActiveFactory.CreateGraphFromObject(referenceObject, node =>
-            {
-                _rootNode = node;
-                ProcessNewGraph();
-            });
+            _currentOperation = controller.ActiveFactory.CreateGraphFromObject(referenceObject);
+
+            PollCurrentOperation();
         }
 
-        private void ProcessNewGraph()
+        private void PollCurrentOperation()
         {
+            bool keepPolling = false;
+            switch (_currentOperation.State)
+            {
+                case OperationState.Pending:
+                    keepPolling = true;
+                    _footer.UpdateProgress("Pending...", float.Epsilon);
+                    break;
+                case OperationState.Failed:
+                    _currentOperation = null;
+                    _footer.UpdateProgress("", 0);
+                    Debug.LogError("Operation failed");
+                    break;
+                case OperationState.Finished:
+                    _footer.UpdateProgress("", 0);
+                    ProcessNewGraph(_currentOperation.Result);
+                    _currentOperation = null;
+                    break;
+                case OperationState.Started:
+                    keepPolling = true;
+                    _footer.UpdateProgress("Scanning...", _currentOperation.Progress);
+                    break;
+            }
+
+            if (keepPolling) rootVisualElement.schedule.Execute(PollCurrentOperation);
+        }
+
+        private void ProcessNewGraph(IObjectNode node)
+        {
+            _rootNode = node;
             GlobalApplicationContext.Instance.Remove<IObjectNode>();
             GlobalApplicationContext.Instance.Add<IObjectNode>(_rootNode);
 

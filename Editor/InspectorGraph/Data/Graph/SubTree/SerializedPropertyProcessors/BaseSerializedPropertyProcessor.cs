@@ -13,8 +13,6 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProc
 {
     internal abstract class BaseSerializedPropertyProcessor : ISerializedPropertyProcessor
     {
-        // TODO: Move this to an Attribute
-        public abstract int Priority { get; }
         public Queue<ObjectNode> NodeQueue { get; set; }
 
         public ITypeFilterHandler FilterHandler

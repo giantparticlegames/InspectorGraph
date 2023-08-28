@@ -4,9 +4,8 @@
         <uie:ToolbarMenu display-tooltip-when-elided="true" name="_editMenu" text="Edit" style="-unity-text-align: middle-left;" />
         <uie:ToolbarMenu display-tooltip-when-elided="true" name="_helpMenu" text="Help" style="-unity-text-align: middle-left;" />
         <ui:VisualElement name="_activeObjectContainer" style="height: 100%; position: absolute; right: 0; flex-direction: row;">
-            <ui:DropdownField label="Inspection Mode" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="_inspectionModeDropdown" />
-            <ui:Label text="Active Object:" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
-            <uie:ObjectField name="_refField" />
+            <ui:DropdownField label="Inspection Mode:" index="-1" choices="System.Collections.Generic.List`1[System.String]" name="_inspectionModeDropdown" tooltip="Indicate how the active object will be inspected" />
+            <uie:ObjectField name="_refField" label="Active Object:" tooltip="Indicate the object that will be inspected" />
         </ui:VisualElement>
     </uie:Toolbar>
 </ui:UXML>

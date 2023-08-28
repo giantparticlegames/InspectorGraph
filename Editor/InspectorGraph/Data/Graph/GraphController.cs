@@ -18,17 +18,7 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
         public GraphController()
         {
             AvailableFactories = ReflectionHelper.InstantiateAllImplementations<IGraphFactory>();
-            Type priorityAttributeType = typeof(EditorDisplayPriorityAttribute);
-            Array.Sort(AvailableFactories, (factoryA, factoryB) =>
-            {
-                var priorityA = (EditorDisplayPriorityAttribute)Attribute.GetCustomAttribute(
-                    element: factoryA.GetType(),
-                    attributeType: priorityAttributeType);
-                var priorityB = (EditorDisplayPriorityAttribute)Attribute.GetCustomAttribute(
-                    element: factoryB.GetType(),
-                    attributeType: priorityAttributeType);
-                return priorityA.Priority - priorityB.Priority;
-            });
+            Array.Sort(AvailableFactories, ReflectionHelper.CompareByPriority);
             _currentFactory = AvailableFactories[0];
         }
 

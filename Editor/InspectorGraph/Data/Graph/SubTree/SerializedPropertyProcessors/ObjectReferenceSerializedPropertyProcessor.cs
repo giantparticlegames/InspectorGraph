@@ -4,16 +4,16 @@
 // ********************************
 
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.CustomAttributes;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using UnityEditor;
 using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors
 {
+    [InternalPriority(0)]
     internal class ObjectReferenceSerializedPropertyProcessor : BaseSerializedPropertyProcessor
     {
-        public override int Priority => 0;
-
         public override bool ProcessSerializedProperty(SerializedProperty property, ObjectNode parentNode,
             ICollection<Object> excludeSet)
         {

@@ -23,6 +23,7 @@ namespace GiantParticle.InspectorGraph
             _resetZoomButton.RegisterCallback<ClickEvent>(ResetZoomButton_OnClickEvent);
             _zoomSlider.value = 1;
             _zoomSlider.RegisterValueChangedCallback(ZoomSlider_OnValueChangedEvent);
+            _generalProgressBar.visible = false;
         }
 
         private void ResetZoomButton_OnClickEvent(ClickEvent evt)
@@ -35,6 +36,19 @@ namespace GiantParticle.InspectorGraph
             var scale = zoomEvent.newValue;
             _zoomSlider.label = $"Zoom x{scale:F2}";
             ZoomLevelChanged?.Invoke(scale);
+        }
+
+        public void UpdateProgress(string label, float progress)
+        {
+            if (progress <= 0 || progress >= 1)
+            {
+                _generalProgressBar.visible = false;
+                return;
+            }
+
+            _generalProgressBar.visible = true;
+            _generalProgressBar.value = progress;
+            _generalProgressBar.title = label;
         }
     }
 }

@@ -12,11 +12,13 @@ namespace GiantParticle.InspectorGraph
     {
         private ToolbarButton _resetZoomButton;
         private Slider _zoomSlider;
+        private ProgressBar _generalProgressBar;
 
         private void AssignVisualElements()
         {
             _resetZoomButton = this.Q<ToolbarButton>(nameof(_resetZoomButton));
             _zoomSlider = this.Q<Slider>(nameof(_zoomSlider));
+            _generalProgressBar = this.Q<ProgressBar>(nameof(_generalProgressBar));
         }
     }
 }
