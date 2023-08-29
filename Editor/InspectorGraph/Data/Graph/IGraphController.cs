@@ -4,6 +4,7 @@
 // ********************************
 
 using GiantParticle.InspectorGraph.Data.Graph;
+using GiantParticle.InspectorGraph.Data.Nodes;
 
 namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
 {
@@ -13,6 +14,10 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
 
         IGraphFactory[] AvailableFactories { get; }
 
+        IObjectNode ActiveGraph { get; }
+        
+        void ClearActiveGraph();
+        
         void SelectFactory(int index);
     }
 }

@@ -4,8 +4,8 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.CustomAttributes;
 using GiantParticle.InspectorGraph.Data.Graph;
+using GiantParticle.InspectorGraph.Data.Nodes;
 
 namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
 {
@@ -15,12 +15,16 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
         public IGraphFactory ActiveFactory => _currentFactory;
         public IGraphFactory[] AvailableFactories { get; }
 
+        public IObjectNode ActiveGraph => _currentFactory.CurrentGraph;
+
         public GraphController()
         {
             AvailableFactories = ReflectionHelper.InstantiateAllImplementations<IGraphFactory>();
             Array.Sort(AvailableFactories, ReflectionHelper.CompareByPriority);
             _currentFactory = AvailableFactories[0];
         }
+
+        public void ClearActiveGraph() => _currentFactory.ClearGraph();
 
         public void SelectFactory(int index)
         {

@@ -99,6 +99,7 @@ namespace GiantParticle.InspectorGraph.Data
                 else BaseObjectNodeProcessor.ProcessSerializedProperties(_propertyProcessors, node);
             }
 
+            CurrentGraph = root;
             return new Operation<IObjectNode>() { Progress = 1, Result = root, State = OperationState.Finished };
         }
     }

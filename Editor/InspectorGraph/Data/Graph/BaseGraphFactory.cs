@@ -3,7 +3,6 @@
 // All rights reserved.
 // ********************************
 
-using System;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Operations;
@@ -13,6 +12,13 @@ namespace GiantParticle.InspectorGraph.Data.Graph
 {
     internal abstract class BaseGraphFactory : IGraphFactory
     {
+        public IObjectNode CurrentGraph { get; protected set; }
+
+        public void ClearGraph()
+        {
+            CurrentGraph = null;
+        }
+
         protected ITypeFilterHandler TypeFilter => GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
         public abstract IOperation<IObjectNode> CreateGraphFromObject(Object rootObject);
     }

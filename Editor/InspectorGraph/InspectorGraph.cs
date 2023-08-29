@@ -35,8 +35,8 @@ namespace GiantParticle.InspectorGraph
         private InspectorGraphToolbar _toolbar;
         private InspectorGraphFooter _footer;
 
+        private IGraphController _graphController;
         private IOperation<IObjectNode> _currentOperation;
-        private IObjectNode _rootNode;
         private IInspectorGraphPlugin[] _plugins;
 
         [MenuItem("Window/Giant Particle/Inspector Graph")]
@@ -74,7 +74,10 @@ namespace GiantParticle.InspectorGraph
             }
 
             if (!context.Contains<IGraphController>())
-                context.Add<IGraphController>(new GraphController());
+            {
+                _graphController = new GraphController();
+                context.Add<IGraphController>(_graphController);
+            }
 
             if (!context.Contains<IContentViewRegistry>())
                 context.Add<IContentViewRegistry>(_viewRegistry);
@@ -154,7 +157,7 @@ namespace GiantParticle.InspectorGraph
             _viewRegistry.Clear();
 
             _content?.Clear();
-            _rootNode = null;
+            _graphController.ClearActiveGraph();
             if (GlobalApplicationContext.IsInstantiated) GlobalApplicationContext.Instance.Remove<IObjectNode>();
             _waitForResize.Clear();
         }
@@ -196,9 +199,9 @@ namespace GiantParticle.InspectorGraph
 
         private void ResetView()
         {
-            if (_rootNode == null) return;
+            if (_graphController.ActiveGraph == null) return;
             _content.transform.position = Vector3.zero;
-            CreateContentTree(_rootNode.Target);
+            CreateContentTree(_graphController.ActiveGraph.Target);
         }
 
         private void CreateContentTree(Object referenceObject)
@@ -210,8 +213,8 @@ namespace GiantParticle.InspectorGraph
 
         private void UpdateView()
         {
-            if (_rootNode == null) return;
-            UpdateView(_rootNode.Target);
+            if (_graphController.ActiveGraph == null) return;
+            UpdateView(_graphController.ActiveGraph.Target);
         }
 
         private void UpdateView(Object referenceObject)
@@ -219,8 +222,7 @@ namespace GiantParticle.InspectorGraph
             if (referenceObject == null) return;
             if (_currentOperation != null) return;
 
-            var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
-            _currentOperation = controller.ActiveFactory.CreateGraphFromObject(referenceObject);
+            _currentOperation = _graphController.ActiveFactory.CreateGraphFromObject(referenceObject);
 
             PollCurrentOperation();
         }
@@ -255,14 +257,13 @@ namespace GiantParticle.InspectorGraph
 
         private void ProcessNewGraph(IObjectNode node)
         {
-            _rootNode = node;
             GlobalApplicationContext.Instance.Remove<IObjectNode>();
-            GlobalApplicationContext.Instance.Add<IObjectNode>(_rootNode);
+            GlobalApplicationContext.Instance.Add<IObjectNode>(_graphController.ActiveGraph);
 
             Queue<IObjectNode> queue = new();
             HashSet<IObjectNode> visitedNodes = new();
             List<InspectorWindow> newWindows = new();
-            queue.Enqueue(_rootNode);
+            queue.Enqueue(_graphController.ActiveGraph);
 
             // Create windows
             while (queue.Count > 0)
@@ -299,7 +300,7 @@ namespace GiantParticle.InspectorGraph
         {
             Queue<IObjectNode> queue = new();
             HashSet<IObjectNode> visitedNodes = new();
-            queue.Enqueue(_rootNode);
+            queue.Enqueue(_graphController.ActiveGraph);
 
             while (queue.Count > 0)
             {
@@ -361,7 +362,7 @@ namespace GiantParticle.InspectorGraph
         {
             Queue<IObjectNode> queue = new();
             HashSet<IObjectNode> visitedNodes = new();
-            queue.Enqueue(_rootNode);
+            queue.Enqueue(_graphController.ActiveGraph);
 
             while (queue.Count > 0)
             {
@@ -401,13 +402,13 @@ namespace GiantParticle.InspectorGraph
 
         private void OnWindowGUIChanged()
         {
-            UpdateView(_rootNode.WindowData.Target);
+            UpdateView(_graphController.ActiveGraph.WindowData.Target);
         }
 
         private void ReorderWindows()
         {
             Queue<Tuple<IObjectNode, int>> queue = new();
-            queue.Enqueue(new Tuple<IObjectNode, int>(_rootNode, 0));
+            queue.Enqueue(new Tuple<IObjectNode, int>(_graphController.ActiveGraph, 0));
             HashSet<InspectorWindow> windowsVisited = new();
 
             List<float> maxWidthPerLevel = new List<float>();

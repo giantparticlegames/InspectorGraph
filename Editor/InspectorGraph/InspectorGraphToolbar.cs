@@ -162,7 +162,7 @@ namespace GiantParticle.InspectorGraph
             {
                 int index = _inspectionModeDropdown.choices.IndexOf(evt.newValue);
                 controller.SelectFactory(index);
-                _config?.ResetCallback.Invoke();
+                _config?.CreateCallback.Invoke(_refField.value);
             });
         }
 
