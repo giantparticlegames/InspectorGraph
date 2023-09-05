@@ -15,9 +15,9 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
         IGraphFactory[] AvailableFactories { get; }
 
         IObjectNode ActiveGraph { get; }
-        
+
         void ClearActiveGraph();
-        
+
         void SelectFactory(int index);
     }
 }

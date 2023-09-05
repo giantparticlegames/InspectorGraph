@@ -20,8 +20,9 @@ namespace GiantParticle.InspectorGraph.Data
     [EditorDisplayName("View References From Object")]
     internal class SubTreeGraphFactory : BaseGraphFactory
     {
-        private readonly Queue<ObjectNode> _queue = new();
+        public override ReferenceDirection GraphDirection => ReferenceDirection.ReferenceTo;
 
+        private readonly Queue<ObjectNode> _queue = new();
         private readonly IReadOnlyList<ISerializedPropertyProcessor> _propertyProcessors;
         private readonly IReadOnlyDictionary<Type, IObjectNodeProcessor> _objectNodeProcessors;
 
@@ -75,7 +76,9 @@ namespace GiantParticle.InspectorGraph.Data
 
         public override IOperation<IObjectNode> CreateGraphFromObject(Object rootObject)
         {
-            _queue.Enqueue(new ObjectNode(new WindowData(rootObject)));
+            var nodeFactory = GlobalApplicationContext.Instance.Get<IObjectNodeFactory>();
+            nodeFactory.ClearRegistry();
+            _queue.Enqueue(nodeFactory.CreateNode(rootObject));
 
             Dictionary<Object, ObjectNode> visitedObjects = new();
             ObjectNode root = null;
@@ -83,18 +86,18 @@ namespace GiantParticle.InspectorGraph.Data
             {
                 var node = _queue.Dequeue();
 
-                if (visitedObjects.ContainsKey(node.Target)) continue;
+                if (visitedObjects.ContainsKey(node.Object)) continue;
 
                 if (root == null) root = node;
-                visitedObjects.Add(node.Target, node);
+                visitedObjects.Add(node.Object, node);
 
-                if (!TypeFilter.ShouldExpandObject(node.Target))
+                if (!TypeFilter.ShouldExpandObject(node.Object))
                     continue;
-                if (!TypeFilter.ShouldShowObject(node.Target))
+                if (!TypeFilter.ShouldShowObject(node.Object))
                     continue;
 
                 // Process Object
-                Type objectType = node.Target.GetType();
+                Type objectType = node.Object.GetType();
                 if (_objectNodeProcessors.ContainsKey(objectType)) _objectNodeProcessors[objectType].ProcessNode(node);
                 else BaseObjectNodeProcessor.ProcessSerializedProperties(_propertyProcessors, node);
             }

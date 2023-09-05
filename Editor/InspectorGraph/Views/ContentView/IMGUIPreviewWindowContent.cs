@@ -23,7 +23,7 @@ namespace GiantParticle.InspectorGraph.ContentView
 
         public IMGUIPreviewWindowContent(IWindowData windowData)
         {
-            _editor = UnityEditor.Editor.CreateEditor(windowData.Target);
+            _editor = UnityEditor.Editor.CreateEditor(windowData.Object);
             ApplyHacksForEditor();
 
             windowData.UpdateSerializedObject(_editor.serializedObject);

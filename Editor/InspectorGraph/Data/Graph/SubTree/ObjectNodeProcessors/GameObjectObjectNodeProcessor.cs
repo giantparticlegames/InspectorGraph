@@ -18,12 +18,12 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 
         public override void ProcessNode(ObjectNode node)
         {
-            if (!(node.Target is GameObject rootPrefab)) return;
+            if (!(node.Object is GameObject rootPrefab)) return;
 
             Dictionary<string, ObjectNode> hierarchyMap = CreateHierarchyMap(rootPrefab, node);
             HashSet<Object> internalReferences = new();
             internalReferences.UnionWith(GetAllComponentsAsObjects(rootPrefab));
-            internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedTarget));
+            internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedObject));
 
             Queue<GameObject> gameObjectQueue = new();
             gameObjectQueue.Enqueue(rootPrefab);
@@ -69,8 +69,12 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(currentGameObject);
                 if (!map.ContainsKey(assetPath))
                 {
-                    ObjectNode node = new ObjectNode(new WindowData(currentGameObject));
-                    parentNode.AddNode(node, ReferenceType.NestedPrefab);
+                    ObjectNode node = NodeFactory.CreateNode(currentGameObject);
+                    ObjectNode.CreateReference(
+                        sourceObject: parentNode,
+                        targetObject: node,
+                        referenceType: ReferenceType.NestedPrefab);
+
                     map.Add(assetPath, node);
                 }
 

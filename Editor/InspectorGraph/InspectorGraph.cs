@@ -11,6 +11,7 @@ using GiantParticle.InspectorGraph.Data;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
+using GiantParticle.InspectorGraph.Editor.InspectorGraph.Views;
 using GiantParticle.InspectorGraph.Manipulators;
 using GiantParticle.InspectorGraph.Operations;
 using GiantParticle.InspectorGraph.Plugins;
@@ -27,15 +28,14 @@ namespace GiantParticle.InspectorGraph
 {
     internal partial class InspectorGraph : EditorWindow
     {
-        private const int kPositionXOffset = 80;
-        private const int kPositionYOffset = 30;
-
         private ContentViewRegistry _viewRegistry = new();
         private HashSet<InspectorWindow> _waitForResize = new();
         private InspectorGraphToolbar _toolbar;
         private InspectorGraphFooter _footer;
 
         private IGraphController _graphController;
+        private IConnectionDrawer _connectionDrawer;
+        private IWindowOrganizer _windowOrganizer;
         private IOperation<IObjectNode> _currentOperation;
         private IInspectorGraphPlugin[] _plugins;
 
@@ -55,6 +55,16 @@ namespace GiantParticle.InspectorGraph
 
         public void OnEnable()
         {
+            Initialize();
+        }
+
+        public void OnDisable()
+        {
+            ClearCurrentContent();
+        }
+
+        private void Initialize()
+        {
             GlobalApplicationContext.Instantiate();
             IApplicationContext context = GlobalApplicationContext.Instance;
             if (!context.Contains<IPreferenceHandler>())
@@ -73,6 +83,9 @@ namespace GiantParticle.InspectorGraph
                 context.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
             }
 
+            if (!context.Contains<IObjectNodeFactory>())
+                context.Add<IObjectNodeFactory>(new ObjectNodeFactory());
+
             if (!context.Contains<IGraphController>())
             {
                 _graphController = new GraphController();
@@ -88,11 +101,6 @@ namespace GiantParticle.InspectorGraph
             if (!context.Contains<IUIDocumentCatalog<InspectorWindowUIDocumentType>>())
                 context.Add<IUIDocumentCatalog<InspectorWindowUIDocumentType>>(InspectorWindowUIDocumentCatalog
                     .GetCatalog());
-        }
-
-        public void OnDisable()
-        {
-            ClearCurrentContent();
         }
 
         private void CreateGUI()
@@ -201,7 +209,7 @@ namespace GiantParticle.InspectorGraph
         {
             if (_graphController.ActiveGraph == null) return;
             _content.transform.position = Vector3.zero;
-            CreateContentTree(_graphController.ActiveGraph.Target);
+            CreateContentTree(_graphController.ActiveGraph.Object);
         }
 
         private void CreateContentTree(Object referenceObject)
@@ -214,7 +222,7 @@ namespace GiantParticle.InspectorGraph
         private void UpdateView()
         {
             if (_graphController.ActiveGraph == null) return;
-            UpdateView(_graphController.ActiveGraph.Target);
+            UpdateView(_graphController.ActiveGraph.Object);
         }
 
         private void UpdateView(Object referenceObject)
@@ -277,14 +285,15 @@ namespace GiantParticle.InspectorGraph
                 if (window != null) newWindows.Add(window);
 
                 // Enqueue
-                foreach (IObjectNodeReference nodeReference in item.References)
+                foreach (IObjectReference nodeReference in item.References)
                     queue.Enqueue(nodeReference.TargetNode);
             }
 
             DeleteLingeringWindows();
 
             // Draw Lines
-            DrawConnections();
+            if (_connectionDrawer == null) _connectionDrawer = new ConnectionDrawer();
+            _connectionDrawer.DrawConnections(_content);
 
             // Observe newly added windows for changes in geometry and position
             for (int i = 0; i < newWindows.Count; ++i)
@@ -309,14 +318,14 @@ namespace GiantParticle.InspectorGraph
                 visitedNodes.Add(node);
 
                 // Enqueue
-                foreach (IObjectNodeReference nodeReference in node.References)
+                foreach (IObjectReference nodeReference in node.References)
                     queue.Enqueue(nodeReference.TargetNode);
             }
 
             // Check objects
             HashSet<Object> visitedObjects = new(visitedNodes.Count);
             foreach (IObjectNode visitedNode in visitedNodes)
-                visitedObjects.Add(visitedNode.Target);
+                visitedObjects.Add(visitedNode.Object);
             List<InspectorWindow> windowsToDelete = new(_viewRegistry.AllWindowsExceptByKey(visitedObjects));
 
             // Delete
@@ -340,7 +349,7 @@ namespace GiantParticle.InspectorGraph
         private InspectorWindow CreateWindow(IObjectNode node)
         {
             var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
-            var key = node.Target;
+            var key = node.Object;
             if (_viewRegistry.IsWindowRegisteredByTarget(key)) return null;
             if (_viewRegistry.WindowCount > settings.MaxWindows)
             {
@@ -358,37 +367,6 @@ namespace GiantParticle.InspectorGraph
             return window;
         }
 
-        private void DrawConnections()
-        {
-            Queue<IObjectNode> queue = new();
-            HashSet<IObjectNode> visitedNodes = new();
-            queue.Enqueue(_graphController.ActiveGraph);
-
-            while (queue.Count > 0)
-            {
-                var node = queue.Dequeue();
-                if (visitedNodes.Contains(node)) continue;
-                visitedNodes.Add(node);
-
-                var sourceWindow = _viewRegistry.WindowByTarget(node.Target);
-                foreach (IObjectNodeReference nodeReference in node.References)
-                {
-                    var targetWindow = _viewRegistry.WindowByTarget(nodeReference.TargetNode.Target);
-                    if (targetWindow == null) continue;
-                    if (!_viewRegistry.ContainsConnection(sourceWindow, targetWindow))
-                    {
-                        var line = new ConnectionLine(source: sourceWindow, dest: targetWindow, nodeReference.RefType);
-                        _content.Add(line);
-                        line.SendToBack();
-                        // Register line
-                        _viewRegistry.RegisterConnection(line);
-                    }
-
-                    queue.Enqueue(nodeReference.TargetNode);
-                }
-            }
-        }
-
         private void OnInspectorWindowGeometryChanged(GeometryChangedEvent evt)
         {
             InspectorWindow source = (InspectorWindow)evt.target;
@@ -400,64 +378,16 @@ namespace GiantParticle.InspectorGraph
             ReorderWindows();
         }
 
-        private void OnWindowGUIChanged()
+        private void OnWindowGUIChanged(InspectorWindow window)
         {
-            UpdateView(_graphController.ActiveGraph.WindowData.Target);
+            UpdateView(_graphController.ActiveGraph.WindowData.Object);
         }
 
         private void ReorderWindows()
         {
-            Queue<Tuple<IObjectNode, int>> queue = new();
-            queue.Enqueue(new Tuple<IObjectNode, int>(_graphController.ActiveGraph, 0));
-            HashSet<InspectorWindow> windowsVisited = new();
+            if (_windowOrganizer == null) _windowOrganizer = new TopDownWindowOrganizer();
 
-            List<float> maxWidthPerLevel = new List<float>();
-            float currentY = 0;
-            int currentLevel = 0;
-            while (queue.Count > 0)
-            {
-                var item = queue.Dequeue();
-                IObjectNode node = item.Item1;
-                int level = item.Item2;
-
-                // Add children
-                foreach (IObjectNodeReference nodeReference in node.References)
-                    queue.Enqueue(new Tuple<IObjectNode, int>(nodeReference.TargetNode, level + 1));
-
-                if (currentLevel != level)
-                {
-                    currentY = 0;
-                    currentLevel = level;
-                }
-
-                InspectorWindow window = _viewRegistry.WindowByTarget(item.Item1.Target);
-                if (window == null) continue;
-                // Avoid reposition already repositioned window
-                if (windowsVisited.Contains(window)) continue;
-
-                // Store max width
-                if (maxWidthPerLevel.Count > level)
-                    maxWidthPerLevel[level] = Math.Max(maxWidthPerLevel[level], window.contentRect.width);
-                else
-                    maxWidthPerLevel.Add(window.contentRect.width);
-
-                // Avoid moving manually moved window
-                if (!window.Node.WindowData.HasBeenManuallyMoved)
-                {
-                    float newPositionX = 0;
-                    for (int i = 0; i < level; ++i)
-                        newPositionX += maxWidthPerLevel[i] + kPositionXOffset;
-
-                    window.transform.position = new Vector3(
-                        x: newPositionX,
-                        y: currentY,
-                        z: 0);
-                }
-
-                currentY += window.contentRect.height + kPositionYOffset;
-                windowsVisited.Add(window);
-            }
-
+            _windowOrganizer.ReorderWindows();
             _content.ResizeToFit<InspectorWindow>();
             UpdateWindowVisibility();
         }

@@ -33,7 +33,7 @@ namespace GiantParticle.InspectorGraph.Views
         private BaseWindowContent _view;
 
         public IReadOnlyList<IManipulator> Manipulators => _manipulators;
-        public event Action GUIChanged;
+        public event Action<InspectorWindow> GUIChanged;
 
         public IObjectNode Node { get; }
         private bool _forceStaticPreviewMode;
@@ -66,19 +66,19 @@ namespace GiantParticle.InspectorGraph.Views
             _toolbar = this.Q<Toolbar>(nameof(_toolbar));
 
             var title = this.Q<Label>("_titleLabel");
-            title.text = $"[{Node.Target.name}]";
+            title.text = $"[{Node.Object.name}]";
 
             // Toolbar
             ContentViewMode preferredMode = _forceStaticPreviewMode
                 ? ContentViewMode.StaticPreview
-                : WindowContentFactory.PreferredViewModeForObject(Node.Target);
-            var viewModeMenu = new ViewModeMenu(Node.Target);
+                : WindowContentFactory.PreferredViewModeForObject(Node.Object);
+            var viewModeMenu = new ViewModeMenu(Node.Object);
             viewModeMenu.ViewMode = preferredMode;
             viewModeMenu.ViewModeChanged += SwitchView;
             _toolbar.Add(viewModeMenu);
 
             var refField = this.Q<ObjectField>("_refField");
-            refField.value = Node.Target;
+            refField.value = Node.Object;
             refField.objectType = typeof(NoTypeClass);
 
             // Footer
@@ -161,7 +161,7 @@ namespace GiantParticle.InspectorGraph.Views
 
         private void OnContentChanged()
         {
-            GUIChanged?.Invoke();
+            GUIChanged?.Invoke(this);
         }
     }
 }

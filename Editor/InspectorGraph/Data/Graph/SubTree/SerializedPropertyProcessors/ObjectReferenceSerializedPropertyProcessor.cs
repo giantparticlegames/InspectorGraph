@@ -37,8 +37,11 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProc
                     reference = AssetDatabase.LoadAssetAtPath<Object>(prefabPath);
             }
 
-            ObjectNode childNode = new ObjectNode(new WindowData(reference));
-            parentNode.AddNode(childNode, ReferenceType.Direct);
+            ObjectNode childNode = NodeFactory.CreateNode(reference);
+            ObjectNode.CreateReference(
+                sourceObject: parentNode,
+                targetObject: childNode,
+                referenceType: ReferenceType.Direct);
 
             // Expand if indicated
             if (!FilterHandler.ShouldExpandObject(reference))

@@ -16,6 +16,8 @@ namespace GiantParticle.InspectorGraph.Data
         int WindowCount { get; }
         InspectorWindow WindowByTarget(Object target);
         void ExecuteOnEachWindow(Action<InspectorWindow> action);
+        bool ContainsConnection(VisualElement source, VisualElement dest);
+        void RegisterConnection(ConnectionLine line);
         IEnumerable<ConnectionLine> AllConnectionsRelatedToWindow(InspectorWindow window);
         IEnumerable<ConnectionLine> ConnectionsFromWindow(InspectorWindow source);
         IEnumerable<ConnectionLine> ConnectionsToWindow(InspectorWindow destination);
@@ -50,12 +52,12 @@ namespace GiantParticle.InspectorGraph.Data
 
         public void RegisterWindow(InspectorWindow window)
         {
-            _windowsByObject.Add(window.Node.Target, window);
+            _windowsByObject.Add(window.Node.Object, window);
         }
 
         public void DeregisterWindow(InspectorWindow window)
         {
-            _windowsByObject.Remove(window.Node.Target);
+            _windowsByObject.Remove(window.Node.Object);
         }
 
         public void DeregisterWindowByTarget(Object target)
@@ -73,7 +75,7 @@ namespace GiantParticle.InspectorGraph.Data
         {
             foreach (InspectorWindow window in _windowsByObject.Values)
             {
-                if (collection.Contains(window.Node.Target)) continue;
+                if (collection.Contains(window.Node.Object)) continue;
                 yield return window;
             }
         }
@@ -93,6 +95,7 @@ namespace GiantParticle.InspectorGraph.Data
 
             return false;
         }
+
         public void RegisterConnection(ConnectionLine line)
         {
             _allLines.Add(line);

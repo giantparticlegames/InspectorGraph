@@ -44,18 +44,21 @@ namespace GiantParticle.InspectorGraph.Views
         private void AddObjectType()
         {
             var objectTypeLabel = GetOrCreateLabel("_objectType");
-            objectTypeLabel.text = $"{Node.Target.GetType().Name}";
-            objectTypeLabel.tooltip = $"Object Type: {Node.Target.GetType().FullName}";
+            objectTypeLabel.text = $"{Node.Object.GetType().Name}";
+            objectTypeLabel.tooltip = $"Object Type:\n{Node.Object.GetType().FullName}";
         }
 
         private void AddReferencesLabel()
         {
             int refCount = 0;
-            int totalReferences = 0;
-            foreach (IObjectNodeReference reference in Node.References)
+            HashSet<IObjectNode> uniqueReferences = new();
+            for (int i = 0; i < Node.References.Count; ++i)
             {
-                ++refCount;
-                totalReferences += reference.RefCount;
+                if (Node.References[i].Direction == ReferenceDirection.ReferenceTo)
+                {
+                    ++refCount;
+                    uniqueReferences.Add(Node.References[i].TargetNode);
+                }
             }
 
             if (refCount <= 0) return;
@@ -63,41 +66,29 @@ namespace GiantParticle.InspectorGraph.Views
             StringBuilder builder = new();
             builder.Append($"Refs: {refCount}");
 
-            string tooltipText = null;
-            if (totalReferences != refCount)
+            string tooltipText = $"Number of References to other objects: {refCount}";
+            if (uniqueReferences.Count != refCount)
             {
-                builder.Append($" [Total: {totalReferences}]");
+                builder.Append($" [Total: {uniqueReferences.Count}]");
                 tooltipText = "* Object is referencing an object more than once";
             }
 
             var statsLabel = GetOrCreateLabel("_refsLabel");
             statsLabel.text = builder.ToString();
-            if (tooltipText != null) statsLabel.tooltip = tooltipText;
+            statsLabel.tooltip = tooltipText;
         }
 
         private void AddReferencedByLabel()
         {
-            var root = GlobalApplicationContext.Instance.Get<IObjectNode>();
-            HashSet<IObjectNode> visitedNodes = new();
-            Queue<IObjectNode> queue = new();
-            queue.Enqueue(root);
-
             int refCount = 0;
-            int totalReferences = 0;
-            while (queue.Count > 0)
-            {
-                IObjectNode node = queue.Dequeue();
-                if (visitedNodes.Contains(node)) continue;
-                visitedNodes.Add(node);
+            HashSet<IObjectNode> uniqueReferences = new();
 
-                foreach (IObjectNodeReference reference in node.References)
+            for (int i = 0; i < Node.References.Count; ++i)
+            {
+                if (Node.References[i].Direction == ReferenceDirection.ReferenceBy)
                 {
-                    queue.Enqueue(reference.TargetNode);
-                    if (reference.TargetNode == Node)
-                    {
-                        ++refCount;
-                        totalReferences += reference.RefCount;
-                    }
+                    ++refCount;
+                    uniqueReferences.Add(Node.References[i].TargetNode);
                 }
             }
 
@@ -106,16 +97,16 @@ namespace GiantParticle.InspectorGraph.Views
             StringBuilder builder = new();
             builder.Append($"Refs By: {refCount}");
 
-            string tooltipText = null;
-            if (totalReferences != refCount)
+            string tooltipText = $"Number of References by other Objects: {refCount}";
+            if (uniqueReferences.Count != refCount)
             {
-                builder.Append($" [Total: {totalReferences}]");
+                builder.Append($" [Total: {uniqueReferences.Count}]");
                 tooltipText = "* Object is being referenced multiple times by one or more objects";
             }
 
             var statsLabel = GetOrCreateLabel("_refByLabel");
             statsLabel.text = builder.ToString();
-            if (tooltipText != null) statsLabel.tooltip = tooltipText;
+            statsLabel.tooltip = tooltipText;
         }
 
         public void UpdateView()

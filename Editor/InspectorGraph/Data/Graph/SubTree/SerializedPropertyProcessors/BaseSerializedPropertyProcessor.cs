@@ -15,10 +15,9 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProc
     {
         public Queue<ObjectNode> NodeQueue { get; set; }
 
-        public ITypeFilterHandler FilterHandler
-        {
-            get => GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
-        }
+        protected ITypeFilterHandler FilterHandler => GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+
+        protected IObjectNodeFactory NodeFactory => GlobalApplicationContext.Instance.Get<IObjectNodeFactory>();
 
         public abstract bool ProcessSerializedProperty(SerializedProperty property, ObjectNode parentNode,
             ICollection<Object> excludeSet);

@@ -21,6 +21,8 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
         public abstract Type TargetType { get; }
         protected IReadOnlyList<ISerializedPropertyProcessor> PropertyProcessors { get; private set; }
 
+        protected IObjectNodeFactory NodeFactory => GlobalApplicationContext.Instance.Get<IObjectNodeFactory>();
+
         public void SetPropertyProcessors(IReadOnlyList<ISerializedPropertyProcessor> processors)
         {
             PropertyProcessors = processors;
@@ -112,7 +114,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
         public static void ProcessSerializedProperties(IReadOnlyList<ISerializedPropertyProcessor> propertyProcessors,
             ObjectNode node)
         {
-            SerializedObject serializedObject = node.WindowData.SerializedTarget;
+            SerializedObject serializedObject = node.WindowData.SerializedObject;
 
             Queue<SerializedObject> queue = new Queue<SerializedObject>();
             HashSet<Object> internalReferences = CreateInternalReferenceSet(serializedObject);

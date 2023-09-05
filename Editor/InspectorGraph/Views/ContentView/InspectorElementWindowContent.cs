@@ -16,7 +16,7 @@ namespace GiantParticle.InspectorGraph.ContentView
         public InspectorElementWindowContent(IWindowData windowData)
         {
             windowData.CreateNewSerializedTarget();
-            _view = new InspectorElement(windowData.SerializedTarget);
+            _view = new InspectorElement(windowData.SerializedObject);
 
             // Observer element
             _inspectorElementObserver = new InspectorElementObserver();

@@ -24,7 +24,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 
         public override void ProcessNode(ObjectNode node)
         {
-            SerializedObject serializedObject = node.WindowData.SerializedTarget;
+            SerializedObject serializedObject = node.WindowData.SerializedObject;
 
             Queue<SerializedObject> queue = new Queue<SerializedObject>();
             HashSet<Object> internalReferences = CreateInternalReferenceSet(serializedObject);

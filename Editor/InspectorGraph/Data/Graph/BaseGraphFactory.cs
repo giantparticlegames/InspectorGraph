@@ -13,6 +13,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph
     internal abstract class BaseGraphFactory : IGraphFactory
     {
         public IObjectNode CurrentGraph { get; protected set; }
+        public abstract ReferenceDirection GraphDirection { get; }
 
         public void ClearGraph()
         {

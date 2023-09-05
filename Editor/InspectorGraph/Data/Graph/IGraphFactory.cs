@@ -12,6 +12,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph
     internal interface IGraphFactory
     {
         IObjectNode CurrentGraph { get; }
+        ReferenceDirection GraphDirection { get; }
         void ClearGraph();
         IOperation<IObjectNode> CreateGraphFromObject(Object rootObject);
     }
