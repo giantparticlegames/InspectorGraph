@@ -3,11 +3,11 @@
 // All rights reserved.
 // ********************************
 
-namespace GiantParticle.InspectorGraph.Data.Nodes
+namespace GiantParticle.InspectorGraph.Views
 {
-    internal enum ReferenceDirection
+    internal enum WindowOrganizerType
     {
-        ReferenceTo = 0,
-        ReferenceBy = 1
+        TopDown = 0,
+        BottomUp = 1
     }
 }

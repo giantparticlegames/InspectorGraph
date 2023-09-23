@@ -11,7 +11,6 @@ using GiantParticle.InspectorGraph.Data;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
-using GiantParticle.InspectorGraph.Editor.InspectorGraph.Views;
 using GiantParticle.InspectorGraph.Manipulators;
 using GiantParticle.InspectorGraph.Operations;
 using GiantParticle.InspectorGraph.Plugins;
@@ -35,7 +34,7 @@ namespace GiantParticle.InspectorGraph
 
         private IGraphController _graphController;
         private IConnectionDrawer _connectionDrawer;
-        private IWindowOrganizer _windowOrganizer;
+        private WindowOrganizerFactory _windowOrganizerFactory;
         private IOperation<IObjectNode> _currentOperation;
         private IInspectorGraphPlugin[] _plugins;
 
@@ -385,9 +384,23 @@ namespace GiantParticle.InspectorGraph
 
         private void ReorderWindows()
         {
-            if (_windowOrganizer == null) _windowOrganizer = new TopDownWindowOrganizer();
+            if (_windowOrganizerFactory == null) _windowOrganizerFactory = new WindowOrganizerFactory();
 
-            _windowOrganizer.ReorderWindows();
+            IWindowOrganizer organizer = null;
+            var graphDirection = _graphController.ActiveFactory.GraphDirection;
+            switch (graphDirection)
+            {
+                case ReferenceDirection.ReferenceTo:
+                    organizer = _windowOrganizerFactory.GetWindowOrganizer(WindowOrganizerType.TopDown);
+                    break;
+                case ReferenceDirection.ReferenceBy:
+                    organizer = _windowOrganizerFactory.GetWindowOrganizer(WindowOrganizerType.BottomUp);
+                    break;
+                default:
+                    throw new NotImplementedException($"Unhandled direction [{graphDirection}]");
+            }
+
+            organizer.ReorderWindows();
             _content.ResizeToFit<InspectorWindow>();
             UpdateWindowVisibility();
         }
