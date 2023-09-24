@@ -12,6 +12,7 @@ namespace GiantParticle.InspectorGraph
         private VisualElement _windowView;
         private VisualElement _content;
         private VisualElement _toolbarContainer;
+        private VisualElement _notificationContainer;
         private VisualElement _footerContainer;
 
         private void AssignVisualElements()
@@ -20,6 +21,7 @@ namespace GiantParticle.InspectorGraph
             _content = rootVisualElement.Q<VisualElement>(nameof(_content));
             _toolbarContainer = rootVisualElement.Q<VisualElement>(nameof(_toolbarContainer));
             _footerContainer = rootVisualElement.Q<VisualElement>(nameof(_footerContainer));
+            _notificationContainer = rootVisualElement.Q<VisualElement>(nameof(_notificationContainer));
         }
     }
 }

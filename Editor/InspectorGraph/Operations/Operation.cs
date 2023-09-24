@@ -13,6 +13,7 @@ namespace GiantParticle.InspectorGraph.Operations
 
         public float Progress { get; set; }
 
+        public string Message { get; set; }
     }
 
     internal class Operation<T> : Operation, IOperation<T>

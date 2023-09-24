@@ -4,7 +4,6 @@
 // ********************************
 
 using System;
-using UnityEngine;
 
 namespace GiantParticle.InspectorGraph.UIDocuments
 {
@@ -13,6 +12,7 @@ namespace GiantParticle.InspectorGraph.UIDocuments
         MainWindow = 1,
         MainWindowToolbar = 100,
         MainWindowFooter = 200,
+        MainWindowNotification = 300
     }
 
     [Serializable]

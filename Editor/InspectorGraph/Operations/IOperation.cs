@@ -11,6 +11,7 @@ namespace GiantParticle.InspectorGraph.Operations
     {
         OperationState State { get; }
         float Progress { get; }
+        string Message { get; }
     }
 
     internal interface IOperation<T> : IOperation

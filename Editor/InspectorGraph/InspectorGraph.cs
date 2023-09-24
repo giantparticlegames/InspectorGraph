@@ -12,6 +12,7 @@ using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Manipulators;
+using GiantParticle.InspectorGraph.Notifications;
 using GiantParticle.InspectorGraph.Operations;
 using GiantParticle.InspectorGraph.Plugins;
 using GiantParticle.InspectorGraph.Preferences;
@@ -32,6 +33,7 @@ namespace GiantParticle.InspectorGraph
         private InspectorGraphToolbar _toolbar;
         private InspectorGraphFooter _footer;
 
+        private INotificationController _notificationController;
         private IGraphController _graphController;
         private IConnectionDrawer _connectionDrawer;
         private WindowOrganizerFactory _windowOrganizerFactory;
@@ -100,6 +102,13 @@ namespace GiantParticle.InspectorGraph
             if (!context.Contains<IUIDocumentCatalog<InspectorWindowUIDocumentType>>())
                 context.Add<IUIDocumentCatalog<InspectorWindowUIDocumentType>>(InspectorWindowUIDocumentCatalog
                     .GetCatalog());
+
+            // Notification
+            if (!context.Contains<INotificationController>())
+            {
+                _notificationController = new NotificationController();
+                context.Add<INotificationController>(_notificationController);
+            }
         }
 
         private void CreateGUI()
@@ -124,6 +133,8 @@ namespace GiantParticle.InspectorGraph
             _footer = new InspectorGraphFooter();
             _footerContainer.Add(_footer);
             _footer.ZoomLevelChanged += OnZoomLevelChanged;
+
+            _notificationController.Container = _notificationContainer;
 
             var moveManipulator = new DragManipulator(_windowView, _content,
                 new[]
@@ -244,9 +255,12 @@ namespace GiantParticle.InspectorGraph
                     _footer.UpdateProgress("Pending...", float.Epsilon);
                     break;
                 case OperationState.Failed:
-                    _currentOperation = null;
                     _footer.UpdateProgress("", 0);
-                    Debug.LogError("Operation failed");
+                    _notificationController.ShowNotification(
+                        notificationType: NotificationType.Error,
+                        message: _currentOperation.Message);
+                    if (_currentOperation.Result != null) ProcessNewGraph(_currentOperation.Result);
+                    _currentOperation = null;
                     break;
                 case OperationState.Finished:
                     _footer.UpdateProgress("", 0);

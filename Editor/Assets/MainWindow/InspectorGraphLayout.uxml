@@ -4,5 +4,6 @@
     <ui:VisualElement name="_windowView" style="width: 100%; height: 100%; overflow: hidden;">
         <ui:VisualElement name="_content" style="flex-grow: 1;" />
     </ui:VisualElement>
+    <ui:VisualElement name="_notificationContainer" style="flex-direction: column-reverse; justify-content: flex-end; width: 25%; right: 0; position: absolute; bottom: 25px;" />
     <ui:VisualElement name="_footerContainer" />
 </ui:UXML>
