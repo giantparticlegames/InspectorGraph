@@ -11,5 +11,6 @@ namespace GiantParticle.InspectorGraph.Notifications
     {
         VisualElement Container { get; set; }
         void ShowNotification(NotificationType notificationType, string message);
+        void ClearNotifications();
     }
 }

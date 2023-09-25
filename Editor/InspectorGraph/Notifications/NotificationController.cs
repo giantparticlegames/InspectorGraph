@@ -16,5 +16,10 @@ namespace GiantParticle.InspectorGraph.Notifications
             var notification = new InspectorGraphNotification(notificationType, message);
             Container.Add(notification);
         }
+
+        public void ClearNotifications()
+        {
+            Container.Clear();
+        }
     }
 }

@@ -178,6 +178,7 @@ namespace GiantParticle.InspectorGraph
             _graphController.ClearActiveGraph();
             if (GlobalApplicationContext.IsInstantiated) GlobalApplicationContext.Instance.Remove<IObjectNode>();
             _waitForResize.Clear();
+            _notificationController.ClearNotifications();
         }
 
         private void ObserveWindow(InspectorWindow window)
@@ -265,6 +266,10 @@ namespace GiantParticle.InspectorGraph
                 case OperationState.Finished:
                     _footer.UpdateProgress("", 0);
                     ProcessNewGraph(_currentOperation.Result);
+                    if (!string.IsNullOrEmpty(_currentOperation.Message))
+                        _notificationController.ShowNotification(
+                            notificationType: NotificationType.Info,
+                            message: _currentOperation.Message);
                     _currentOperation = null;
                     break;
                 case OperationState.Started:
