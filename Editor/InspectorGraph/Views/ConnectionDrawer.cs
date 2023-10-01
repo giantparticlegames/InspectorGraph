@@ -35,17 +35,23 @@ namespace GiantParticle.InspectorGraph.Views
 
                     var targetWindow = viewRegistry.WindowByTarget(nodeReference.TargetNode.Object);
                     if (targetWindow == null) continue;
-                    if (!viewRegistry.ContainsConnection(sourceWindow, targetWindow))
+
+                    InspectorWindow directionalSource = sourceWindow;
+                    InspectorWindow directionalTarget = targetWindow;
+                    if (nodeReference.Direction == ReferenceDirection.ReferenceBy)
                     {
-                        var sourcePoint = nodeReference.Direction == ReferenceDirection.ReferenceTo
-                            ? sourceWindow
-                            : targetWindow;
-                        var targetPoint = nodeReference.Direction == ReferenceDirection.ReferenceTo
-                            ? targetWindow
-                            : sourceWindow;
+                        directionalSource = targetWindow;
+                        directionalTarget = sourceWindow;
+                    }
+
+                    if (!viewRegistry.ContainsConnection(
+                            source: directionalSource,
+                            dest: directionalTarget,
+                            refType: nodeReference.RefType))
+                    {
                         var line = new ConnectionLine(
-                            source: sourcePoint,
-                            dest: targetPoint,
+                            source: directionalSource,
+                            dest: directionalTarget,
                             refType: nodeReference.RefType);
                         container.Add(line);
                         line.SendToBack();
@@ -56,6 +62,34 @@ namespace GiantParticle.InspectorGraph.Views
                     queue.Enqueue(nodeReference.TargetNode);
                 }
             }
+
+            // Organize connections
+            viewRegistry.ExecuteOnEachWindow(window =>
+            {
+                int fromTotal = viewRegistry.ConnectionsFromWindowCount(window);
+                if (fromTotal > 1)
+                {
+                    int count = 1;
+                    foreach (ConnectionLine line in viewRegistry.ConnectionsFromWindow(window))
+                    {
+                        line.SourceCount = count;
+                        line.SourceTotal = fromTotal;
+                        ++count;
+                    }
+                }
+
+                int toTotal = viewRegistry.ConnectionsToWindowCount(window);
+                if (toTotal > 0)
+                {
+                    int count = 1;
+                    foreach (ConnectionLine line in viewRegistry.ConnectionsToWindow(window))
+                    {
+                        line.DestinationCount = count;
+                        line.DestinationTotal = toTotal;
+                        ++count;
+                    }
+                }
+            });
         }
     }
 }

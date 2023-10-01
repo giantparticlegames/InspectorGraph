@@ -17,7 +17,7 @@ using Object = UnityEngine.Object;
 namespace GiantParticle.InspectorGraph.Data
 {
     [InternalPriority(0)]
-    [EditorDisplayName("View References From Object")]
+    [EditorDisplayName("References From Object")]
     internal class SubTreeGraphFactory : BaseGraphFactory
     {
         public override ReferenceDirection GraphDirection => ReferenceDirection.ReferenceTo;

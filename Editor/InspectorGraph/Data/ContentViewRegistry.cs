@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Views;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -16,10 +17,12 @@ namespace GiantParticle.InspectorGraph.Data
         int WindowCount { get; }
         InspectorWindow WindowByTarget(Object target);
         void ExecuteOnEachWindow(Action<InspectorWindow> action);
-        bool ContainsConnection(VisualElement source, VisualElement dest);
+        bool ContainsConnection(VisualElement source, VisualElement dest, ReferenceType refType);
         void RegisterConnection(ConnectionLine line);
         IEnumerable<ConnectionLine> AllConnectionsRelatedToWindow(InspectorWindow window);
+        int ConnectionsFromWindowCount(InspectorWindow source);
         IEnumerable<ConnectionLine> ConnectionsFromWindow(InspectorWindow source);
+        int ConnectionsToWindowCount(InspectorWindow source);
         IEnumerable<ConnectionLine> ConnectionsToWindow(InspectorWindow destination);
     }
 
@@ -84,12 +87,13 @@ namespace GiantParticle.InspectorGraph.Data
 
         #region Connections
 
-        public bool ContainsConnection(VisualElement source, VisualElement dest)
+        public bool ContainsConnection(VisualElement source, VisualElement dest, ReferenceType refType)
         {
             foreach (ConnectionLine connectionLine in _allLines)
             {
                 if (connectionLine.Source != source) continue;
                 if (connectionLine.Destination != dest) continue;
+                if (connectionLine.ReferenceType != refType) continue;
                 return true;
             }
 
@@ -135,6 +139,18 @@ namespace GiantParticle.InspectorGraph.Data
             }
         }
 
+        public int ConnectionsFromWindowCount(InspectorWindow source)
+        {
+            int count = 0;
+            foreach (ConnectionLine line in _allLines)
+            {
+                if (line.Source != source) continue;
+                ++count;
+            }
+
+            return count;
+        }
+
         public IEnumerable<ConnectionLine> ConnectionsFromWindow(InspectorWindow source)
         {
             foreach (ConnectionLine line in _allLines)
@@ -142,6 +158,18 @@ namespace GiantParticle.InspectorGraph.Data
                 if (line.Source != source) continue;
                 yield return line;
             }
+        }
+
+        public int ConnectionsToWindowCount(InspectorWindow destination)
+        {
+            int count = 0;
+            foreach (ConnectionLine line in _allLines)
+            {
+                if (line.Destination != destination) continue;
+                ++count;
+            }
+
+            return count;
         }
 
         public IEnumerable<ConnectionLine> ConnectionsToWindow(InspectorWindow destination)

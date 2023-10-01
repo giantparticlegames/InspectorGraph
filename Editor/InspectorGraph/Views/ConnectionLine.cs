@@ -30,7 +30,12 @@ namespace GiantParticle.InspectorGraph.Views
 
         public VisualElement Source { get; }
         public VisualElement Destination { get; }
+        public ReferenceType ReferenceType { get; }
         public int ForceHighlightCount { get; set; }
+        public int SourceCount { get; set; }
+        public int SourceTotal { get; set; }
+        public int DestinationCount { get; set; }
+        public int DestinationTotal { get; set; }
 
         private ViewMode _mode;
         private IReferenceColorSettings _colorSettings;
@@ -39,9 +44,14 @@ namespace GiantParticle.InspectorGraph.Views
         {
             Source = source;
             Destination = dest;
+            ReferenceType = refType;
             var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
             _colorSettings = settings.GetReferenceColor(refType);
 
+            SourceCount = 1;
+            SourceTotal = 1;
+            DestinationCount = 1;
+            DestinationTotal = 1;
             var line = new IMGUIContainer(DrawLine);
             this.Add(line);
         }
@@ -64,9 +74,19 @@ namespace GiantParticle.InspectorGraph.Views
             }
 
             Vector3 startPoint = Source.transform.position +
-                                 new Vector3(Source.contentRect.width, Source.contentRect.height * 0.5f, 0);
+                                 new Vector3(
+                                     x: Source.contentRect.width,
+                                     y: Source.contentRect.height * 0.25f
+                                        + (Source.contentRect.height * 0.5f) * (SourceCount * 1f) /
+                                        (SourceTotal * 1f + 1),
+                                     z: 0);
             Vector3 endPoint = Destination.transform.position +
-                               new Vector3(0, Destination.contentRect.height * 0.5f, 0);
+                               new Vector3(
+                                   x: 0,
+                                   y: Destination.contentRect.height * 0.25f
+                                      + (Destination.contentRect.height * 0.5f) * (DestinationCount * 1f) /
+                                      (DestinationTotal * 1f + 1),
+                                   z: 0);
 
             Handles.DrawBezier(startPosition: startPoint,
                 endPosition: endPoint - Vector3.right * 10,
