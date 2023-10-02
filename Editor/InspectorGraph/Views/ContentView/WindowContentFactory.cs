@@ -33,7 +33,7 @@ namespace GiantParticle.InspectorGraph.ContentView
                 return ReturnMode(targetType, ContentViewMode.InspectorElement, inspector);
 
             // At this point we just guess the best fit
-            if (target is ScriptableObject)
+            if (target is ScriptableObject || target is MonoBehaviour)
                 return ReturnMode(targetType, ContentViewMode.IMGUI, inspector);
 
             // Default to Static Preview

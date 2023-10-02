@@ -233,6 +233,9 @@ namespace GiantParticle.InspectorGraph
         private void UpdateView()
         {
             if (_graphController.ActiveGraph == null) return;
+            // Clear connections
+            _viewRegistry.ExecuteOnEachConnection((connection) => { connection.RemoveFromHierarchy(); });
+            _viewRegistry.ClearConnections();
             UpdateView(_graphController.ActiveGraph.Object);
         }
 

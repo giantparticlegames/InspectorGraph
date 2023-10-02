@@ -41,6 +41,8 @@ namespace GiantParticle.InspectorGraph.Data
             _windowsByObject.Clear();
         }
 
+        public void ClearConnections() => _allLines.Clear();
+
         #region Windows
 
         public InspectorWindow WindowByTarget(Object target)
