@@ -44,10 +44,15 @@ namespace GiantParticle.InspectorGraph.Views
                         directionalTarget = sourceWindow;
                     }
 
-                    if (!viewRegistry.ContainsConnection(
-                            source: directionalSource,
-                            dest: directionalTarget,
-                            refType: nodeReference.RefType))
+                    var connectionLine = viewRegistry.GetConnection(
+                        source: directionalSource,
+                        dest: directionalTarget,
+                        refType: nodeReference.RefType);
+                    if (connectionLine != null)
+                    {
+                        connectionLine.ReferenceCount += 1;
+                    }
+                    else
                     {
                         var line = new ConnectionLine(
                             source: directionalSource,

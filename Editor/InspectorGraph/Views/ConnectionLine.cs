@@ -36,6 +36,7 @@ namespace GiantParticle.InspectorGraph.Views
         public int SourceTotal { get; set; }
         public int DestinationCount { get; set; }
         public int DestinationTotal { get; set; }
+        public int ReferenceCount { get; set; }
 
         private ViewMode _mode;
         private IReferenceColorSettings _colorSettings;
@@ -45,6 +46,7 @@ namespace GiantParticle.InspectorGraph.Views
             Source = source;
             Destination = dest;
             ReferenceType = refType;
+            ReferenceCount = 1;
             var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
             _colorSettings = settings.GetReferenceColor(refType);
 
@@ -88,6 +90,7 @@ namespace GiantParticle.InspectorGraph.Views
                                       (DestinationTotal * 1f + 1),
                                    z: 0);
 
+            // Draw Curve
             Handles.DrawBezier(startPosition: startPoint,
                 endPosition: endPoint - Vector3.right * 10,
                 startTangent: startPoint + Vector3.right * 25,
@@ -95,13 +98,28 @@ namespace GiantParticle.InspectorGraph.Views
                 color: lineColor,
                 texture: Texture2D.whiteTexture,
                 width: thickness);
+
+            // Draw Arrow
             var arrow = new Vector3[]
             {
                 endPoint, new(endPoint.x - kArrowLength, endPoint.y - kArrowWidth * 0.5f, endPoint.z),
                 new(endPoint.x - kArrowLength, endPoint.y + kArrowWidth * 0.5f, endPoint.z),
             };
+            var previousColor = Handles.color;
             Handles.color = lineColor;
             Handles.DrawAAConvexPolygon(arrow);
+            Handles.color = previousColor;
+
+            // Draw number
+            if (ReferenceCount > 1)
+            {
+                var previousGUIColor = GUI.color;
+                GUI.color = new Color(lineColor.r, lineColor.g, lineColor.b, 1f);
+                var labelPosition = endPoint - new Vector3(kArrowLength * 2, 0, 0);
+                Handles.Label(labelPosition, $"{ReferenceCount}");
+                GUI.color = previousGUIColor;
+            }
+
             Handles.EndGUI();
         }
     }

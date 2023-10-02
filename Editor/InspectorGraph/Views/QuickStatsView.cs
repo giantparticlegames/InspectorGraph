@@ -3,7 +3,6 @@
 // All rights reserved.
 // ********************************
 
-using System.Collections.Generic;
 using System.Text;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Data.Stats;
@@ -71,7 +70,7 @@ namespace GiantParticle.InspectorGraph.Views
 
             // Tooltip Text
             builder.Clear();
-            builder.AppendLine("Number of References:");
+            builder.AppendLine("Number of references from this Object:");
             builder.AppendLine($"- Total: {stats.TotalReferences}");
             builder.AppendLine($"- Unique: {stats.UniqueReferences}");
             int totalStats = stats.ReferenceTypes;
@@ -105,7 +104,7 @@ namespace GiantParticle.InspectorGraph.Views
 
             // Tooltip Text
             builder.Clear();
-            builder.AppendLine("Number of References:");
+            builder.AppendLine("Number of references to this Object:");
             builder.AppendLine($"- Total: {stats.TotalReferences}");
             builder.AppendLine($"- Unique: {stats.UniqueReferences}");
             int totalStats = stats.ReferenceTypes;

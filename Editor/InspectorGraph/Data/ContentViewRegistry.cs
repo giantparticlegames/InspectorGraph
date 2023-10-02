@@ -18,6 +18,7 @@ namespace GiantParticle.InspectorGraph.Data
         InspectorWindow WindowByTarget(Object target);
         void ExecuteOnEachWindow(Action<InspectorWindow> action);
         bool ContainsConnection(VisualElement source, VisualElement dest, ReferenceType refType);
+        ConnectionLine GetConnection(VisualElement source, VisualElement dest, ReferenceType refType);
         void RegisterConnection(ConnectionLine line);
         IEnumerable<ConnectionLine> AllConnectionsRelatedToWindow(InspectorWindow window);
         int ConnectionsFromWindowCount(InspectorWindow source);
@@ -98,6 +99,19 @@ namespace GiantParticle.InspectorGraph.Data
             }
 
             return false;
+        }
+
+        public ConnectionLine GetConnection(VisualElement source, VisualElement dest, ReferenceType refType)
+        {
+            foreach (ConnectionLine connectionLine in _allLines)
+            {
+                if (connectionLine.Source != source) continue;
+                if (connectionLine.Destination != dest) continue;
+                if (connectionLine.ReferenceType != refType) continue;
+                return connectionLine;
+            }
+
+            return null;
         }
 
         public void RegisterConnection(ConnectionLine line)
