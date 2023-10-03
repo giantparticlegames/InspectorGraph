@@ -15,10 +15,13 @@ namespace GiantParticle.InspectorGraph.Manipulators
         private Vector2 _startingSize;
         private VisualElement _resizeTarget;
         private bool _enabled;
+        private Vector2 _minValues;
 
-        public ResizeManipulator(VisualElement handle, VisualElement resizeTarget) : base(handle)
+        public ResizeManipulator(VisualElement handle, VisualElement resizeTarget, Vector2 minValues) :
+            base(handle)
         {
             _resizeTarget = resizeTarget;
+            _minValues = minValues;
         }
 
         protected override void OnPointerDown(PointerDownEvent evt)
@@ -30,8 +33,14 @@ namespace GiantParticle.InspectorGraph.Manipulators
 
         protected override void OnPointerMove(PointerMoveEvent evt)
         {
-            _resizeTarget.style.width = new StyleLength(_startingSize.x + PositionDelta.x);
-            _resizeTarget.style.height = new StyleLength(_startingSize.y + PositionDelta.y);
+            _resizeTarget.style.width = new StyleLength(
+                Mathf.Max(
+                    a: _minValues.x,
+                    b: _startingSize.x + PositionDelta.x));
+            _resizeTarget.style.height = new StyleLength(
+                Mathf.Max(
+                    a: _minValues.y,
+                    b: _startingSize.y + PositionDelta.y));
             // Remove limits
             if (_resizeTarget.style.maxWidth != new StyleLength(StyleKeyword.None))
                 _resizeTarget.style.maxWidth = new StyleLength(StyleKeyword.None);

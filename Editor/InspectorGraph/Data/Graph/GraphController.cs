@@ -30,5 +30,10 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
         {
             _currentFactory = AvailableFactories[index];
         }
+
+        public void SelectFactory(IGraphFactory factory)
+        {
+            _currentFactory = factory;
+        }
     }
 }

@@ -63,7 +63,6 @@ namespace GiantParticle.InspectorGraph
             ConfigureEditMenu();
             ConfigureHelpMenu();
 
-            ConfigureActiveMode();
             ConfigureActiveObject();
             if (_extensions != null)
                 for (int i = 0; i < _extensions.Length; ++i)
@@ -116,6 +115,32 @@ namespace GiantParticle.InspectorGraph
                         return DropdownMenuAction.Status.Normal;
                     });
             }
+
+            _viewMenu.menu.AppendSeparator();
+
+            // Inspection Mode
+            var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
+            for (int i = 0; i < controller.AvailableFactories.Length; ++i)
+            {
+                var factory = controller.AvailableFactories[i];
+                var displayName = (EditorDisplayNameAttribute)Attribute.GetCustomAttribute(
+                    element: factory.GetType(),
+                    attributeType: typeof(EditorDisplayNameAttribute));
+
+                _viewMenu.menu.AppendAction(
+                    actionName: $"Inspection Mode/{displayName.DisplayName}",
+                    action: (menuAction) =>
+                    {
+                        controller.SelectFactory(factory);
+                        _config?.CreateCallback.Invoke(_refField.value);
+                    },
+                    actionStatusCallback: action =>
+                    {
+                        return controller.ActiveFactory == factory
+                            ? DropdownMenuAction.Status.Checked
+                            : DropdownMenuAction.Status.Normal;
+                    });
+            }
         }
 
         private void ConfigureEditMenu()
@@ -140,30 +165,6 @@ namespace GiantParticle.InspectorGraph
             _helpMenu.menu.AppendAction(
                 actionName: "Website",
                 action: (menuAction) => { Application.OpenURL(kWebsite); });
-        }
-
-        private void ConfigureActiveMode()
-        {
-            var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
-            _inspectionModeDropdown.choices.Clear();
-            for (int i = 0; i < controller.AvailableFactories.Length; ++i)
-            {
-                var factory = controller.AvailableFactories[i];
-                var displayName = (EditorDisplayNameAttribute)Attribute.GetCustomAttribute(
-                    element: factory.GetType(),
-                    attributeType: typeof(EditorDisplayNameAttribute));
-                _inspectionModeDropdown.choices.Add(displayName.DisplayName);
-            }
-
-            _inspectionModeDropdown.index = 0;
-
-            _inspectionModeDropdown.visible = _inspectionModeDropdown.choices.Count > 1;
-            _inspectionModeDropdown.RegisterValueChangedCallback(evt =>
-            {
-                int index = _inspectionModeDropdown.choices.IndexOf(evt.newValue);
-                controller.SelectFactory(index);
-                _config?.CreateCallback.Invoke(_refField.value);
-            });
         }
 
         private void ConfigureActiveObject()

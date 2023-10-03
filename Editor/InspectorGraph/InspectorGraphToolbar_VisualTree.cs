@@ -14,7 +14,6 @@ namespace GiantParticle.InspectorGraph
         private ToolbarMenu _editMenu;
         private ToolbarMenu _helpMenu;
         private VisualElement _activeObjectContainer;
-        private DropdownField _inspectionModeDropdown;
         private ObjectField _refField;
 
         private void AssignVisualElements()
@@ -24,7 +23,6 @@ namespace GiantParticle.InspectorGraph
             _helpMenu = this.Q<ToolbarMenu>(nameof(_helpMenu));
             _activeObjectContainer = this.Q<VisualElement>(nameof(_activeObjectContainer));
             _refField = this.Q<ObjectField>(nameof(_refField));
-            _inspectionModeDropdown = this.Q<DropdownField>(nameof(_inspectionModeDropdown));
         }
     }
 }

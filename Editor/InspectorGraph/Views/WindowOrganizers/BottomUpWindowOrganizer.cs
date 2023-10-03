@@ -13,7 +13,7 @@ namespace GiantParticle.InspectorGraph.Views
         {
             int windowLevel = windowLevelData.Level;
             float newPositionX = 0;
-            for (int i = windowLevel; i < maxWidthPerLevel.Count - 1; ++i)
+            for (int i = maxWidthPerLevel.Count - 1; i > windowLevel; --i)
                 newPositionX += maxWidthPerLevel[i] + kPositionXOffset;
 
             return newPositionX;

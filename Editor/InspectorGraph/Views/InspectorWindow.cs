@@ -11,7 +11,9 @@ using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Settings;
 using GiantParticle.InspectorGraph.ToolbarContent;
 using GiantParticle.InspectorGraph.UIDocuments;
+using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Views
@@ -67,6 +69,8 @@ namespace GiantParticle.InspectorGraph.Views
 
             var title = this.Q<Label>("_titleLabel");
             title.text = $"[{Node.Object.name}]";
+            var icon = this.Q<VisualElement>("_objectIcon");
+            icon.style.backgroundImage = new StyleBackground(AssetPreview.GetMiniThumbnail(Node.Object));
 
             // Toolbar
             ContentViewMode preferredMode = _forceStaticPreviewMode
@@ -101,7 +105,10 @@ namespace GiantParticle.InspectorGraph.Views
             _manipulators.Add(dragManipulator);
             // Resize
             var resizeButton = this.Q<VisualElement>("_resizeCorner");
-            var resizeManipulator = new ResizeManipulator(resizeButton, this);
+            var resizeManipulator = new ResizeManipulator(
+                handle: resizeButton,
+                resizeTarget: this,
+                minValues: new Vector2(280, 60));
             resizeManipulator.TargetResized += _stateController.ForceNormalState;
             _manipulators.Add(resizeManipulator);
 
