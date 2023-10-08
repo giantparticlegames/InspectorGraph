@@ -4,7 +4,7 @@
 // ********************************
 
 using GiantParticle.InspectorGraph.Data.Nodes;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Persistence;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -47,8 +47,8 @@ namespace GiantParticle.InspectorGraph.Views
             Destination = dest;
             ReferenceType = refType;
             ReferenceCount = 1;
-            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
-            _colorSettings = settings.GetReferenceColor(refType);
+            var projectSettings = GlobalApplicationContext.Instance.Get<IInspectorGraphProjectSettings>();
+            _colorSettings = projectSettings.ConnectionSettings.GetColorSettings(refType);
 
             SourceCount = 1;
             SourceTotal = 1;

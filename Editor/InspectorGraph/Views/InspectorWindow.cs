@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using GiantParticle.InspectorGraph.ContentView;
 using GiantParticle.InspectorGraph.Manipulators;
 using GiantParticle.InspectorGraph.Data.Nodes;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.ToolbarContent;
 using GiantParticle.InspectorGraph.UIDocuments;
 using UnityEditor;
@@ -132,8 +132,8 @@ namespace GiantParticle.InspectorGraph.Views
 
         private void UpdateSettings()
         {
-            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
-            var sizeSettings = settings.GetSizeForWindowViewMode(_currentMode);
+            var projectSettings = GlobalApplicationContext.Instance.Get<IInspectorGraphProjectSettings>();
+            var sizeSettings = projectSettings.WindowSettings.GetWindowSizeSettings(_currentMode);
             this.style.width = new StyleLength(sizeSettings.Size.x);
             this.style.maxHeight = new StyleLength(sizeSettings.Size.y);
             if (_currentMode == ContentViewMode.Preview || _currentMode == ContentViewMode.StaticPreview)

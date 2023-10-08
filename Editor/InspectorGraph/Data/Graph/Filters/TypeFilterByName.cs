@@ -4,7 +4,7 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Persistence;
 
 namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 {
@@ -16,7 +16,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 
         public bool ShouldShowType { get; set; }
 
-        public TypeFilterByName(IFilterTypeSettings filterTypeSettings)
+        public TypeFilterByName(FilterTypeSetting filterTypeSettings)
         {
             TargetType = ReflectionHelper.GetTypeByName(filterTypeSettings.FullyQualifiedName);
             ShouldShowType = filterTypeSettings.ShowType;

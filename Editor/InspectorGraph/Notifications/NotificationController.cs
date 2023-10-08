@@ -19,7 +19,7 @@ namespace GiantParticle.InspectorGraph.Notifications
 
         public void ClearNotifications()
         {
-            Container.Clear();
+            Container?.Clear();
         }
     }
 }

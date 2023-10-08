@@ -10,9 +10,8 @@ using GiantParticle.InspectorGraph.UIDocuments;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Plugins;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Views;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -32,12 +31,12 @@ namespace GiantParticle.InspectorGraph
         private const string kReportBugURL = "https://github.com/giantparticlegames/InspectorGraph/issues/new";
         private const string kWebsite = "https://www.giantparticlegames.com/home/inspector-graph";
         private InspectorGraphToolbarConfig _config;
-        private IInspectorGraphToolbarPlugin[] _extensions;
+        private IInspectorGraphToolbar[] _extensions;
 
         public InspectorGraphToolbar(InspectorGraphToolbarConfig config)
         {
             _config = config;
-            _extensions = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphToolbarPlugin>();
+            _extensions = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphToolbar>();
             LoadLayout();
             ConfigureUI();
         }
@@ -150,7 +149,7 @@ namespace GiantParticle.InspectorGraph
                 actionName: "Project Settings",
                 action: (menuAction) =>
                 {
-                    SettingsService.OpenProjectSettings($"{InspectorGraphSettingsRegister.kMenuPath}");
+                    SettingsService.OpenProjectSettings($"{InspectorGraphSettingsProvider.kMenuPath}");
                 });
         }
 

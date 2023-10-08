@@ -1,6 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:VisualElement style="border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; background-color: rgb(70, 70, 70); padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
-        <ui:Label text="Label" display-tooltip-when-elided="true" name="_modeField" style="-unity-font-style: bold;" />
-        <uie:Vector2IntField label="Size" name="_sizeField" binding-path="_targetSize" />
-    </ui:VisualElement>
-</ui:UXML>

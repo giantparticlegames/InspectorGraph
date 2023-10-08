@@ -5,7 +5,7 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Settings;
+using GiantParticle.InspectorGraph.Persistence;
 
 namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 {
@@ -22,7 +22,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 
         public IReadOnlyCollection<ITypeFilter> Filters => _filters.Values;
 
-        public TypeFilterHandler(IInspectorGraphSettings settings)
+        public TypeFilterHandler(IFilterSettings settings)
         {
             if (settings.TypeFilters == null || settings.TypeFilters.Count <= 0)
                 return;

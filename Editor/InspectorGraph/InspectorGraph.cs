@@ -14,9 +14,9 @@ using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Manipulators;
 using GiantParticle.InspectorGraph.Notifications;
 using GiantParticle.InspectorGraph.Operations;
+using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.Plugins;
 using GiantParticle.InspectorGraph.Preferences;
-using GiantParticle.InspectorGraph.Settings;
 using GiantParticle.InspectorGraph.Views;
 using UnityEditor;
 using UnityEngine;
@@ -75,13 +75,15 @@ namespace GiantParticle.InspectorGraph
                 context.Add<IPreferenceHandler>(handler);
             }
 
-            if (!context.Contains<IInspectorGraphSettings>())
-                context.Add<IInspectorGraphSettings>(InspectorGraphSettings.GetSettings());
+            if (!context.Contains<IInspectorGraphProjectSettings>())
+            {
+                context.Add<IInspectorGraphProjectSettings>(InspectorGraphProjectSettings.instance);
+            }
 
             if (!context.Contains<ITypeFilterHandler>())
             {
-                var settings = context.Get<IInspectorGraphSettings>();
-                context.Add<ITypeFilterHandler>(new TypeFilterHandler(settings));
+                var settings = context.Get<IInspectorGraphProjectSettings>();
+                context.Add<ITypeFilterHandler>(new TypeFilterHandler(settings.FilterSettings));
             }
 
             if (!context.Contains<IObjectNodeFactory>())
@@ -148,7 +150,11 @@ namespace GiantParticle.InspectorGraph
                 });
             moveManipulator.PositionChanged += element => UpdateWindowVisibility();
 
-            ProcessPlugins(plugin => plugin.ConfigureView(rootVisualElement));
+            ProcessPlugins(plugin =>
+            {
+                if (plugin is IInspectorGraphPluginView viewPlugin)
+                    viewPlugin.ConfigureView(rootVisualElement);
+            });
 
             _toolbar.LoadPreferences();
         }
@@ -369,10 +375,10 @@ namespace GiantParticle.InspectorGraph
 
         private InspectorWindow CreateWindow(IObjectNode node)
         {
-            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
+            var projectSettings = GlobalApplicationContext.Instance.Get<IInspectorGraphProjectSettings>();
             var key = node.Object;
             if (_viewRegistry.IsWindowRegisteredByTarget(key)) return null;
-            if (_viewRegistry.WindowCount > settings.MaxWindows)
+            if (_viewRegistry.WindowCount > projectSettings.WindowSettings.MaxWindows)
             {
                 Debug.LogWarning("Max Window limit reached");
                 return null;
@@ -380,7 +386,7 @@ namespace GiantParticle.InspectorGraph
 
             var window = new InspectorWindow(
                 node: node,
-                forceStaticPreview: _viewRegistry.WindowCount > settings.MaxPreviewWindows);
+                forceStaticPreview: _viewRegistry.WindowCount > projectSettings.WindowSettings.MaxPreviewWindows);
             window.style.position = new StyleEnum<Position>(Position.Absolute);
 
             _content.Add(window);

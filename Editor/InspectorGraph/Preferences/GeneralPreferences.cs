@@ -20,7 +20,10 @@ namespace GiantParticle.InspectorGraph.Preferences
         public string LastInspectedObjectGUID
         {
             get => CurrentData.LastInspectedObjectGUID;
-            set => CurrentData.LastInspectedObjectGUID = value;
+            set
+            {
+                CurrentData.LastInspectedObjectGUID = value;
+            }
         }
     }
 }

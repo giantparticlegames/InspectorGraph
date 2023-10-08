@@ -3,7 +3,7 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.UIDocuments;
+using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -11,18 +11,18 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
 {
     internal abstract class BasePropertyDrawer : PropertyDrawer
     {
-        protected abstract SettingsUIDocumentType DocumentType { get; }
-
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
-            var root = new VisualElement();
-            var layout = SettingsUIDocumentCatalog.GetCatalog()[DocumentType].Asset;
-            layout.CloneTree(root);
-            CreateFields(root, property);
+            VisualElement root = new VisualElement();
+            var asset = UIToolkitHelper.LocateViewForType(this);
+            if (asset == null) return root;
+            asset.CloneTree(root);
+            UIToolkitHelper.ResolveVisualElements(this, root);
 
+            ConfigureFields(property);
             return root;
         }
 
-        protected abstract void CreateFields(VisualElement root, SerializedProperty property);
+        protected abstract void ConfigureFields(SerializedProperty property);
     }
 }
