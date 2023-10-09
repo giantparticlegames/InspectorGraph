@@ -4,7 +4,7 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.UIDocuments;
+using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph
@@ -15,15 +15,19 @@ namespace GiantParticle.InspectorGraph
 
         public InspectorGraphFooter()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
-            IUIDocumentInfo<MainWindowUIDocumentType> info = catalog[MainWindowUIDocumentType.MainWindowFooter];
-            info.Asset.CloneTree(this);
-            AssignVisualElements();
-
+            LoadLayout();
             _resetZoomButton.RegisterCallback<ClickEvent>(ResetZoomButton_OnClickEvent);
             _zoomSlider.value = 1;
             _zoomSlider.RegisterValueChangedCallback(ZoomSlider_OnValueChangedEvent);
             _generalProgressBar.visible = false;
+        }
+
+        private void LoadLayout()
+        {
+            var asset = UIToolkitHelper.LocateViewForType(this);
+            if (asset == null) return;
+            asset.CloneTree(this);
+            UIToolkitHelper.ResolveVisualElements(this, this);
         }
 
         private void ResetZoomButton_OnClickEvent(ClickEvent evt)

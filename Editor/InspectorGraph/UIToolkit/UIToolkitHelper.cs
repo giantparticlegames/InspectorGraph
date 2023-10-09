@@ -41,7 +41,7 @@ namespace GiantParticle.InspectorGraph.UIToolkit
                 return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(relativePath);
             }
 
-            Debug.LogError($"Could not locate UXML file for {objectType.Name}");
+            Debug.LogError($"Could not locate UXML file for [{objectType.Name}]");
             return null;
         }
 

@@ -10,6 +10,7 @@ namespace GiantParticle.InspectorGraph.Persistence
 {
     internal interface IConnectionSettings
     {
+        bool DrawReferenceCount { get; }
         List<ReferenceColorSettings> ColorSettings { get; }
 
         ReferenceColorSettings GetColorSettings(ReferenceType referenceType);

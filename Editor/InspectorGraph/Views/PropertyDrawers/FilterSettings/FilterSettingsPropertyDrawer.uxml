@@ -5,7 +5,6 @@
         <ui:Label text="Sometimes, some objects may have too many references which may overload the visualization or simply add little to no useful information. To address this problem we have filter types, these filters change the standard visualization based on the object type." display-tooltip-when-elided="true" style="white-space: normal;" />
         <ui:VisualElement style="margin-top: 10px;">
             <ui:Label text="General" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
-            <ui:Label text="Enable or disable all filters" display-tooltip-when-elided="true" style="white-space: normal;" />
             <ui:Toggle label="Enable Filters" name="_enableFilterToggle" tooltip="Indicate to Enable or Disable all Filters" />
         </ui:VisualElement>
         <ui:VisualElement style="margin-top: 10px;">

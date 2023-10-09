@@ -5,11 +5,11 @@
 
 using System;
 using GiantParticle.InspectorGraph.CustomAttributes;
-using GiantParticle.InspectorGraph.UIDocuments;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.Plugins;
+using GiantParticle.InspectorGraph.UIToolkit;
 using GiantParticle.InspectorGraph.Views;
 using UnityEditor;
 using UnityEngine;
@@ -50,10 +50,10 @@ namespace GiantParticle.InspectorGraph
 
         private void LoadLayout()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
-            IUIDocumentInfo<MainWindowUIDocumentType> info = catalog[MainWindowUIDocumentType.MainWindowToolbar];
-            info.Asset.CloneTree(this);
-            AssignVisualElements();
+            var asset = UIToolkitHelper.LocateViewForType(this);
+            if (asset == null) return;
+            asset.CloneTree(this);
+            UIToolkitHelper.ResolveVisualElements(this, this);
         }
 
         private void ConfigureUI()

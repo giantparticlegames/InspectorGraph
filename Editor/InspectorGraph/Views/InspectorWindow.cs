@@ -10,35 +10,29 @@ using GiantParticle.InspectorGraph.Manipulators;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.ToolbarContent;
-using GiantParticle.InspectorGraph.UIDocuments;
+using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace GiantParticle.InspectorGraph.Views
 {
-    internal class InspectorWindow : VisualElement, IDisposable
+    internal partial class InspectorWindow : VisualElement, IDisposable
     {
         private class NoTypeClass
         {
         }
 
-        private VisualElement _windowContent;
-        private ScrollView _content;
-        private Toolbar _toolbar;
-        private Toolbar _footer;
         private ContentViewMode _currentMode;
         private WindowStateController _stateController;
         private List<IManipulator> _manipulators = new();
         private QuickStatsView _quickStatsView;
         private BaseWindowContent _view;
-
-        public IReadOnlyList<IManipulator> Manipulators => _manipulators;
-        public event Action<InspectorWindow> GUIChanged;
+        private bool _forceStaticPreviewMode;
 
         public IObjectNode Node { get; }
-        private bool _forceStaticPreviewMode;
+        public IReadOnlyList<IManipulator> Manipulators => _manipulators;
+        public event Action<InspectorWindow> GUIChanged;
 
 
         public InspectorWindow(IObjectNode node, bool forceStaticPreview = false)
@@ -58,38 +52,40 @@ namespace GiantParticle.InspectorGraph.Views
 
         private void CreateLayout()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<InspectorWindowUIDocumentType>>();
-            var xmlLayout = catalog[InspectorWindowUIDocumentType.InspectorWindow].Asset;
-            xmlLayout.CloneTree(this);
+            var asset = UIToolkitHelper.LocateViewForType(this);
+            if (asset == null) return;
+            asset.CloneTree(this);
+            UIToolkitHelper.ResolveVisualElements(this, this);
 
-            _content = this.Q<ScrollView>(nameof(_content));
-            _windowContent = this.Q<VisualElement>(nameof(_windowContent));
-            _footer = this.Q<Toolbar>(nameof(_footer));
-            _toolbar = this.Q<Toolbar>(nameof(_toolbar));
+            UpdateTitle();
 
-            var title = this.Q<Label>("_titleLabel");
-            title.text = $"[{Node.Object.name}]";
-            var icon = this.Q<VisualElement>("_objectIcon");
-            icon.style.backgroundImage = new StyleBackground(AssetPreview.GetMiniThumbnail(Node.Object));
-
-            // Toolbar
             ContentViewMode preferredMode = _forceStaticPreviewMode
                 ? ContentViewMode.StaticPreview
                 : WindowContentFactory.PreferredViewModeForObject(Node.Object);
-            var viewModeMenu = new ViewModeMenu(Node.Object);
-            viewModeMenu.ViewMode = preferredMode;
-            viewModeMenu.ViewModeChanged += SwitchView;
-            _toolbar.Add(viewModeMenu);
-
-            var refField = this.Q<ObjectField>("_refField");
-            refField.value = Node.Object;
-            refField.objectType = typeof(NoTypeClass);
+            ConfigureToolbar(preferredMode);
 
             // Footer
             _quickStatsView = new QuickStatsView(Node);
             _footer.Add(_quickStatsView);
 
             SwitchView(preferredMode);
+        }
+
+        private void UpdateTitle()
+        {
+            _titleLabel.text = $"[{Node.Object.name}]";
+            _objectIcon.style.backgroundImage = new StyleBackground(AssetPreview.GetMiniThumbnail(Node.Object));
+        }
+
+        private void ConfigureToolbar(ContentViewMode preferredMode)
+        {
+            var viewModeMenu = new ViewModeMenu(Node.Object);
+            viewModeMenu.ViewMode = preferredMode;
+            viewModeMenu.ViewModeChanged += SwitchView;
+            _toolbar.Add(viewModeMenu);
+
+            _refField.value = Node.Object;
+            _refField.objectType = typeof(NoTypeClass);
         }
 
         private void ConfigureWindowManipulation()

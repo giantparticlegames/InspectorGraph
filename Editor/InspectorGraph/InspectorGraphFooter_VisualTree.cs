@@ -3,6 +3,7 @@
 // All rights reserved.
 // ********************************
 
+using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
@@ -10,15 +11,13 @@ namespace GiantParticle.InspectorGraph
 {
     internal partial class InspectorGraphFooter
     {
+        [VisualElementField]
         private ToolbarButton _resetZoomButton;
-        private Slider _zoomSlider;
-        private ProgressBar _generalProgressBar;
 
-        private void AssignVisualElements()
-        {
-            _resetZoomButton = this.Q<ToolbarButton>(nameof(_resetZoomButton));
-            _zoomSlider = this.Q<Slider>(nameof(_zoomSlider));
-            _generalProgressBar = this.Q<ProgressBar>(nameof(_generalProgressBar));
-        }
+        [VisualElementField]
+        private Slider _zoomSlider;
+
+        [VisualElementField]
+        private ProgressBar _generalProgressBar;
     }
 }

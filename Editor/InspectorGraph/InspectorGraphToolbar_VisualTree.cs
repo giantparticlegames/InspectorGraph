@@ -3,6 +3,7 @@
 // All rights reserved.
 // ********************************
 
+using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
@@ -10,19 +11,19 @@ namespace GiantParticle.InspectorGraph
 {
     internal partial class InspectorGraphToolbar
     {
+        [VisualElementField]
         private ToolbarMenu _viewMenu;
-        private ToolbarMenu _editMenu;
-        private ToolbarMenu _helpMenu;
-        private VisualElement _activeObjectContainer;
-        private ObjectField _refField;
 
-        private void AssignVisualElements()
-        {
-            _viewMenu = this.Q<ToolbarMenu>(nameof(_viewMenu));
-            _editMenu = this.Q<ToolbarMenu>(nameof(_editMenu));
-            _helpMenu = this.Q<ToolbarMenu>(nameof(_helpMenu));
-            _activeObjectContainer = this.Q<VisualElement>(nameof(_activeObjectContainer));
-            _refField = this.Q<ObjectField>(nameof(_refField));
-        }
+        [VisualElementField]
+        private ToolbarMenu _editMenu;
+
+        [VisualElementField]
+        private ToolbarMenu _helpMenu;
+
+        [VisualElementField]
+        private VisualElement _activeObjectContainer;
+
+        [VisualElementField]
+        private ObjectField _refField;
     }
 }

@@ -3,7 +3,7 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.UIDocuments;
+using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,10 +14,10 @@ namespace GiantParticle.InspectorGraph.Notifications
     {
         public InspectorGraphNotification(NotificationType notificationType, string message)
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
-            IUIDocumentInfo<MainWindowUIDocumentType> info = catalog[MainWindowUIDocumentType.MainWindowNotification];
-            info.Asset.CloneTree(this);
-            AssignVisualElements();
+            var asset = UIToolkitHelper.LocateViewForType(this);
+            if (asset == null) return;
+            asset.CloneTree(this);
+            UIToolkitHelper.ResolveVisualElements(this, this);
 
             _text.text = message;
             _closeButton.RegisterCallback<ClickEvent>(CloseButton_OnClickEvent);

@@ -15,10 +15,18 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
     internal class ConnectionSettingsPropertyDrawer : BasePropertyDrawer
     {
         [VisualElementField]
+        private Toggle _drawReferenceCountToggle;
+
+        [VisualElementField]
         private Foldout _referenceColorsContainer;
 
         protected override void ConfigureFields(SerializedProperty property)
         {
+            _drawReferenceCountToggle.bindingPath = nameof(ConnectionSettings._drawReferenceCount);
+            _drawReferenceCountToggle.Bind(property.serializedObject);
+            _drawReferenceCountToggle.RegisterValueChangedCallback(evt =>
+                InspectorGraphProjectSettings.instance.Save());
+
             var connectionSettings = InspectorGraphProjectSettings.instance.ConnectionSettings;
             var sizesProperty = property.FindPropertyRelative(nameof(ConnectionSettings._colorSettings));
             for (int i = 0; i < connectionSettings.ColorSettings.Count; ++i)

@@ -14,6 +14,9 @@ namespace GiantParticle.InspectorGraph.Persistence
     internal class ConnectionSettings : IConnectionSettings
     {
         [SerializeField]
+        internal bool _drawReferenceCount = true;
+
+        [SerializeField]
         internal List<ReferenceColorSettings> _colorSettings = new List<ReferenceColorSettings>()
         {
             new ReferenceColorSettings(
@@ -26,6 +29,7 @@ namespace GiantParticle.InspectorGraph.Persistence
                 highlightedColor: new Color(0, 1, 1, 1))
         };
 
+        public bool DrawReferenceCount => _drawReferenceCount;
         public List<ReferenceColorSettings> ColorSettings => _colorSettings;
 
         public ReferenceColorSettings GetColorSettings(ReferenceType referenceType)

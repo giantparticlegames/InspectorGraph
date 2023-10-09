@@ -5,8 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using GiantParticle.InspectorGraph.UIDocuments;
 using GiantParticle.InspectorGraph.Data;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
@@ -16,6 +14,7 @@ using GiantParticle.InspectorGraph.Notifications;
 using GiantParticle.InspectorGraph.Operations;
 using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.Plugins;
+using GiantParticle.InspectorGraph.UIToolkit;
 using GiantParticle.InspectorGraph.Views;
 using UnityEditor;
 using UnityEngine;
@@ -93,13 +92,6 @@ namespace GiantParticle.InspectorGraph
             if (!context.Contains<IContentViewRegistry>())
                 context.Add<IContentViewRegistry>(_viewRegistry);
 
-            // UI Catalogs
-            if (!context.Contains<IUIDocumentCatalog<MainWindowUIDocumentType>>())
-                context.Add<IUIDocumentCatalog<MainWindowUIDocumentType>>(MainWindowUIDocumentCatalog.GetCatalog());
-            if (!context.Contains<IUIDocumentCatalog<InspectorWindowUIDocumentType>>())
-                context.Add<IUIDocumentCatalog<InspectorWindowUIDocumentType>>(InspectorWindowUIDocumentCatalog
-                    .GetCatalog());
-
             // Notification
             if (!context.Contains<INotificationController>())
             {
@@ -110,16 +102,8 @@ namespace GiantParticle.InspectorGraph
 
         private void CreateGUI()
         {
-            // TODO: Remove
-            TaskScheduler.UnobservedTaskException += (sender, args) => { Debug.LogException(args.Exception); };
-
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<MainWindowUIDocumentType>>();
-            var layout = catalog[MainWindowUIDocumentType.MainWindow].Asset;
-            layout.CloneTree(rootVisualElement);
-            AssignVisualElements();
-            _plugins = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphPlugin>();
-            ProcessPlugins(plugin => plugin.Initialize());
-
+            LoadLayout();
+            LoadPlugins();
 
             _toolbar = new InspectorGraphToolbar(new InspectorGraphToolbarConfig()
             {
@@ -144,14 +128,26 @@ namespace GiantParticle.InspectorGraph
                             EventModifiers.Alt | EventModifiers.Control)
                 });
             moveManipulator.PositionChanged += element => UpdateWindowVisibility();
+            _toolbar.LoadPreferences();
+        }
 
+        private void LoadLayout()
+        {
+            var asset = UIToolkitHelper.LocateViewForType(this);
+            if (asset == null) return;
+            asset.CloneTree(rootVisualElement);
+            UIToolkitHelper.ResolveVisualElements(this, rootVisualElement);
+        }
+
+        private void LoadPlugins()
+        {
+            _plugins = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphPlugin>();
+            ProcessPlugins(plugin => plugin.Initialize());
             ProcessPlugins(plugin =>
             {
                 if (plugin is IInspectorGraphPluginView viewPlugin)
                     viewPlugin.ConfigureView(rootVisualElement);
             });
-
-            _toolbar.LoadPreferences();
         }
 
         private void ProcessPlugins(Action<IInspectorGraphPlugin> pluginAction)

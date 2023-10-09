@@ -39,6 +39,7 @@ namespace GiantParticle.InspectorGraph.Views
         public int ReferenceCount { get; set; }
 
         private ViewMode _mode;
+        private IConnectionSettings _connectionSettings;
         private IReferenceColorSettings _colorSettings;
 
         public ConnectionLine(VisualElement source, VisualElement dest, ReferenceType refType) : base()
@@ -48,6 +49,7 @@ namespace GiantParticle.InspectorGraph.Views
             ReferenceType = refType;
             ReferenceCount = 1;
             var projectSettings = GlobalApplicationContext.Instance.Get<IInspectorGraphProjectSettings>();
+            _connectionSettings = projectSettings.ConnectionSettings;
             _colorSettings = projectSettings.ConnectionSettings.GetColorSettings(refType);
 
             SourceCount = 1;
@@ -92,7 +94,7 @@ namespace GiantParticle.InspectorGraph.Views
 
             // Draw Curve
             Handles.DrawBezier(startPosition: startPoint,
-                endPosition: endPoint - Vector3.right * 10,
+                endPosition: endPoint + Vector3.left * kArrowLength,
                 startTangent: startPoint + Vector3.right * 25,
                 endTangent: endPoint + Vector3.left * 25,
                 color: lineColor,
@@ -111,7 +113,7 @@ namespace GiantParticle.InspectorGraph.Views
             Handles.color = previousColor;
 
             // Draw number
-            if (ReferenceCount > 1)
+            if (ReferenceCount > 1 && _connectionSettings.DrawReferenceCount)
             {
                 var previousGUIColor = GUI.color;
                 GUI.color = new Color(lineColor.r, lineColor.g, lineColor.b, 1f);
