@@ -4,7 +4,7 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Preferences;
+using GiantParticle.InspectorGraph.Persistence;
 
 namespace GiantParticle.InspectorGraph.Plugins
 {
@@ -13,6 +13,6 @@ namespace GiantParticle.InspectorGraph.Plugins
     /// </summary>
     internal interface IPlugin : IDisposable
     {
-        void ConfigurePreferences(IPreferenceHandler handler);
+        void ConfigurePreferences(IInspectorGraphUserPreferences preferences);
     }
 }

@@ -6,6 +6,7 @@
 using System;
 using GiantParticle.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Persistence;
 
 namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
 {
@@ -21,19 +22,34 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
         {
             AvailableFactories = ReflectionHelper.InstantiateAllImplementations<IGraphFactory>();
             Array.Sort(AvailableFactories, ReflectionHelper.CompareByPriority);
-            _currentFactory = AvailableFactories[0];
+            var preferences = GlobalApplicationContext.Instance.Get<IInspectorGraphUserPreferences>();
+
+            if (SelectFactory(preferences.SelectedGraphFactoryIndex)) return;
+            SelectFactory(0);
         }
 
         public void ClearActiveGraph() => _currentFactory.ClearGraph();
 
-        public void SelectFactory(int index)
+        public bool SelectFactory(int index)
         {
+            if (index < 0 || AvailableFactories.Length <= index) return false;
+
             _currentFactory = AvailableFactories[index];
+            var preferences = GlobalApplicationContext.Instance.Get<IInspectorGraphUserPreferences>();
+            preferences.SelectedGraphFactoryIndex = index;
+            preferences.Save();
+            return true;
         }
 
-        public void SelectFactory(IGraphFactory factory)
+        public bool SelectFactory(IGraphFactory factory)
         {
-            _currentFactory = factory;
+            for (int i = 0; i < AvailableFactories.Length; ++i)
+            {
+                if (AvailableFactories[i] != factory) continue;
+                return SelectFactory(i);
+            }
+
+            return false;
         }
     }
 }

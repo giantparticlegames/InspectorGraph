@@ -5,10 +5,10 @@
 
 using System;
 using GiantParticle.InspectorGraph.CustomAttributes;
-using GiantParticle.InspectorGraph.Preferences;
 using GiantParticle.InspectorGraph.UIDocuments;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
 using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
+using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.Plugins;
 using GiantParticle.InspectorGraph.Views;
 using UnityEditor;
@@ -172,16 +172,14 @@ namespace GiantParticle.InspectorGraph
             _refField.RegisterCallback<ChangeEvent<Object>>(evt =>
             {
                 var assignedObject = evt.newValue;
-                IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
-                GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
-
-                if (assignedObject == null) generalPrefs.LastInspectedObjectGUID = null;
+                var preferences = GlobalApplicationContext.Instance.Get<IInspectorGraphUserPreferences>();
+                if (assignedObject == null) preferences.LastInspectedObjectGUID = null;
                 else
                 {
                     string path = AssetDatabase.GetAssetPath(assignedObject);
                     string guid = AssetDatabase.AssetPathToGUID(path);
-                    generalPrefs.LastInspectedObjectGUID = guid;
-                    handler.Save<GeneralPreferences>();
+                    preferences.LastInspectedObjectGUID = guid;
+                    preferences.Save();
                 }
 
                 _config.CreateCallback?.Invoke(assignedObject);
@@ -191,11 +189,10 @@ namespace GiantParticle.InspectorGraph
         public void LoadPreferences()
         {
             // Load last saved object
-            IPreferenceHandler handler = GlobalApplicationContext.Instance.Get<IPreferenceHandler>();
-            GeneralPreferences generalPrefs = handler.GetPreference<GeneralPreferences>();
-            if (string.IsNullOrEmpty(generalPrefs.LastInspectedObjectGUID)) return;
+            var preferences = GlobalApplicationContext.Instance.Get<IInspectorGraphUserPreferences>();
+            if (string.IsNullOrEmpty(preferences.LastInspectedObjectGUID)) return;
 
-            var path = AssetDatabase.GUIDToAssetPath(generalPrefs.LastInspectedObjectGUID);
+            var path = AssetDatabase.GUIDToAssetPath(preferences.LastInspectedObjectGUID);
             if (string.IsNullOrEmpty(path)) return;
 
             var lastObject = AssetDatabase.LoadAssetAtPath<Object>(path);
@@ -205,7 +202,7 @@ namespace GiantParticle.InspectorGraph
 
             if (_extensions != null)
                 for (int i = 0; i < _extensions.Length; ++i)
-                    _extensions[i].ConfigurePreferences(handler);
+                    _extensions[i].ConfigurePreferences(preferences);
         }
     }
 }

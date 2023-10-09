@@ -18,7 +18,7 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
 
         void ClearActiveGraph();
 
-        void SelectFactory(int index);
-        void SelectFactory(IGraphFactory factory);
+        bool SelectFactory(int index);
+        bool SelectFactory(IGraphFactory factory);
     }
 }

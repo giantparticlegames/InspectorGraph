@@ -16,7 +16,6 @@ using GiantParticle.InspectorGraph.Notifications;
 using GiantParticle.InspectorGraph.Operations;
 using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.Plugins;
-using GiantParticle.InspectorGraph.Preferences;
 using GiantParticle.InspectorGraph.Views;
 using UnityEditor;
 using UnityEngine;
@@ -68,12 +67,8 @@ namespace GiantParticle.InspectorGraph
         {
             GlobalApplicationContext.Instantiate();
             IApplicationContext context = GlobalApplicationContext.Instance;
-            if (!context.Contains<IPreferenceHandler>())
-            {
-                var handler = new PreferenceHandler();
-                handler.LoadAllPreferences();
-                context.Add<IPreferenceHandler>(handler);
-            }
+            if (!context.Contains<IInspectorGraphUserPreferences>())
+                context.Add<IInspectorGraphUserPreferences>(InspectorGraphUserPreferences.instance);
 
             if (!context.Contains<IInspectorGraphProjectSettings>())
             {
