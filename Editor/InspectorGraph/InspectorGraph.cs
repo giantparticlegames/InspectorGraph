@@ -129,6 +129,13 @@ namespace GiantParticle.InspectorGraph
                 });
             moveManipulator.PositionChanged += element => UpdateWindowVisibility();
             _toolbar.LoadPreferences();
+
+            // Configure View once everything is set
+            ProcessPlugins(plugin =>
+            {
+                if (plugin is IInspectorGraphPluginView viewPlugin)
+                    viewPlugin.ConfigureView(rootVisualElement);
+            });
         }
 
         private void LoadLayout()
@@ -143,11 +150,6 @@ namespace GiantParticle.InspectorGraph
         {
             _plugins = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphPlugin>();
             ProcessPlugins(plugin => plugin.Initialize());
-            ProcessPlugins(plugin =>
-            {
-                if (plugin is IInspectorGraphPluginView viewPlugin)
-                    viewPlugin.ConfigureView(rootVisualElement);
-            });
         }
 
         private void ProcessPlugins(Action<IInspectorGraphPlugin> pluginAction)

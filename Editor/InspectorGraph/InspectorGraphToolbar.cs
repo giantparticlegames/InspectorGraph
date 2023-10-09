@@ -81,6 +81,21 @@ namespace GiantParticle.InspectorGraph
 
             // Filters
             var typeFilterHandler = GlobalApplicationContext.Instance.Get<ITypeFilterHandler>();
+            _viewMenu.menu.AppendAction(
+                actionName: "Filters/Enable Filters",
+                action: action =>
+                {
+                    typeFilterHandler.EnableFilters = !typeFilterHandler.EnableFilters;
+                    // Refresh view if needed
+                    _config.UpdateCallback?.Invoke();
+                },
+                actionStatusCallback: action =>
+                {
+                    return typeFilterHandler.EnableFilters
+                        ? DropdownMenuAction.Status.Checked
+                        : DropdownMenuAction.Status.Normal;
+                });
+            _viewMenu.menu.AppendSeparator("Filters/");
             foreach (ITypeFilter filter in typeFilterHandler.Filters)
             {
                 // Show

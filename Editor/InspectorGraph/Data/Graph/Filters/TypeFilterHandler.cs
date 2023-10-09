@@ -11,6 +11,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 {
     internal interface ITypeFilterHandler
     {
+        bool EnableFilters { get; set; }
         IReadOnlyCollection<ITypeFilter> Filters { get; }
         bool ShouldExpandObject(object objectInstance);
         bool ShouldShowObject(object objectInstance);
@@ -20,10 +21,12 @@ namespace GiantParticle.InspectorGraph.Data.Graph.Filters
     {
         private readonly Dictionary<Type, ITypeFilter> _filters = new();
 
+        public bool EnableFilters { get; set; }
         public IReadOnlyCollection<ITypeFilter> Filters => _filters.Values;
 
         public TypeFilterHandler(IFilterSettings settings)
         {
+            EnableFilters = settings.EnableFilters;
             if (settings.TypeFilters == null || settings.TypeFilters.Count <= 0)
                 return;
             for (int i = 0; i < settings.TypeFilters.Count; ++i)
@@ -49,6 +52,8 @@ namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 
         public bool ShouldExpandObject(object objectInstance)
         {
+            if (!EnableFilters) return true;
+
             foreach (ITypeFilter filter in _filters.Values)
             {
                 if (!filter.TargetType.IsInstanceOfType(objectInstance))
@@ -61,6 +66,8 @@ namespace GiantParticle.InspectorGraph.Data.Graph.Filters
 
         public bool ShouldShowObject(object objectInstance)
         {
+            if (!EnableFilters) return true;
+
             foreach (ITypeFilter filter in _filters.Values)
             {
                 if (!filter.TargetType.IsInstanceOfType(objectInstance))
