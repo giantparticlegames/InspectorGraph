@@ -4,9 +4,7 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.CustomAttributes;
 using GiantParticle.InspectorGraph.Data.Graph.Filters;
-using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.Plugins;
 using GiantParticle.InspectorGraph.UIToolkit;
@@ -37,15 +35,29 @@ namespace GiantParticle.InspectorGraph
         {
             _config = config;
             _extensions = ReflectionHelper.InstantiateAllImplementations<IInspectorGraphToolbar>();
+            ExecuteOnAllExtensions(toolbar =>
+            {
+                if (toolbar is IInspectorGraphToolbarConfigurable configurableToolbar)
+                    configurableToolbar.Configure(_config);
+            });
             LoadLayout();
             ConfigureUI();
         }
 
+        private void ExecuteOnAllExtensions(Action<IInspectorGraphToolbar> action)
+        {
+            if (_extensions == null) return;
+            for (int i = 0; i < _extensions.Length; ++i)
+                action.Invoke(_extensions[i]);
+        }
+
         public void Dispose()
         {
-            if (_extensions != null)
-                for (int i = 0; i < _extensions.Length; ++i)
-                    _extensions[i].Dispose();
+            ExecuteOnAllExtensions(toolbar =>
+            {
+                if (toolbar is IDisposable disposableToolbar)
+                    disposableToolbar.Dispose();
+            });
         }
 
         private void LoadLayout()
@@ -63,9 +75,7 @@ namespace GiantParticle.InspectorGraph
             ConfigureHelpMenu();
 
             ConfigureActiveObject();
-            if (_extensions != null)
-                for (int i = 0; i < _extensions.Length; ++i)
-                    _extensions[i].ConfigureView(this);
+            ExecuteOnAllExtensions(toolbar => toolbar.ConfigureView(this));
         }
 
         private void ConfigureViewMenu()
@@ -129,32 +139,6 @@ namespace GiantParticle.InspectorGraph
                         return DropdownMenuAction.Status.Normal;
                     });
             }
-
-            _viewMenu.menu.AppendSeparator();
-
-            // Inspection Mode
-            var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
-            for (int i = 0; i < controller.AvailableFactories.Length; ++i)
-            {
-                var factory = controller.AvailableFactories[i];
-                var displayName = (EditorDisplayNameAttribute)Attribute.GetCustomAttribute(
-                    element: factory.GetType(),
-                    attributeType: typeof(EditorDisplayNameAttribute));
-
-                _viewMenu.menu.AppendAction(
-                    actionName: $"Inspection Mode/{displayName.DisplayName}",
-                    action: (menuAction) =>
-                    {
-                        controller.SelectFactory(factory);
-                        _config?.CreateCallback.Invoke(_refField.value);
-                    },
-                    actionStatusCallback: action =>
-                    {
-                        return controller.ActiveFactory == factory
-                            ? DropdownMenuAction.Status.Checked
-                            : DropdownMenuAction.Status.Normal;
-                    });
-            }
         }
 
         private void ConfigureEditMenu()
@@ -215,9 +199,11 @@ namespace GiantParticle.InspectorGraph
 
             _refField.value = lastObject;
 
-            if (_extensions != null)
-                for (int i = 0; i < _extensions.Length; ++i)
-                    _extensions[i].ConfigurePreferences(preferences);
+            ExecuteOnAllExtensions(toolbar =>
+            {
+                if (toolbar is IConfigurablePreferences configurableToolbar)
+                    configurableToolbar.ConfigurePreferences();
+            });
         }
     }
 }
