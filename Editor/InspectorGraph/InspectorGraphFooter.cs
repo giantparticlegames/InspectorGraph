@@ -4,6 +4,8 @@
 // ********************************
 
 using System;
+using GiantParticle.InspectorGraph.CustomAttributes;
+using GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEngine.UIElements;
 
@@ -20,6 +22,9 @@ namespace GiantParticle.InspectorGraph
             _zoomSlider.value = 1;
             _zoomSlider.RegisterValueChangedCallback(ZoomSlider_OnValueChangedEvent);
             _generalProgressBar.visible = false;
+            var controller = GlobalApplicationContext.Instance.Get<IGraphController>();
+            controller.SelectedFactoryChanged += UpdateDisplayMode;
+            UpdateDisplayMode(controller);
         }
 
         private void LoadLayout()
@@ -53,6 +58,20 @@ namespace GiantParticle.InspectorGraph
             _generalProgressBar.visible = true;
             _generalProgressBar.value = progress;
             _generalProgressBar.title = label;
+        }
+
+        private void UpdateDisplayMode(IGraphController controller)
+        {
+            if (controller.AvailableFactories.Length <= 1)
+            {
+                _currentModeLabel.visible = false;
+                return;
+            }
+
+            var displayName = (EditorDisplayNameAttribute)Attribute.GetCustomAttribute(
+                element: controller.ActiveFactory.GetType(),
+                attributeType: typeof(EditorDisplayNameAttribute));
+            _currentModeLabel.text = $"Displaying: {displayName.DisplayName}";
         }
     }
 }

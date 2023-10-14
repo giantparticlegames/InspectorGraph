@@ -18,6 +18,9 @@ namespace GiantParticle.InspectorGraph
         private Slider _zoomSlider;
 
         [VisualElementField]
+        private Label _currentModeLabel;
+
+        [VisualElementField]
         private ProgressBar _generalProgressBar;
     }
 }

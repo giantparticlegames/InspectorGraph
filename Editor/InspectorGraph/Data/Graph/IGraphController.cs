@@ -3,6 +3,7 @@
 // All rights reserved.
 // ********************************
 
+using System;
 using GiantParticle.InspectorGraph.Data.Graph;
 using GiantParticle.InspectorGraph.Data.Nodes;
 
@@ -10,6 +11,7 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
 {
     internal interface IGraphController
     {
+        event Action<IGraphController> SelectedFactoryChanged;
         IGraphFactory ActiveFactory { get; }
 
         IGraphFactory[] AvailableFactories { get; }

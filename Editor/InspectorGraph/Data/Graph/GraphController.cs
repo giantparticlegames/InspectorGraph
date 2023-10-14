@@ -12,11 +12,13 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
 {
     internal class GraphController : IGraphController
     {
-        private IGraphFactory _currentFactory;
+        public event Action<IGraphController> SelectedFactoryChanged;
         public IGraphFactory ActiveFactory => _currentFactory;
         public IGraphFactory[] AvailableFactories { get; }
 
         public IObjectNode ActiveGraph => _currentFactory.CurrentGraph;
+
+        private IGraphFactory _currentFactory;
 
         public GraphController()
         {
@@ -38,6 +40,8 @@ namespace GiantParticle.InspectorGraph.Editor.InspectorGraph.Data.Graph
             var preferences = GlobalApplicationContext.Instance.Get<IInspectorGraphUserPreferences>();
             preferences.SelectedGraphFactoryIndex = index;
             preferences.Save();
+
+            SelectedFactoryChanged?.Invoke(this);
             return true;
         }
 

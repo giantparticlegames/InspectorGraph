@@ -3,6 +3,7 @@
 // All rights reserved.
 // ********************************
 
+using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Persistence;
 using GiantParticle.InspectorGraph.UIToolkit;
 using UnityEditor;
@@ -31,6 +32,8 @@ namespace GiantParticle.InspectorGraph.PropertyDrawers
             var sizesProperty = property.FindPropertyRelative(nameof(ConnectionSettings._colorSettings));
             for (int i = 0; i < connectionSettings.ColorSettings.Count; ++i)
             {
+                var setting = connectionSettings.ColorSettings[i];
+                if (string.Equals(setting.ReferenceType.ToString(), ReferenceType.kNotAvailable)) continue;
                 var propertyField = new PropertyField(sizesProperty.GetArrayElementAtIndex(i));
                 propertyField.Bind(property.serializedObject);
                 _referenceColorsContainer.Add(propertyField);
