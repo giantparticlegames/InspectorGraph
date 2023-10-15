@@ -134,6 +134,7 @@ This field is located at the upper right corner and allows you to assign a refer
 
 ### Zoom Controls
 The Zoom controls are located at the bottom left corner of the main window and give you control of the scale of the visualization. The zoom level is controlled by the slider and the reset button will reset the zoom to 1.
+
 ![Zoom Controls](.docs/ZoomControls.png)
 
 ## Inspector Window
@@ -173,6 +174,8 @@ The following information is displayed next to the object name:
 * Number of references from the object in the graph
 
 Hovering over the stats will display more detailed information about the references.
+
+![Window - Quick Stats](.docs/InspectorWindow-QuickStats.png)
 
 > Note: If there are more than one references from/to a single object to/from the object represented in the window, the total number of unique references will be displayed in brackets (Example: `[Unique 5]`).
 
