@@ -20,6 +20,7 @@
 * **Inspector Windows**
   * Modified quick stats to be more explicit
   * Modified quick stats tooltip to have more details
+  * Changed where the project settings are saved from `Assets` to `ProjectSettings/GiantParticle`
 * **Settings**
   * Added more details to settings
 
