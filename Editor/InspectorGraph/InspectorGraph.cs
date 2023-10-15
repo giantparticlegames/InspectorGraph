@@ -370,7 +370,14 @@ namespace GiantParticle.InspectorGraph
         {
             var projectSettings = GlobalApplicationContext.Instance.Get<IInspectorGraphProjectSettings>();
             var key = node.Object;
-            if (_viewRegistry.IsWindowRegisteredByTarget(key)) return null;
+            if (_viewRegistry.IsWindowRegisteredByTarget(key))
+            {
+                // Update Window
+                var windowToUpdate = _viewRegistry.WindowByTarget(key);
+                windowToUpdate.Node = node;
+                windowToUpdate.UpdateView();
+                return null;
+            }
             if (_viewRegistry.WindowCount > projectSettings.WindowSettings.MaxWindows)
             {
                 Debug.LogWarning("Max Window limit reached");
@@ -400,7 +407,7 @@ namespace GiantParticle.InspectorGraph
 
         private void OnWindowGUIChanged(InspectorWindow window)
         {
-            UpdateView(_graphController.ActiveGraph.WindowData.Object);
+            UpdateView();
         }
 
         private void ReorderWindows()

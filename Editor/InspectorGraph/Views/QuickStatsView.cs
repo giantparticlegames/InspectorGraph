@@ -13,7 +13,7 @@ namespace GiantParticle.InspectorGraph.Views
 {
     internal class QuickStatsView : VisualElement
     {
-        private IObjectNode Node { get; }
+        public IObjectNode Node { get; set; }
 
         public QuickStatsView(IObjectNode node)
         {
@@ -25,8 +25,7 @@ namespace GiantParticle.InspectorGraph.Views
         {
             this.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
             AddObjectType();
-            AddReferencedByLabel();
-            AddReferencesLabel();
+            UpdateView();
         }
 
         private Label GetOrCreateLabel(string labelName, bool addDivision = false)
@@ -55,12 +54,18 @@ namespace GiantParticle.InspectorGraph.Views
             objectTypeLabel.tooltip = $"Object Type:\n{Node.Object.GetType().FullName}";
         }
 
-        private void AddReferencesLabel()
+        private void UpdateReferencesLabel()
         {
             ReferenceStats stats = ObjectNodeStats.GetReferenceStats(Node, ReferenceDirection.ReferenceTo);
-            if (stats.TotalReferences <= 0) return;
-
             var statsLabel = GetOrCreateLabel("_refsLabel", true);
+            if (stats.TotalReferences <= 0)
+            {
+                statsLabel.visible = false;
+                return;
+            }
+
+            statsLabel.visible = true;
+
             // Label text
             StringBuilder builder = new StringBuilder();
             builder.Append($"Refs: {stats.TotalReferences}");
@@ -89,12 +94,18 @@ namespace GiantParticle.InspectorGraph.Views
             statsLabel.tooltip = builder.ToString();
         }
 
-        private void AddReferencedByLabel()
+        private void UpdateReferencedByLabel()
         {
             ReferenceStats stats = ObjectNodeStats.GetReferenceStats(Node, ReferenceDirection.ReferenceBy);
-            if (stats.TotalReferences <= 0) return;
-
             var statsLabel = GetOrCreateLabel("_refsByLabel", true);
+            if (stats.TotalReferences <= 0)
+            {
+                statsLabel.visible = false;
+                return;
+            }
+
+            statsLabel.visible = true;
+
             // Label text
             StringBuilder builder = new StringBuilder();
             builder.Append($"Refs By: {stats.TotalReferences}");
@@ -125,8 +136,8 @@ namespace GiantParticle.InspectorGraph.Views
 
         public void UpdateView()
         {
-            AddReferencedByLabel();
-            AddReferencesLabel();
+            UpdateReferencedByLabel();
+            UpdateReferencesLabel();
         }
     }
 }

@@ -11,6 +11,7 @@ using GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors;
 using GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProcessors;
 using GiantParticle.InspectorGraph.Data.Nodes;
 using GiantParticle.InspectorGraph.Operations;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

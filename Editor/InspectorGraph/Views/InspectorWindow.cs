@@ -30,7 +30,7 @@ namespace GiantParticle.InspectorGraph.Views
         private BaseWindowContent _view;
         private bool _forceStaticPreviewMode;
 
-        public IObjectNode Node { get; }
+        public IObjectNode Node { get; set; }
         public IReadOnlyList<IManipulator> Manipulators => _manipulators;
         public event Action<InspectorWindow> GUIChanged;
 
@@ -138,6 +138,7 @@ namespace GiantParticle.InspectorGraph.Views
 
         public void UpdateView()
         {
+            _quickStatsView.Node = Node;
             _quickStatsView.UpdateView();
         }
 

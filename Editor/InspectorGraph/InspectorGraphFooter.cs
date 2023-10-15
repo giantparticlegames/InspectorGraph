@@ -62,12 +62,6 @@ namespace GiantParticle.InspectorGraph
 
         private void UpdateDisplayMode(IGraphController controller)
         {
-            if (controller.AvailableFactories.Length <= 1)
-            {
-                _currentModeLabel.visible = false;
-                return;
-            }
-
             var displayName = (EditorDisplayNameAttribute)Attribute.GetCustomAttribute(
                 element: controller.ActiveFactory.GetType(),
                 attributeType: typeof(EditorDisplayNameAttribute));

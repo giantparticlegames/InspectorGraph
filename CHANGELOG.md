@@ -9,6 +9,10 @@
 * **Settings**
   * Added option to disable or enable all Filters at once
   * Added option to show or hide the reference counter in the graph
+* **Inspector Windows**
+  * Added Asset icon next to the name of the asset in the title bar
+* **Main Window**
+  * Added "Displaying" label to indicate the logic being used that construct the graph
 
 ### Changed
 * **Graph**
@@ -20,7 +24,7 @@
   * Added more details to settings
 
 ### Fixed
-WIP
+* Fixed issues when updating the graph either manually or automatically when changing references
 
 ## [0.10.1-b] 2023-04-16
 

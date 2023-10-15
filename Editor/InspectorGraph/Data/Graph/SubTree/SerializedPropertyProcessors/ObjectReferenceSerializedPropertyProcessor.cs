@@ -32,9 +32,9 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.SerializedPropertyProc
             // Translate component reference to Prefab
             if (reference is Component)
             {
-                string prefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(reference);
-                if (!string.IsNullOrEmpty(prefabPath))
-                    reference = AssetDatabase.LoadAssetAtPath<Object>(prefabPath);
+                string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(reference);
+                if (!string.IsNullOrEmpty(assetPath))
+                    reference = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
             }
 
             ObjectNode childNode = NodeFactory.CreateNode(reference);
