@@ -50,7 +50,7 @@ namespace GiantParticle.InspectorGraph.Views
                         refType: nodeReference.RefType);
                     if (connectionLine != null)
                     {
-                        connectionLine.ReferenceCount += 1;
+                        connectionLine.Data.ReferenceCount += 1;
                     }
                     else
                     {
@@ -77,8 +77,8 @@ namespace GiantParticle.InspectorGraph.Views
                     int count = 1;
                     foreach (ConnectionLine line in viewRegistry.ConnectionsFromWindow(window))
                     {
-                        line.SourceCount = count;
-                        line.SourceTotal = fromTotal;
+                        line.Data.SourceCount = count;
+                        line.Data.SourceTotal = fromTotal;
                         ++count;
                     }
                 }
@@ -89,8 +89,8 @@ namespace GiantParticle.InspectorGraph.Views
                     int count = 1;
                     foreach (ConnectionLine line in viewRegistry.ConnectionsToWindow(window))
                     {
-                        line.DestinationCount = count;
-                        line.DestinationTotal = toTotal;
+                        line.Data.DestinationCount = count;
+                        line.Data.DestinationTotal = toTotal;
                         ++count;
                     }
                 }

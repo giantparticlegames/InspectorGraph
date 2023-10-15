@@ -32,11 +32,8 @@ namespace GiantParticle.InspectorGraph.Views
         public VisualElement Destination { get; }
         public ReferenceType ReferenceType { get; }
         public int ForceHighlightCount { get; set; }
-        public int SourceCount { get; set; }
-        public int SourceTotal { get; set; }
-        public int DestinationCount { get; set; }
-        public int DestinationTotal { get; set; }
-        public int ReferenceCount { get; set; }
+
+        public ConnectionData Data { get; }
 
         private ViewMode _mode;
         private IConnectionSettings _connectionSettings;
@@ -47,15 +44,11 @@ namespace GiantParticle.InspectorGraph.Views
             Source = source;
             Destination = dest;
             ReferenceType = refType;
-            ReferenceCount = 1;
+            Data = new ConnectionData();
             var projectSettings = GlobalApplicationContext.Instance.Get<IInspectorGraphProjectSettings>();
             _connectionSettings = projectSettings.ConnectionSettings;
             _colorSettings = projectSettings.ConnectionSettings.GetColorSettings(refType);
 
-            SourceCount = 1;
-            SourceTotal = 1;
-            DestinationCount = 1;
-            DestinationTotal = 1;
             var line = new IMGUIContainer(DrawLine);
             this.Add(line);
         }
@@ -81,15 +74,15 @@ namespace GiantParticle.InspectorGraph.Views
                                  new Vector3(
                                      x: Source.contentRect.width,
                                      y: Source.contentRect.height * 0.25f
-                                        + (Source.contentRect.height * 0.5f) * (SourceCount * 1f) /
-                                        (SourceTotal * 1f + 1),
+                                        + (Source.contentRect.height * 0.5f) * (Data.SourceCount * 1f) /
+                                        (Data.SourceTotal * 1f + 1),
                                      z: 0);
             Vector3 endPoint = Destination.transform.position +
                                new Vector3(
                                    x: 0,
                                    y: Destination.contentRect.height * 0.25f
-                                      + (Destination.contentRect.height * 0.5f) * (DestinationCount * 1f) /
-                                      (DestinationTotal * 1f + 1),
+                                      + (Destination.contentRect.height * 0.5f) * (Data.DestinationCount * 1f) /
+                                      (Data.DestinationTotal * 1f + 1),
                                    z: 0);
 
             // Draw Curve
@@ -113,12 +106,12 @@ namespace GiantParticle.InspectorGraph.Views
             Handles.color = previousColor;
 
             // Draw number
-            if (ReferenceCount > 1 && _connectionSettings.DrawReferenceCount)
+            if (Data.ReferenceCount > 1 && _connectionSettings.DrawReferenceCount)
             {
                 var previousGUIColor = GUI.color;
                 GUI.color = new Color(lineColor.r, lineColor.g, lineColor.b, 1f);
                 var labelPosition = endPoint - new Vector3(kArrowLength * 2, 0, 0);
-                Handles.Label(labelPosition, $"{ReferenceCount}");
+                Handles.Label(labelPosition, $"{Data.ReferenceCount}");
                 GUI.color = previousGUIColor;
             }
 
