@@ -5,7 +5,7 @@
 
 namespace GiantParticle.InspectorGraph.Notifications
 {
-    public enum NotificationType
+    internal enum NotificationType
     {
         Info = 0,
         Warning = 1,
