@@ -20,15 +20,18 @@ namespace GiantParticle.InspectorGraph.Data.Nodes
             _nodesByAssetPath.Clear();
         }
 
-        public ObjectNode CreateNode(Object obj)
+        public ObjectNode CreateNode(Object obj, bool skipPath = false)
         {
-            var assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(obj);
-            if (!string.IsNullOrEmpty(assetPath))
+            if (!skipPath)
             {
-                if (_nodesByAssetPath.ContainsKey(assetPath)) return _nodesByAssetPath[assetPath];
-                var nodeAsset = new ObjectNode(obj);
-                _nodesByAssetPath.Add(assetPath, nodeAsset);
-                return nodeAsset;
+                var assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(obj);
+                if (!string.IsNullOrEmpty(assetPath))
+                {
+                    if (_nodesByAssetPath.ContainsKey(assetPath)) return _nodesByAssetPath[assetPath];
+                    var nodeAsset = new ObjectNode(obj);
+                    _nodesByAssetPath.Add(assetPath, nodeAsset);
+                    return nodeAsset;
+                }
             }
 
             if (_nodes.ContainsKey(obj)) return _nodes[obj];

@@ -20,7 +20,8 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
         {
             if (!(node.Object is GameObject rootPrefab)) return;
 
-            Dictionary<string, ObjectNode> hierarchyMap = CreatePrefabHierarchyMap(rootPrefab, node);
+            Dictionary<string, Dictionary<GameObject, ObjectNode>> hierarchyMap =
+                CreatePrefabHierarchyMap(rootPrefab, node);
             HashSet<Object> internalReferences = new();
             internalReferences.UnionWith(GetAllComponentsAsObjects(rootPrefab));
             internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedObject));
@@ -37,9 +38,10 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 {
                     var currentComponent = components[i];
                     string componentAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(currentComponent);
+                    GameObject parentRoot = PrefabUtility.GetNearestPrefabInstanceRoot(currentGameObject);
 
-                    var parentNode = hierarchyMap.ContainsKey(componentAssetPath)
-                        ? hierarchyMap[componentAssetPath]
+                    var parentNode = hierarchyMap.ContainsKey(componentAssetPath) && parentRoot != null
+                        ? hierarchyMap[componentAssetPath][parentRoot]
                         : node;
                     var serializedComponent = new SerializedObject(currentComponent);
                     ProcessAllVisibleSerializedProperties(
@@ -54,10 +56,10 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             }
         }
 
-        private Dictionary<string, ObjectNode> CreatePrefabHierarchyMap(GameObject prefab, ObjectNode rootNode)
+        private Dictionary<string, Dictionary<GameObject, ObjectNode>> CreatePrefabHierarchyMap(GameObject prefab,
+            ObjectNode rootNode)
         {
-            Dictionary<string, ObjectNode> map = new();
-            Dictionary<string, HashSet<GameObject>> rootMap = new();
+            Dictionary<string, Dictionary<GameObject, ObjectNode>> map = new();
 
             void AddToMaps(GameObject obj, ObjectNode parentNode, bool isRoot = false)
             {
@@ -67,8 +69,9 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 var rootPrefab = PrefabUtility.GetNearestPrefabInstanceRoot(obj);
                 if (isRoot)
                 {
-                    map.Add(assetPath, parentNode);
-                    rootMap.Add(assetPath, new HashSet<GameObject> { rootPrefab });
+                    var pairs = new Dictionary<GameObject, ObjectNode>();
+                    pairs.Add(obj, rootNode);
+                    map.Add(assetPath, pairs);
                     return;
                 }
 
@@ -81,18 +84,18 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                         referenceType: ReferenceType.NestedPrefab);
 
                     // Add to maps
-                    map.Add(assetPath, node);
-                    rootMap.Add(assetPath, new HashSet<GameObject> { rootPrefab });
+                    var pairs = new Dictionary<GameObject, ObjectNode>();
+                    pairs.Add(rootPrefab, node);
+                    map.Add(assetPath, pairs);
                     return;
                 }
 
-                // New duplicate nested prefab
-                if (!rootMap.ContainsKey(assetPath)) return;
-                if (rootMap[assetPath].Contains(rootPrefab)) return;
+                if (rootPrefab == null) return;
+                if (map[assetPath].ContainsKey(rootPrefab)) return;
 
                 // Add new reference
-                rootMap[assetPath].Add(rootPrefab);
-                ObjectNode newNode = NodeFactory.CreateNode(obj);
+                ObjectNode newNode = NodeFactory.CreateNode(obj, true);
+                map[assetPath].Add(rootPrefab, newNode);
                 ObjectNode.CreateReference(
                     sourceObject: parentNode,
                     targetObject: newNode,
@@ -113,14 +116,15 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 
                 // Queue children
                 string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(currentGameObject);
+                var parentPrefab = PrefabUtility.GetNearestPrefabInstanceRoot(currentGameObject);
                 for (int i = 0; i < currentGameObject.transform.childCount; ++i)
                 {
                     GameObject child = currentGameObject.transform.GetChild(i).gameObject;
                     gameObjectQueue.Enqueue(
                         item: new Tuple<GameObject, ObjectNode>(
                             item1: child,
-                            item2: map.ContainsKey(assetPath)
-                                ? map[assetPath]
+                            item2: map.ContainsKey(assetPath) && parentPrefab != null
+                                ? map[assetPath][parentPrefab]
                                 : rootNode));
                 }
             }

@@ -10,6 +10,6 @@ namespace GiantParticle.InspectorGraph.Data.Nodes
     internal interface IObjectNodeFactory
     {
         void ClearRegistry();
-        ObjectNode CreateNode(Object obj);
+        ObjectNode CreateNode(Object obj, bool skipPath = false);
     }
 }
