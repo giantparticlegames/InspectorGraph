@@ -20,12 +20,13 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
         {
             if (!(node.Object is GameObject rootPrefab)) return;
 
-            Dictionary<string, Dictionary<GameObject, ObjectNode>> hierarchyMap =
-                CreatePrefabHierarchyMap(rootPrefab, node);
+            var nodeMap = CreatePrefabMap(rootPrefab, node);
+
             HashSet<Object> internalReferences = new();
             internalReferences.UnionWith(GetAllComponentsAsObjects(rootPrefab));
             internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedObject));
 
+            HashSet<ObjectNode> visited = new();
             Queue<GameObject> gameObjectQueue = new();
             gameObjectQueue.Enqueue(rootPrefab);
             while (gameObjectQueue.Count > 0)
@@ -37,11 +38,9 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 for (int i = 0; i < components.Length; ++i)
                 {
                     var currentComponent = components[i];
-                    string componentAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(currentComponent);
-                    GameObject parentRoot = PrefabUtility.GetNearestPrefabInstanceRoot(currentGameObject);
 
-                    var parentNode = hierarchyMap.ContainsKey(componentAssetPath) && parentRoot != null
-                        ? hierarchyMap[componentAssetPath][parentRoot]
+                    var parentNode = nodeMap.ContainsKey(currentGameObject)
+                        ? nodeMap[currentGameObject]
                         : node;
                     var serializedComponent = new SerializedObject(currentComponent);
                     ProcessAllVisibleSerializedProperties(
@@ -56,80 +55,113 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             }
         }
 
-        private Dictionary<string, Dictionary<GameObject, ObjectNode>> CreatePrefabHierarchyMap(GameObject prefab,
-            ObjectNode rootNode)
+        private Dictionary<GameObject, ObjectNode> CreatePrefabMap(GameObject root, ObjectNode parent)
         {
-            Dictionary<string, Dictionary<GameObject, ObjectNode>> map = new();
+            var map = new Dictionary<GameObject, ObjectNode>();
+            var assetPrefabReferences = new Dictionary<string, ObjectNode>();
+            var rootAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(root);
+            // Add children
+            Queue<Tuple<GameObject, ObjectNode>> gameObjects = new();
+            for (int i = 0; i < root.transform.childCount; ++i)
+                gameObjects.Enqueue(new Tuple<GameObject, ObjectNode>(
+                    item1: root.transform.GetChild(i).gameObject,
+                    item2: parent));
 
-            void AddToMaps(GameObject obj, ObjectNode parentNode, bool isRoot = false)
+            ObjectNode AddToMap(GameObject gameObject, ObjectNode currentParent)
             {
-                string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(obj);
-                if (string.IsNullOrEmpty(assetPath)) return;
+                // Check if it's a prefab instance
+                var assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(gameObject);
+                if (string.IsNullOrEmpty(assetPath)) return currentParent;
+                if (string.Equals(assetPath, rootAssetPath)) return currentParent;
 
-                var rootPrefab = PrefabUtility.GetNearestPrefabInstanceRoot(obj);
-                if (isRoot)
+                // Check if is a modified Prefab Instance
+                var rootPrefabInstance = PrefabUtility.GetNearestPrefabInstanceRoot(gameObject);
+                if (IsModifiedPrefabInstance(gameObject))
                 {
-                    var pairs = new Dictionary<GameObject, ObjectNode>();
-                    pairs.Add(obj, rootNode);
-                    map.Add(assetPath, pairs);
-                    return;
-                }
+                    if (rootPrefabInstance != null && map.ContainsKey(rootPrefabInstance))
+                    {
+                        map.Add(gameObject, map[rootPrefabInstance]);
+                        return map[rootPrefabInstance];
+                    }
 
-                if (!map.ContainsKey(assetPath))
-                {
-                    ObjectNode node = NodeFactory.CreateNode(obj);
+                    var node = NodeFactory.CreateNode(gameObject, true);
+                    map.Add(gameObject, node);
                     ObjectNode.CreateReference(
-                        sourceObject: parentNode,
+                        sourceObject: currentParent,
                         targetObject: node,
                         referenceType: ReferenceType.NestedPrefab);
-
-                    // Add to maps
-                    var pairs = new Dictionary<GameObject, ObjectNode>();
-                    pairs.Add(rootPrefab, node);
-                    map.Add(assetPath, pairs);
-                    return;
+                    return node;
                 }
 
-                if (rootPrefab == null) return;
-                if (map[assetPath].ContainsKey(rootPrefab)) return;
+                // Create node to original Prefab
+                if (!assetPrefabReferences.ContainsKey(assetPath))
+                {
+                    var originalAsset = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                    var assetNode = NodeFactory.CreateNode(originalAsset);
+                    assetPrefabReferences.Add(assetPath, assetNode);
+                    ObjectNode.CreateReference(
+                        sourceObject: currentParent,
+                        targetObject: assetNode,
+                        referenceType: ReferenceType.NestedPrefab);
+                    return assetNode;
+                }
 
-                // Add new reference
-                ObjectNode newNode = NodeFactory.CreateNode(obj, true);
-                map[assetPath].Add(rootPrefab, newNode);
+                // Map Object to original prefab
+                var existingAssetNode = assetPrefabReferences[assetPath];
+                map.Add(gameObject, existingAssetNode);
                 ObjectNode.CreateReference(
-                    sourceObject: parentNode,
-                    targetObject: newNode,
+                    sourceObject: currentParent,
+                    targetObject: existingAssetNode,
                     referenceType: ReferenceType.NestedPrefab);
+                return existingAssetNode;
             }
 
-            AddToMaps(prefab, rootNode, true);
-
-            Queue<Tuple<GameObject, ObjectNode>> gameObjectQueue = new();
-            gameObjectQueue.Enqueue(new Tuple<GameObject, ObjectNode>(prefab, rootNode));
-            while (gameObjectQueue.Count > 0)
+            while (gameObjects.Count > 0)
             {
-                var pair = gameObjectQueue.Dequeue();
-                GameObject currentGameObject = pair.Item1;
-                ObjectNode parentNode = pair.Item2;
+                var dataPair = gameObjects.Dequeue();
+                var gameObject = dataPair.Item1;
+                var currentParent = dataPair.Item2;
 
-                AddToMaps(currentGameObject, parentNode);
+                var newParent = AddToMap(gameObject, currentParent);
 
-                // Queue children
-                string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(currentGameObject);
-                var parentPrefab = PrefabUtility.GetNearestPrefabInstanceRoot(currentGameObject);
-                for (int i = 0; i < currentGameObject.transform.childCount; ++i)
-                {
-                    GameObject child = currentGameObject.transform.GetChild(i).gameObject;
-                    gameObjectQueue.Enqueue(
-                        item: new Tuple<GameObject, ObjectNode>(
-                            item1: child,
-                            item2: map.ContainsKey(assetPath) && parentPrefab != null
-                                ? map[assetPath][parentPrefab]
-                                : rootNode));
-                }
+                // Enqueue children
+                for (int i = 0; i < gameObject.transform.childCount; ++i)
+                    gameObjects.Enqueue(new Tuple<GameObject, ObjectNode>(
+                        item1: gameObject.transform.GetChild(i).gameObject,
+                        item2: newParent));
             }
 
             return map;
+        }
+
+        private bool IsModifiedPrefabInstance(GameObject prefabInstance)
+        {
+            var addedComponents = PrefabUtility.GetAddedComponents(prefabInstance);
+            if (addedComponents.Count > 0)
+            {
+                for (int i = 0; i < addedComponents.Count; ++i)
+                    if (addedComponents[i].instanceComponent.gameObject == prefabInstance)
+                        return true;
+            }
+
+            var removedComponents = PrefabUtility.GetRemovedComponents(prefabInstance);
+            if (removedComponents.Count > 0)
+            {
+                for (int i = 0; i < removedComponents.Count; ++i)
+                    if (removedComponents[i].containingInstanceGameObject == prefabInstance)
+                        return true;
+            }
+
+            var modifications = PrefabUtility.GetPropertyModifications(prefabInstance);
+            for (int i = 0; i < modifications.Length; ++i)
+            {
+                var mod = modifications[i];
+                if (mod.target is Transform) continue;
+                if (mod.target is GameObject) continue;
+                return true;
+            }
+
+            return false;
         }
 
         private HashSet<Object> GetAllComponentsAsObjects(GameObject root)
