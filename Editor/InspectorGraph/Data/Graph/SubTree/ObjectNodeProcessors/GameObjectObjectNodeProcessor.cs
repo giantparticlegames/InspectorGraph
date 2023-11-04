@@ -14,24 +14,39 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 {
     internal class GameObjectObjectNodeProcessor : BaseObjectNodeProcessor
     {
+        private class GameObjectPair
+        {
+            public readonly GameObject GameObject;
+            public readonly ObjectNode Node;
+
+            public GameObjectPair(GameObject gameObject, ObjectNode node)
+            {
+                GameObject = gameObject;
+                Node = node;
+            }
+        }
+
         public override Type TargetType => typeof(GameObject);
 
         public override void ProcessNode(ObjectNode node)
         {
-            if (!(node.Object is GameObject rootPrefab)) return;
+            if (!(node.Object is GameObject rootGameObject)) return;
 
-            var nodeMap = CreatePrefabMap(rootPrefab, node);
+            var nodeMap = CreatePrefabMap(rootGameObject, node);
 
             HashSet<Object> internalReferences = new();
-            internalReferences.UnionWith(GetAllComponentsAsObjects(rootPrefab));
+            internalReferences.UnionWith(GetAllComponentsAsObjects(rootGameObject));
             internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedObject));
 
-            HashSet<ObjectNode> visited = new();
-            Queue<GameObject> gameObjectQueue = new();
-            gameObjectQueue.Enqueue(rootPrefab);
+            Queue<GameObjectPair> gameObjectQueue = new();
+            gameObjectQueue.Enqueue(new GameObjectPair(rootGameObject, node));
             while (gameObjectQueue.Count > 0)
             {
-                GameObject currentGameObject = gameObjectQueue.Dequeue();
+                var pair = gameObjectQueue.Dequeue();
+                GameObject currentGameObject = pair.GameObject;
+                ObjectNode parentNode = nodeMap.ContainsKey(currentGameObject) ? nodeMap[currentGameObject] : pair.Node;
+                // TODO: Figure out how to map a GameObject instance to the original Prefab GameObject in a hierarchy
+                // This will allow to treat unmodified Prefab Instances as the original Prefab as reference
 
                 // Check all components
                 var components = currentGameObject.GetComponents<Component>();
@@ -39,9 +54,6 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 {
                     var currentComponent = components[i];
 
-                    var parentNode = nodeMap.ContainsKey(currentGameObject)
-                        ? nodeMap[currentGameObject]
-                        : node;
                     var serializedComponent = new SerializedObject(currentComponent);
                     ProcessAllVisibleSerializedProperties(
                         parentNode: parentNode,
@@ -51,7 +63,9 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 
                 // Check child GameObjects
                 for (int i = 0; i < currentGameObject.transform.childCount; ++i)
-                    gameObjectQueue.Enqueue(currentGameObject.transform.GetChild(i).gameObject);
+                    gameObjectQueue.Enqueue(new GameObjectPair(
+                        currentGameObject.transform.GetChild(i).gameObject,
+                        parentNode));
             }
         }
 
@@ -61,11 +75,11 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             var assetPrefabReferences = new Dictionary<string, ObjectNode>();
             var rootAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(root);
             // Add children
-            Queue<Tuple<GameObject, ObjectNode>> gameObjects = new();
+            Queue<GameObjectPair> gameObjects = new();
             for (int i = 0; i < root.transform.childCount; ++i)
-                gameObjects.Enqueue(new Tuple<GameObject, ObjectNode>(
-                    item1: root.transform.GetChild(i).gameObject,
-                    item2: parent));
+                gameObjects.Enqueue(new GameObjectPair(
+                    root.transform.GetChild(i).gameObject,
+                    parent));
 
             ObjectNode AddToMap(GameObject gameObject, ObjectNode currentParent)
             {
@@ -76,7 +90,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 
                 // Check if is a modified Prefab Instance
                 var rootPrefabInstance = PrefabUtility.GetNearestPrefabInstanceRoot(gameObject);
-                if (IsModifiedPrefabInstance(gameObject))
+                if (IsModifiedPrefabInstance(rootPrefabInstance))
                 {
                     if (rootPrefabInstance != null && map.ContainsKey(rootPrefabInstance))
                     {
@@ -110,26 +124,31 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 // Map Object to original prefab
                 var existingAssetNode = assetPrefabReferences[assetPath];
                 map.Add(gameObject, existingAssetNode);
-                ObjectNode.CreateReference(
-                    sourceObject: currentParent,
-                    targetObject: existingAssetNode,
-                    referenceType: ReferenceType.NestedPrefab);
+                // Avoid creating self reference
+                if (currentParent.Object != existingAssetNode.Object)
+                {
+                    ObjectNode.CreateReference(
+                        sourceObject: currentParent,
+                        targetObject: existingAssetNode,
+                        referenceType: ReferenceType.NestedPrefab);
+                }
+
                 return existingAssetNode;
             }
 
             while (gameObjects.Count > 0)
             {
                 var dataPair = gameObjects.Dequeue();
-                var gameObject = dataPair.Item1;
-                var currentParent = dataPair.Item2;
+                var gameObject = dataPair.GameObject;
+                var currentParent = dataPair.Node;
 
                 var newParent = AddToMap(gameObject, currentParent);
 
                 // Enqueue children
                 for (int i = 0; i < gameObject.transform.childCount; ++i)
-                    gameObjects.Enqueue(new Tuple<GameObject, ObjectNode>(
-                        item1: gameObject.transform.GetChild(i).gameObject,
-                        item2: newParent));
+                    gameObjects.Enqueue(new GameObjectPair(
+                        gameObject.transform.GetChild(i).gameObject,
+                        newParent));
             }
 
             return map;
@@ -158,7 +177,24 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             {
                 var objectOverride = overrides[i];
                 if (!(objectOverride.instanceObject is Component component)) continue;
-                if (component.gameObject == prefabInstance) return true;
+                // Check if the target is a children of this instance
+                if (IsObjectInHierarchy(prefabInstance, component.gameObject)) return true;
+            }
+
+            return false;
+        }
+
+        private bool IsObjectInHierarchy(GameObject root, GameObject target)
+        {
+            Queue<GameObject> queue = new();
+            queue.Enqueue(root);
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                if (current == target) return true;
+                // Enqueue children
+                for (int i = 0; i < current.transform.childCount; ++i)
+                    queue.Enqueue(current.transform.GetChild(i).gameObject);
             }
 
             return false;
