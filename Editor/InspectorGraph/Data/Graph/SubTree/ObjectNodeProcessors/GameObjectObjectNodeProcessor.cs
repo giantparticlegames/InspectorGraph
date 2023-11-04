@@ -70,7 +70,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             ObjectNode AddToMap(GameObject gameObject, ObjectNode currentParent)
             {
                 // Check if it's a prefab instance
-                var assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(gameObject);
+                string assetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(gameObject);
                 if (string.IsNullOrEmpty(assetPath)) return currentParent;
                 if (string.Equals(assetPath, rootAssetPath)) return currentParent;
 
@@ -99,6 +99,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                     var originalAsset = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                     var assetNode = NodeFactory.CreateNode(originalAsset);
                     assetPrefabReferences.Add(assetPath, assetNode);
+                    map.Add(gameObject, assetNode);
                     ObjectNode.CreateReference(
                         sourceObject: currentParent,
                         targetObject: assetNode,
@@ -152,13 +153,12 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                         return true;
             }
 
-            var modifications = PrefabUtility.GetPropertyModifications(prefabInstance);
-            for (int i = 0; i < modifications.Length; ++i)
+            var overrides = PrefabUtility.GetObjectOverrides(prefabInstance);
+            for (int i = 0; i < overrides.Count; ++i)
             {
-                var mod = modifications[i];
-                if (mod.target is Transform) continue;
-                if (mod.target is GameObject) continue;
-                return true;
+                var objectOverride = overrides[i];
+                if (!(objectOverride.instanceObject is Component component)) continue;
+                if (component.gameObject == prefabInstance) return true;
             }
 
             return false;
