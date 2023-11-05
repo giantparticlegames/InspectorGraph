@@ -26,6 +26,18 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             }
         }
 
+        private class ObjectNodeInfo
+        {
+            public readonly ObjectNode Node;
+            public readonly bool IsModifiedPrefab;
+
+            public ObjectNodeInfo(ObjectNode node, bool isModified)
+            {
+                Node = node;
+                IsModifiedPrefab = isModified;
+            }
+        }
+
         public override Type TargetType => typeof(GameObject);
 
         public override void ProcessNode(ObjectNode node)
@@ -38,15 +50,27 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             internalReferences.UnionWith(GetAllComponentsAsObjects(rootGameObject));
             internalReferences.UnionWith(CreateInternalReferenceSet(node.WindowData.SerializedObject));
 
+            HashSet<GameObject> visited = new();
             Queue<GameObjectPair> gameObjectQueue = new();
             gameObjectQueue.Enqueue(new GameObjectPair(rootGameObject, node));
             while (gameObjectQueue.Count > 0)
             {
                 var pair = gameObjectQueue.Dequeue();
                 GameObject currentGameObject = pair.GameObject;
-                ObjectNode parentNode = nodeMap.ContainsKey(currentGameObject) ? nodeMap[currentGameObject] : pair.Node;
-                // TODO: Figure out how to map a GameObject instance to the original Prefab GameObject in a hierarchy
-                // This will allow to treat unmodified Prefab Instances as the original Prefab as reference
+                ObjectNode parentNode = pair.Node;
+                if (nodeMap.ContainsKey(currentGameObject))
+                {
+                    var data = nodeMap[currentGameObject];
+                    parentNode = data.Node;
+                    if (!data.IsModifiedPrefab)
+                    {
+                        var originalObject = PrefabUtility.GetCorrespondingObjectFromOriginalSource(currentGameObject);
+                        if (originalObject != null) currentGameObject = originalObject;
+                    }
+                }
+
+                if (visited.Contains(currentGameObject)) continue;
+                visited.Add(currentGameObject);
 
                 // Check all components
                 var components = currentGameObject.GetComponents<Component>();
@@ -69,9 +93,9 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
             }
         }
 
-        private Dictionary<GameObject, ObjectNode> CreatePrefabMap(GameObject root, ObjectNode parent)
+        private Dictionary<GameObject, ObjectNodeInfo> CreatePrefabMap(GameObject root, ObjectNode parent)
         {
-            var map = new Dictionary<GameObject, ObjectNode>();
+            var map = new Dictionary<GameObject, ObjectNodeInfo>();
             var assetPrefabReferences = new Dictionary<string, ObjectNode>();
             var rootAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(root);
             // Add children
@@ -95,11 +119,11 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                     if (rootPrefabInstance != null && map.ContainsKey(rootPrefabInstance))
                     {
                         map.Add(gameObject, map[rootPrefabInstance]);
-                        return map[rootPrefabInstance];
+                        return map[rootPrefabInstance].Node;
                     }
 
                     var node = NodeFactory.CreateNode(gameObject, true);
-                    map.Add(gameObject, node);
+                    map.Add(gameObject, new ObjectNodeInfo(node, true));
                     ObjectNode.CreateReference(
                         sourceObject: currentParent,
                         targetObject: node,
@@ -113,7 +137,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                     var originalAsset = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                     var assetNode = NodeFactory.CreateNode(originalAsset);
                     assetPrefabReferences.Add(assetPath, assetNode);
-                    map.Add(gameObject, assetNode);
+                    map.Add(gameObject, new ObjectNodeInfo(assetNode, false));
                     ObjectNode.CreateReference(
                         sourceObject: currentParent,
                         targetObject: assetNode,
@@ -123,7 +147,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 
                 // Map Object to original prefab
                 var existingAssetNode = assetPrefabReferences[assetPath];
-                map.Add(gameObject, existingAssetNode);
+                map.Add(gameObject, new ObjectNodeInfo(existingAssetNode, false));
                 // Avoid creating self reference
                 if (currentParent.Object != existingAssetNode.Object)
                 {

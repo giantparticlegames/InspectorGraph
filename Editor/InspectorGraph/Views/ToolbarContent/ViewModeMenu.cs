@@ -42,6 +42,7 @@ namespace GiantParticle.InspectorGraph.ToolbarContent
             }
 
             this.text = "View Mode";
+            this.style.minWidth = new StyleLength(85);
         }
 
         private DropdownMenuAction.Status CheckMenuAction(DropdownMenuAction action)
