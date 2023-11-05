@@ -181,6 +181,13 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 if (IsObjectInHierarchy(prefabInstance, component.gameObject)) return true;
             }
 
+            var addedObjects = PrefabUtility.GetAddedGameObjects(prefabInstance);
+            for (int i = 0; i < addedObjects.Count; ++i)
+            {
+                if (!IsObjectInHierarchy(prefabInstance, addedObjects[i].instanceGameObject)) continue;
+                return true;
+            }
+
             return false;
         }
 
