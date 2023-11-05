@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [0.11.0] 2023-10-XX
+## [0.11.0] 2023-11-XX
 
 ### Added
 * **Graph**
@@ -20,7 +20,7 @@
 * **Inspector Windows**
   * Modified quick stats to be more explicit
   * Modified quick stats tooltip to have more details
-  * Changed where the project settings are saved from `Assets` to `ProjectSettings/GiantParticle`
+  * Changed where the project settings are saved, from `Assets` to `ProjectSettings/GiantParticle`
 * **Settings**
   * Added more details to settings
 
