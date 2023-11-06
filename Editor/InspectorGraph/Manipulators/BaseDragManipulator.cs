@@ -6,7 +6,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Manipulators
+namespace GiantParticle.InspectorGraph.Manipulators
 {
     /// <summary>
     /// Button id.
@@ -54,16 +54,16 @@ namespace GiantParticle.InspectorGraph.Editor.Manipulators
         protected Vector3 StartPosition => _startClickPosition;
 
         protected Vector3 PositionDelta => new Vector3(
-            x: _deltaClickPosition.x * MovementScale.x,
-            y: _deltaClickPosition.y * MovementScale.y,
-            z: _deltaClickPosition.z * MovementScale.z);
+            x: _deltaClickPosition.x * _movementScale.x,
+            y: _deltaClickPosition.y * _movementScale.y,
+            z: _deltaClickPosition.z * _movementScale.z);
 
         private Vector3 _movementScale = Vector3.one;
 
-        public Vector3 MovementScale
+        public float Scale
         {
-            get => _movementScale;
-            set => _movementScale = value;
+            get => _movementScale.x;
+            set { _movementScale = new Vector3(1f / value, 1f / value, 1f); }
         }
 
         protected BaseDragManipulator(VisualElement handle, ActivatorCombination[] activators = null)

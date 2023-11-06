@@ -3,16 +3,17 @@
 // All rights reserved.
 // ********************************
 
-using System.Collections.Generic;
 using System.Text;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes;
+using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Data.Stats;
+using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Views
+namespace GiantParticle.InspectorGraph.Views
 {
     internal class QuickStatsView : VisualElement
     {
-        private IObjectNode Node { get; }
+        public IObjectNode Node { get; set; }
 
         public QuickStatsView(IObjectNode node)
         {
@@ -24,17 +25,22 @@ namespace GiantParticle.InspectorGraph.Editor.Views
         {
             this.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
             AddObjectType();
-            AddReferencedByLabel();
-            AddReferencesLabel();
+            UpdateView();
         }
 
-        private Label GetOrCreateLabel(string labelName)
+        private Label GetOrCreateLabel(string labelName, bool addDivision = false)
         {
             var label = this.Q<Label>(labelName);
             if (label == null)
             {
                 label = new Label();
                 label.name = labelName;
+                if (addDivision)
+                {
+                    label.style.borderLeftColor = new StyleColor(new Color(1, 1, 1, 0.5f));
+                    label.style.borderLeftWidth = new StyleFloat(1);
+                }
+
                 this.Add(label);
             }
 
@@ -44,84 +50,94 @@ namespace GiantParticle.InspectorGraph.Editor.Views
         private void AddObjectType()
         {
             var objectTypeLabel = GetOrCreateLabel("_objectType");
-            objectTypeLabel.text = $"{Node.Target.GetType().Name}";
-            objectTypeLabel.tooltip = $"Object Type: {Node.Target.GetType().FullName}";
+            objectTypeLabel.text = $"{Node.Object.GetType().Name}";
+            objectTypeLabel.tooltip = $"Object Type:\n{Node.Object.GetType().FullName}";
         }
 
-        private void AddReferencesLabel()
+        private void UpdateReferencesLabel()
         {
-            int refCount = 0;
-            int totalReferences = 0;
-            foreach (IObjectNodeReference reference in Node.References)
+            ReferenceStats stats = ObjectNodeStats.GetReferenceStats(Node, ReferenceDirection.ReferenceTo);
+            var statsLabel = GetOrCreateLabel("_refsLabel", true);
+            if (stats.TotalReferences <= 0)
             {
-                ++refCount;
-                totalReferences += reference.RefCount;
+                statsLabel.visible = false;
+                return;
             }
 
-            if (refCount <= 0) return;
+            statsLabel.visible = true;
 
-            StringBuilder builder = new();
-            builder.Append($"Refs: {refCount}");
-
-            string tooltipText = null;
-            if (totalReferences != refCount)
-            {
-                builder.Append($" [Total: {totalReferences}]");
-                tooltipText = "* Object is referencing an object more than once";
-            }
-
-            var statsLabel = GetOrCreateLabel("_refsLabel");
+            // Label text
+            StringBuilder builder = new StringBuilder();
+            builder.Append($"Refs: {stats.TotalReferences}");
+            if (stats.TotalReferences != stats.UniqueReferences)
+                builder.Append($" [Unique {stats.UniqueReferences}]");
             statsLabel.text = builder.ToString();
-            if (tooltipText != null) statsLabel.tooltip = tooltipText;
+
+            // Tooltip Text
+            builder.Clear();
+            builder.AppendLine("Number of references from this Object:");
+            builder.AppendLine($"- Total: {stats.TotalReferences}");
+            builder.AppendLine($"- Unique: {stats.UniqueReferences}");
+            int totalStats = stats.ReferenceTypes;
+            int statCount = 0;
+            builder.AppendLine("References By Type:");
+            foreach (ReferenceByTypeStats refStats in stats.StatsByType)
+            {
+                builder.Append($"- {refStats.ReferenceType}: {refStats.TotalReferences}");
+                if (refStats.TotalUniqueReference != refStats.TotalReferences)
+                    builder.Append($" [Unique: {refStats.TotalUniqueReference}]");
+
+                ++statCount;
+                if (statCount < totalStats) builder.AppendLine("");
+            }
+
+            statsLabel.tooltip = builder.ToString();
         }
 
-        private void AddReferencedByLabel()
+        private void UpdateReferencedByLabel()
         {
-            var root = GlobalApplicationContext.Instance.Get<IObjectNode>();
-            HashSet<IObjectNode> visitedNodes = new();
-            Queue<IObjectNode> queue = new();
-            queue.Enqueue(root);
-
-            int refCount = 0;
-            int totalReferences = 0;
-            while (queue.Count > 0)
+            ReferenceStats stats = ObjectNodeStats.GetReferenceStats(Node, ReferenceDirection.ReferenceBy);
+            var statsLabel = GetOrCreateLabel("_refsByLabel", true);
+            if (stats.TotalReferences <= 0)
             {
-                IObjectNode node = queue.Dequeue();
-                if (visitedNodes.Contains(node)) continue;
-                visitedNodes.Add(node);
-
-                foreach (IObjectNodeReference reference in node.References)
-                {
-                    queue.Enqueue(reference.TargetNode);
-                    if (reference.TargetNode == Node)
-                    {
-                        ++refCount;
-                        totalReferences += reference.RefCount;
-                    }
-                }
+                statsLabel.visible = false;
+                return;
             }
 
-            if (refCount <= 0) return;
+            statsLabel.visible = true;
 
-            StringBuilder builder = new();
-            builder.Append($"Refs By: {refCount}");
-
-            string tooltipText = null;
-            if (totalReferences != refCount)
-            {
-                builder.Append($" [Total: {totalReferences}]");
-                tooltipText = "* Object is being referenced multiple times by one or more objects";
-            }
-
-            var statsLabel = GetOrCreateLabel("_refByLabel");
+            // Label text
+            StringBuilder builder = new StringBuilder();
+            builder.Append($"Refs By: {stats.TotalReferences}");
+            if (stats.TotalReferences != stats.UniqueReferences)
+                builder.Append($" [Unique {stats.UniqueReferences}]");
             statsLabel.text = builder.ToString();
-            if (tooltipText != null) statsLabel.tooltip = tooltipText;
+
+            // Tooltip Text
+            builder.Clear();
+            builder.AppendLine("Number of references to this Object:");
+            builder.AppendLine($"- Total: {stats.TotalReferences}");
+            builder.AppendLine($"- Unique: {stats.UniqueReferences}");
+            int totalStats = stats.ReferenceTypes;
+            int statCount = 0;
+            builder.AppendLine("References By Type:");
+            foreach (ReferenceByTypeStats refStats in stats.StatsByType)
+            {
+                builder.Append($"- {refStats.ReferenceType}: {refStats.TotalReferences}");
+                if (refStats.TotalUniqueReference != refStats.TotalReferences)
+                    builder.Append($" [Unique: {refStats.TotalUniqueReference}]");
+
+                ++statCount;
+                if (statCount < totalStats) builder.AppendLine("");
+            }
+
+            statsLabel.tooltip = builder.ToString();
         }
 
         public void UpdateView()
         {
-            AddReferencedByLabel();
-            AddReferencesLabel();
+            UpdateReferencedByLabel();
+            UpdateReferencesLabel();
         }
     }
 }

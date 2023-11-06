@@ -1,8 +1,35 @@
 # Changelog
 
+
+## [0.11.0] 2023-11-05
+
+### Added
+* **Graph**
+  * Displaying a reference counter next to the connection lines when multiple references to the same object exist
+* **Settings**
+  * Added option to disable or enable all Filters at once
+  * Added option to show or hide the reference counter in the graph
+* **Inspector Windows**
+  * Added Asset icon next to the name of the asset in the title bar
+* **Main Window**
+  * Added "Displaying" label to indicate the logic being used that construct the graph
+
+### Changed
+* **Graph**
+  * Adjusted connection lines position to make it easier to identify them
+* **Inspector Windows**
+  * Modified quick stats to be more explicit
+  * Modified quick stats tooltip to have more details
+  * Changed where the project settings are saved, from `Assets` to `ProjectSettings/GiantParticle`
+* **Settings**
+  * Added more details to settings
+
+### Fixed
+* Fixed issues when updating the graph either manually or automatically when changing references
+
 ## [0.10.1-b] 2023-04-16
 
-## Fixed
+### Fixed
 * Fixed issue where trackpads cannot move the graph due to the lack of middle button. Now there are two (2) options to move graph that follow [shortcut conventions](https://docs.unity3d.com/Manual/SceneViewNavigation.html):
     * Using mouse middle button
     * [macOS] Using combination of mouse left button + Option Key + Command key
@@ -11,13 +38,13 @@
 
 ## [0.10.0-b] 2023-04-08
 
-## Added
+### Added
 * **Settings**
     * Added option to change reference arrows color in settings
     * Added Settings for default inspector window size based on view mode
     * Made settings panel scrollable
 
-## Changed
+### Changed
 * Excluded references to same asset from the visualization (Example: `Texture2D` references from `Sprite`)
 * **Project**
     * Organized files into a more understandable structure
@@ -30,7 +57,7 @@
 * **UI**
     * Changed way to move around the graph from using scrollbars to drag with middle button
 
-## Fixed
+### Fixed
 * Changed saved last inspected object by path to by GUID
 * Added Workaround to properly display Animation Previews
 * Fixed missing connection lines when toggling `view > expand` on filters

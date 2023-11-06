@@ -4,12 +4,12 @@
 // ********************************
 
 using System;
-using GiantParticle.InspectorGraph.Editor.ContentView;
+using GiantParticle.InspectorGraph.ContentView;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor.ToolbarContent
+namespace GiantParticle.InspectorGraph.ToolbarContent
 {
     internal class ViewModeMenu : ToolbarMenu
     {
@@ -42,6 +42,7 @@ namespace GiantParticle.InspectorGraph.Editor.ToolbarContent
             }
 
             this.text = "View Mode";
+            this.style.minWidth = new StyleLength(85);
         }
 
         private DropdownMenuAction.Status CheckMenuAction(DropdownMenuAction action)

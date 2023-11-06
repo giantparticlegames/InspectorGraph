@@ -6,7 +6,7 @@
 using System;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal abstract class BaseWindowContent : VisualElement, IDisposable
     {

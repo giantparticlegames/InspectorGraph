@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+        <ui:Label text="Filter Settings" display-tooltip-when-elided="true" style="-unity-font-style: bold; font-size: 14px;" />
+        <ui:VisualElement style="background-color: rgb(32, 32, 32); height: 2px; margin-top: 5px; margin-bottom: 5px;" />
+        <ui:Label text="Sometimes, some objects may have too many references which may overload the visualization or simply add little to no useful information. To address this problem we have filter types, these filters change the standard visualization based on the object type." display-tooltip-when-elided="true" style="white-space: normal;" />
+        <ui:VisualElement style="margin-top: 10px;">
+            <ui:Label text="General" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
+            <ui:Toggle label="Enable Filters" name="_enableFilterToggle" tooltip="Indicate to Enable or Disable all Filters" />
+        </ui:VisualElement>
+        <ui:VisualElement style="margin-top: 10px;">
+            <ui:Label text="Type Filters" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
+            <ui:Label text="Filters related to the object types" display-tooltip-when-elided="true" style="white-space: normal;" />
+            <uie:PropertyField name="_filterListField" label="Type Filters" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

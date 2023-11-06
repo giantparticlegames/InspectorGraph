@@ -6,70 +6,58 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using GiantParticle.InspectorGraph.CustomAttributes;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal static class ReflectionHelper
     {
-        public static TInterface[] InstantiateAllImplementations<TInterface>(bool scanAllAssemblies = false)
+        public static TInterface[] InstantiateAllImplementations<TInterface>()
         {
-            Type[] types = scanAllAssemblies
-                ? GetAllInterfaceImplementationsCurrentAssembly(typeof(TInterface))
-                : GetAllInterfaceImplementations(typeof(TInterface));
+            var interfaceType = typeof(TInterface);
+            if (!interfaceType.IsInterface)
+                throw new ArgumentException($"Given type is not an interface: {interfaceType.FullName}");
 
-            List<TInterface> instances = new List<TInterface>(types.Length);
-            for (int i = 0; i < types.Length; ++i)
+            List<Type> allTypes = new();
+
+            ProcessAssemblyTypes(
+                assemblies: AppDomain.CurrentDomain.GetAssemblies(),
+                action: type =>
+                {
+                    if (!interfaceType.IsAssignableFrom(type))
+                        return;
+                    if (type.IsAbstract || type.IsInterface)
+                        return;
+                    allTypes.Add(type);
+                });
+
+            List<TInterface> instances = new List<TInterface>(allTypes.Count);
+            for (int i = 0; i < allTypes.Count; ++i)
             {
-                var instance = (TInterface)Activator.CreateInstance(types[i]);
+                var instance = (TInterface)Activator.CreateInstance(allTypes[i]);
                 instances.Add(instance);
             }
 
             return instances.ToArray();
         }
 
-        public static Type[] GetAllInterfaceImplementationsCurrentAssembly(Type interfaceType,
-            bool includeAbstract = false)
+        public static Type[] GetAllInheritors(Type baseType, bool includeAbstract = false,
+            bool includeInterface = false)
         {
-            if (!interfaceType.IsInterface)
-                throw new ArgumentException($"Given type is not an interface: {interfaceType.FullName}");
-
-            Type[] assemblyTypes = typeof(ReflectionHelper).Assembly.GetTypes();
             List<Type> allTypes = new();
-
-            for (int t = 0; t < assemblyTypes.Length; ++t)
-            {
-                Type assemblyType = assemblyTypes[t];
-                if (!interfaceType.IsAssignableFrom(assemblyType))
-                    continue;
-                if (assemblyType.IsAbstract && !includeAbstract)
-                    continue;
-                allTypes.Add(assemblyType);
-            }
-
-            return allTypes.ToArray();
-        }
-
-        public static Type[] GetAllInterfaceImplementations(Type interfaceType, bool includeAbstract = false)
-        {
-            if (!interfaceType.IsInterface)
-                throw new ArgumentException($"Given type is not an interface: {interfaceType.FullName}");
-
-            List<Type> allTypes = new();
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            for (int i = 0; i < assemblies.Length; ++i)
-            {
-                Type[] assemblyTypes = assemblies[i].GetTypes();
-                for (int t = 0; t < assemblyTypes.Length; ++t)
+            ProcessAssemblyTypes(
+                assemblies: AppDomain.CurrentDomain.GetAssemblies(),
+                action: type =>
                 {
-                    Type assemblyType = assemblyTypes[t];
-                    if (!interfaceType.IsAssignableFrom(assemblyType))
-                        continue;
-                    if (assemblyType.IsAbstract && !includeAbstract)
-                        continue;
-                    allTypes.Add(assemblyType);
-                }
-            }
+                    if (!baseType.IsAssignableFrom(type))
+                        return;
+                    if (type.IsInterface && !includeInterface)
+                        return;
+                    if (type.IsAbstract && !includeAbstract)
+                        return;
+                    allTypes.Add(type);
+                });
 
             return allTypes.ToArray();
         }
@@ -105,6 +93,34 @@ namespace GiantParticle.InspectorGraph.Editor
                 allTypes.AddRange(assemblies[i].GetTypes());
 
             return allTypes;
+        }
+
+        private static void ProcessAssemblyTypes(Assembly[] assemblies, Action<Type> action)
+        {
+            for (int a = 0; a < assemblies.Length; ++a)
+            {
+                var types = assemblies[a].GetTypes();
+                for (int t = 0; t < types.Length; ++t)
+                {
+                    action.Invoke(types[t]);
+                }
+            }
+        }
+
+        public static int CompareByPriority<T>(T objA, T objB)
+        {
+            Type priorityType = typeof(InternalPriorityAttribute);
+            var priorityAttributeA = (InternalPriorityAttribute)Attribute.GetCustomAttribute(
+                element: objA.GetType(),
+                attributeType: priorityType);
+            int priorityA = priorityAttributeA?.Priority ?? int.MaxValue;
+
+            var priorityAttributeB = (InternalPriorityAttribute)Attribute.GetCustomAttribute(
+                element: objB.GetType(),
+                attributeType: priorityType);
+            int priorityB = priorityAttributeB?.Priority ?? int.MaxValue;
+
+            return priorityA - priorityB;
         }
     }
 }

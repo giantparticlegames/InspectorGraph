@@ -6,7 +6,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor
+namespace GiantParticle.InspectorGraph
 {
     internal static class VisualElementExtensions
     {

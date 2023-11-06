@@ -3,12 +3,12 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Data;
+using GiantParticle.InspectorGraph.Data;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal class StaticPreviewWindowContent : BaseWindowContent
     {
@@ -21,12 +21,12 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
             windowData.CreateNewSerializedTarget();
 
             Texture2D preview = forceMini
-                ? AssetPreview.GetMiniThumbnail(windowData.Target)
-                : AssetPreview.GetAssetPreview(windowData.Target);
+                ? AssetPreview.GetMiniThumbnail(windowData.Object)
+                : AssetPreview.GetAssetPreview(windowData.Object);
             bool shouldWaitForTexture = false;
             if (preview == null)
             {
-                preview = AssetPreview.GetMiniThumbnail(windowData.Target);
+                preview = AssetPreview.GetMiniThumbnail(windowData.Object);
                 shouldWaitForTexture = true;
             }
 
@@ -54,7 +54,7 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
 
         private void CheckForPreviewTexture()
         {
-            Texture2D preview = AssetPreview.GetAssetPreview(_windowData.Target);
+            Texture2D preview = AssetPreview.GetAssetPreview(_windowData.Object);
             if (preview == null)
             {
                 _view.schedule.Execute(CheckForPreviewTexture);

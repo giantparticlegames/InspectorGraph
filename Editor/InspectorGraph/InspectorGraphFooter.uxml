@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <uie:Toolbar>
+        <uie:ToolbarButton text="Reset" display-tooltip-when-elided="true" name="_resetZoomButton" tooltip="Reset Zoom to 1x" style="-unity-text-align: middle-left;" />
+        <ui:Slider picking-mode="Ignore" label="Zoom x1" value="42" high-value="2" low-value="0.1" name="_zoomSlider" style="-unity-text-align: middle-left;" />
+        <ui:Label text="Label" display-tooltip-when-elided="true" name="_currentModeLabel" style="-unity-text-align: middle-left; border-left-color: rgb(0, 0, 0); border-left-width: 1px; padding-left: 3px;" />
+        <ui:VisualElement style="flex-direction: row; right: 0; position: absolute; align-items: center; height: 100%;">
+            <ui:ProgressBar value="0" name="_generalProgressBar" high-value="1" style="width: 128px; height: 16px;" />
+        </ui:VisualElement>
+    </uie:Toolbar>
+</ui:UXML>

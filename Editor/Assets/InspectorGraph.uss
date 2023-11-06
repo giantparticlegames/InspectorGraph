@@ -1,0 +1,27 @@
+Toolbar Slider Label {
+    min-width: 80px;
+}
+
+Toolbar Slider .unity-base-slider__input {
+    min-width: 120px;
+}
+
+ContentZoomController ToolbarButton {
+    -unity-text-align: middle-left;
+}
+
+Toolbar DropdownField .unity-popup-field__label {
+    max-width: 100px;
+    min-width: 100px;
+    width: 100px;
+}
+
+Toolbar ObjectField .unity-base-field__label {
+    max-width: 90px;
+    min-width: 90px;
+    width: 90px;
+}
+
+Toolbar ObjectField .unity-base-field__input {
+    min-width: 150px;
+}

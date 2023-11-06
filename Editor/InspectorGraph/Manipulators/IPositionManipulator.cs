@@ -6,7 +6,7 @@
 using System;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Manipulators
+namespace GiantParticle.InspectorGraph.Manipulators
 {
     internal interface IPositionManipulator
     {

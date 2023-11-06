@@ -6,12 +6,12 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Data
+namespace GiantParticle.InspectorGraph.Data
 {
     internal interface IWindowData
     {
-        Object Target { get; }
-        SerializedObject SerializedTarget { get; }
+        Object Object { get; }
+        SerializedObject SerializedObject { get; }
         bool HasBeenManuallyMoved { get; set; }
 
         void CreateNewSerializedTarget();
@@ -20,14 +20,14 @@ namespace GiantParticle.InspectorGraph.Editor.Data
 
     internal class WindowData : IWindowData
     {
-        public Object Target { get; }
+        public Object Object { get; }
 
-        public SerializedObject SerializedTarget
+        public SerializedObject SerializedObject
         {
             get
             {
                 if (_serializedObject == null)
-                    _serializedObject = new SerializedObject(Target);
+                    _serializedObject = new SerializedObject(Object);
                 return _serializedObject;
             }
             private set => _serializedObject = value;
@@ -38,17 +38,17 @@ namespace GiantParticle.InspectorGraph.Editor.Data
 
         public WindowData(Object reference)
         {
-            Target = reference;
+            Object = reference;
         }
 
         public void CreateNewSerializedTarget()
         {
-            SerializedTarget = new SerializedObject(Target);
+            SerializedObject = new SerializedObject(Object);
         }
 
         public void UpdateSerializedObject(SerializedObject newSerializedObject)
         {
-            SerializedTarget = newSerializedObject;
+            SerializedObject = newSerializedObject;
         }
     }
 }
