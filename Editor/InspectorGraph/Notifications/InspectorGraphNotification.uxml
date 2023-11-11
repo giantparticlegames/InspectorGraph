@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="_container" style="border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0); flex-direction: row; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+        <ui:VisualElement name="_icon" style="width: 24px; height: 24px;" />
+        <ui:Label text="-" display-tooltip-when-elided="true" name="_text" style="margin-left: 5px; width: 85%; white-space: normal;" />
+        <ui:Button text="X" display-tooltip-when-elided="true" name="_closeButton" style="right: 0; top: 0; position: absolute; width: 16px; height: 16px; -unity-font-style: bold;" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -5,7 +5,7 @@
 
 using System;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
+namespace GiantParticle.InspectorGraph.Data.Nodes
 {
     internal interface IExtendedReferenceType
     {
@@ -15,6 +15,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
     [Serializable]
     internal struct ReferenceType
     {
+        public const string kNotAvailable = "N/A";
         private const int kDirectValue = 1;
         public static readonly ReferenceType Direct = kDirectValue;
         private const int kNestedPrefabValue = 2;
@@ -48,7 +49,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
                 return result;
             }
 
-            return "N/A";
+            return kNotAvailable;
         }
     }
 }

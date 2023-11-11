@@ -5,11 +5,11 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Data;
-using GiantParticle.InspectorGraph.Editor.Views;
+using GiantParticle.InspectorGraph.Data;
+using GiantParticle.InspectorGraph.Views;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Manipulators
+namespace GiantParticle.InspectorGraph.Manipulators
 {
     internal class HighlightManipulator : BaseHoverManipulator
     {

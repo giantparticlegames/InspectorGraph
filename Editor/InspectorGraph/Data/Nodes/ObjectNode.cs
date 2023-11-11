@@ -6,56 +6,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Data.Nodes
+namespace GiantParticle.InspectorGraph.Data.Nodes
 {
-    internal interface IObjectNode
-    {
-        Object Target { get; }
-        IWindowData WindowData { get; }
-        IEnumerable<IObjectNodeReference> References { get; }
-    }
-
     internal class ObjectNode : IObjectNode
     {
-        public Object Target { get; }
+        public Object Object { get; }
         public IWindowData WindowData { get; }
 
-        public IEnumerable<IObjectNodeReference> References
+        public IReadOnlyList<IObjectReference> References => _references;
+
+        private List<IObjectReference> _references = new();
+
+        public ObjectNode(Object target)
         {
-            get
-            {
-                foreach (var referencesValue in _references.Values)
-                {
-                    foreach (var value in referencesValue.Values)
-                    {
-                        yield return value;
-                    }
-                }
-            }
+            Object = target;
+            WindowData = new WindowData(target);
         }
 
-        private Dictionary<Object, Dictionary<ReferenceType, ObjectNodeReference>> _references = new();
-
-        public ObjectNode(IWindowData data)
+        public static void CreateReference(
+            ObjectNode sourceObject,
+            ObjectNode targetObject,
+            ReferenceType referenceType)
         {
-            Target = data.Target;
-            WindowData = data;
-        }
+            // Reference To
+            var referenceTo = new ObjectReference(
+                targetNode: targetObject,
+                referenceType: referenceType,
+                direction: ReferenceDirection.ReferenceTo);
+            sourceObject._references.Add(referenceTo);
 
-        public void AddNode(ObjectNode objectNode, ReferenceType refType)
-        {
-            var key = objectNode.Target;
-            if (_references.ContainsKey(key) && _references[key].ContainsKey(refType))
-            {
-                _references[key][refType].RefCount++;
-                return;
-            }
-
-            _references.Add(key,
-                new Dictionary<ReferenceType, ObjectNodeReference>()
-                {
-                    { refType, new ObjectNodeReference(objectNode, refType) }
-                });
+            // Reference By
+            var referenceBy = new ObjectReference(
+                targetNode: sourceObject,
+                referenceType: referenceType,
+                direction: ReferenceDirection.ReferenceBy);
+            targetObject._references.Add(referenceBy);
         }
     }
 }

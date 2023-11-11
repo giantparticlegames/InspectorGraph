@@ -5,10 +5,10 @@
 
 using UnityEngine;
 
-namespace GiantParticle.InspectorGraph.Editor.Manipulators
+namespace GiantParticle.InspectorGraph.Manipulators
 {
     internal interface IScalableManipulator
     {
-        Vector3 MovementScale { get; set; }
+        float Scale { get; set; }
     }
 }

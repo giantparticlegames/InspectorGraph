@@ -1,8 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <Style src="InspectorGraphStyle.uss?fileID=7433441132597879392&amp;guid=112b7f4032ad6422e97b4a8906e0136b&amp;type=3#InspectorGraphStyle" />
-    <ui:VisualElement name="_toolbarContainer" />
-    <ui:VisualElement name="_windowView" style="width: 100%; height: 100%; overflow: hidden;">
-        <ui:VisualElement name="_content" />
-    </ui:VisualElement>
-    <uie:Toolbar name="_footer" />
-</ui:UXML>

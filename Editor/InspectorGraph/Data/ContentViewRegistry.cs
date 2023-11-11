@@ -5,19 +5,25 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Views;
+using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Views;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor.Data
+namespace GiantParticle.InspectorGraph.Data
 {
     internal interface IContentViewRegistry
     {
         int WindowCount { get; }
         InspectorWindow WindowByTarget(Object target);
         void ExecuteOnEachWindow(Action<InspectorWindow> action);
+        bool ContainsConnection(VisualElement source, VisualElement dest, ReferenceType refType);
+        ConnectionLine GetConnection(VisualElement source, VisualElement dest, ReferenceType refType);
+        void RegisterConnection(ConnectionLine line);
         IEnumerable<ConnectionLine> AllConnectionsRelatedToWindow(InspectorWindow window);
+        int ConnectionsFromWindowCount(InspectorWindow source);
         IEnumerable<ConnectionLine> ConnectionsFromWindow(InspectorWindow source);
+        int ConnectionsToWindowCount(InspectorWindow source);
         IEnumerable<ConnectionLine> ConnectionsToWindow(InspectorWindow destination);
     }
 
@@ -35,6 +41,8 @@ namespace GiantParticle.InspectorGraph.Editor.Data
             _windowsByObject.Clear();
         }
 
+        public void ClearConnections() => _allLines.Clear();
+
         #region Windows
 
         public InspectorWindow WindowByTarget(Object target)
@@ -50,12 +58,12 @@ namespace GiantParticle.InspectorGraph.Editor.Data
 
         public void RegisterWindow(InspectorWindow window)
         {
-            _windowsByObject.Add(window.Node.Target, window);
+            _windowsByObject.Add(window.Node.Object, window);
         }
 
         public void DeregisterWindow(InspectorWindow window)
         {
-            _windowsByObject.Remove(window.Node.Target);
+            _windowsByObject.Remove(window.Node.Object);
         }
 
         public void DeregisterWindowByTarget(Object target)
@@ -73,7 +81,7 @@ namespace GiantParticle.InspectorGraph.Editor.Data
         {
             foreach (InspectorWindow window in _windowsByObject.Values)
             {
-                if (collection.Contains(window.Node.Target)) continue;
+                if (collection.Contains(window.Node.Object)) continue;
                 yield return window;
             }
         }
@@ -82,17 +90,32 @@ namespace GiantParticle.InspectorGraph.Editor.Data
 
         #region Connections
 
-        public bool ContainsConnection(VisualElement source, VisualElement dest)
+        public bool ContainsConnection(VisualElement source, VisualElement dest, ReferenceType refType)
         {
             foreach (ConnectionLine connectionLine in _allLines)
             {
                 if (connectionLine.Source != source) continue;
                 if (connectionLine.Destination != dest) continue;
+                if (connectionLine.ReferenceType != refType) continue;
                 return true;
             }
 
             return false;
         }
+
+        public ConnectionLine GetConnection(VisualElement source, VisualElement dest, ReferenceType refType)
+        {
+            foreach (ConnectionLine connectionLine in _allLines)
+            {
+                if (connectionLine.Source != source) continue;
+                if (connectionLine.Destination != dest) continue;
+                if (connectionLine.ReferenceType != refType) continue;
+                return connectionLine;
+            }
+
+            return null;
+        }
+
         public void RegisterConnection(ConnectionLine line)
         {
             _allLines.Add(line);
@@ -132,6 +155,18 @@ namespace GiantParticle.InspectorGraph.Editor.Data
             }
         }
 
+        public int ConnectionsFromWindowCount(InspectorWindow source)
+        {
+            int count = 0;
+            foreach (ConnectionLine line in _allLines)
+            {
+                if (line.Source != source) continue;
+                ++count;
+            }
+
+            return count;
+        }
+
         public IEnumerable<ConnectionLine> ConnectionsFromWindow(InspectorWindow source)
         {
             foreach (ConnectionLine line in _allLines)
@@ -139,6 +174,18 @@ namespace GiantParticle.InspectorGraph.Editor.Data
                 if (line.Source != source) continue;
                 yield return line;
             }
+        }
+
+        public int ConnectionsToWindowCount(InspectorWindow destination)
+        {
+            int count = 0;
+            foreach (ConnectionLine line in _allLines)
+            {
+                if (line.Destination != destination) continue;
+                ++count;
+            }
+
+            return count;
         }
 
         public IEnumerable<ConnectionLine> ConnectionsToWindow(InspectorWindow destination)

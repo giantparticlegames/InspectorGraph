@@ -7,11 +7,13 @@ The Inspector Graph is a tool to better visualize, understand and manipulate obj
 - [Main Features](#main-features)
 - [Change log](#change-log)
 - [Project Settings](#project-settings)
-  - [Visualization settings](#visualization-settings)
-  - [Filters](#filters)
+  - [Inspector Window Settings](#inspector-window-settings)
+  - [Filter Settings](#filter-settings)
+    - [Type Filters](#type-filters)
+  - [Diagram Connections Settings](#diagram-connections-settings)
 - [Main Window](#main-window)
   - [View Menu](#view-menu)
-    - [Filters](#filters-1)
+    - [Filters](#filters)
   - [Edit Menu](#edit-menu)
   - [Help Menu](#help-menu)
   - [Inspected Object Reference](#inspected-object-reference)
@@ -35,9 +37,10 @@ The Inspector Graph is a tool to better visualize, understand and manipulate obj
 ## Main Features
 * Floating inspector window per object
 * Multiple View modes available per object
+* Support for different reference types
   * Direct Reference
   * Nested Prefab
-* Visual representation of references from and to objects
+* Visual representation of references from objects
 * In-Place field editing
 * Zoom control for better visualization
 * Per project settings with customization options
@@ -50,18 +53,21 @@ Take a look at the latest changes [here](CHANGELOG.md).
 ## Project Settings
 The Project settings section is where the per project settings of this tool are controlled. You can access this section either via the [`Edit`](#edit-menu) menu under the Inspector Graph Window or via Unity `Edit > Project Settings...`.
 
-By default, the data is saved in your project under `Assets/Editor/com.giantparticle.inspector_graph/InspectorGraphSettings.asset`. Feel free to move it to a different place if you want.
+The data is saved in your project under `ProjectSettings/GiantParticle/InspectorGraphSettings.asset`.
 
 ![Project Settings](.docs/ProjectSettings.png)
 
-### Visualization settings
+### Inspector Window Settings
 * **Max Windows**: Indicate the maximum number of Inspector Windows that will be displayed. `100` is the maximum limit, otherwise Unity starts to complain about it.
 * **Max Preview Windows**: Indicate the maximum number of windows that can display the Preview Mode. After this number is reached, new windows will be forced to display a static preview (Icon based on the object type). This is to avoid potential performance issues, feel free to change this value if your computer is capable and/or your project is not that resource intensive.
-* **Diagram Connection Colors**: Indicate the colors used for each representation of a reference.
-* **Default Window Size**: Indicate the default size of each Inspector Window based on the View Mode
+* **Default Inspector Window Size**: Indicate the default size of each Inspector Window based on the View Mode
 
-### Filters
-Filters are an easy way to control the visibility or expansion of objects of certain types. In this section you can add or remove filters based on your preferences and the types available in your project.
+### Filter Settings
+
+* **Enable Filters**: This field enables or disables all filters.
+
+#### Type Filters
+Type filters are an easy way to control the visibility or expansion of objects of certain types. In this section you can add or remove filters based on your preferences and the types available in your project.
 
 * **Type Full Name**: This is the [fully qualified name](https://learn.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/specifying-fully-qualified-type-names) of the object type to filter without the assembly name (See [Type.FullName](https://learn.microsoft.com/en-us/dotnet/api/system.type.fullname?view=net-7.0))
 * **Display Type**: Indicate to display, or not, objects of the given type
@@ -70,6 +76,12 @@ Filters are an easy way to control the visibility or expansion of objects of cer
 When clicking the **Type Full Name** field, you will see a popup with all available types in your project, just search for the one you are looking for via the search bar and double-click it to autocomplete the field or manually type in the type.
 
 ![Type Selection Popup](.docs/TypeSelectionPopup.png)
+
+### Diagram Connections Settings
+
+* **Draw Reference Count**: This field indicate to show or hide the reference counter in case an object references another multiple times.
+* **Connection Colors**: Indicate the colors used for each representation of a reference.
+
 
 ## Main Window
 The main window has multiple controls for you to use which are explained in this section.
@@ -122,6 +134,7 @@ This field is located at the upper right corner and allows you to assign a refer
 
 ### Zoom Controls
 The Zoom controls are located at the bottom left corner of the main window and give you control of the scale of the visualization. The zoom level is controlled by the slider and the reset button will reset the zoom to 1.
+
 ![Zoom Controls](.docs/ZoomControls.png)
 
 ## Inspector Window
@@ -160,7 +173,11 @@ The following information is displayed next to the object name:
 * Number of references to the object in the graph
 * Number of references from the object in the graph
 
-> Note: If there are more than one references from/to a single object to/from the object represented in the window, the total number of references will be displayed in brackets (Example: `[Total: 5]`).
+Hovering over the stats will display more detailed information about the references.
+
+![Window - Quick Stats](.docs/InspectorWindow-QuickStats.png)
+
+> Note: If there are more than one references from/to a single object to/from the object represented in the window, the total number of unique references will be displayed in brackets (Example: `[Unique 5]`).
 
 #### Reference Highlight
 To toggle highlight the references to and from the object represented in the window, simply press the button with a diverging arrow [ <img src="Editor/Assets/Images/Icon-SplitArrows.png" height="14"></img> ] at the right.
@@ -197,13 +214,15 @@ The static preview mode shows an image of the object either taken from the Previ
 | ![Mesh Static Preview](.docs/InspectorWindow-ViewMode-Static-Mesh.png) | ![Shader Static Preview](.docs/InspectorWindow-ViewMode-Static-Shader.png) |
 
 ### References
-References are represented in the graph as curved arrows. The source of the arrow indicates the object that holds the reference and the end of the arrow represents the reference target.
+References are represented in the graph as curved arrows. The source of the arrow indicates the object that holds the reference and the end of the arrow represents the reference target. By default, if there is more than one reference from the source object to the target object, a number with the reference count will be displayed next to the arrow. This number can be displayed or hide via the [project settings](#project-settings).
 
 ![Reference](.docs/Reference.png)
 
 The color of the arrow indicate what type of reference it is:
 * White for direct reference on a serialized field
 * Cyan for nested prefab references
+
+The colors of each reference type can be changed in the [project settings](#project-settings).
 
 #### Highlighting
 The references to, and from, a specific object will be highlighted by hovering over the header of the inspector window or by activating the highlight lock (See [Footer](#reference-highlight))

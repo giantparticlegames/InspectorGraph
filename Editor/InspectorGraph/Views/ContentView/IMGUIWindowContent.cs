@@ -4,12 +4,12 @@
 // ********************************
 
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Data;
+using GiantParticle.InspectorGraph.Data;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal class IMGUIWindowContent : BaseWindowContent
     {
@@ -19,7 +19,7 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
 
         public IMGUIWindowContent(IWindowData windowData)
         {
-            if (windowData.Target is GameObject gameObject)
+            if (windowData.Object is GameObject gameObject)
             {
                 var components = gameObject.GetComponents<Component>();
                 _editors = new List<UnityEditor.Editor>(components.Length);
@@ -31,7 +31,7 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
             }
             else
             {
-                _editor = UnityEditor.Editor.CreateEditor(windowData.Target);
+                _editor = UnityEditor.Editor.CreateEditor(windowData.Object);
                 windowData.UpdateSerializedObject(_editor.serializedObject);
             }
 

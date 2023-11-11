@@ -3,10 +3,10 @@
 // All rights reserved.
 // ********************************
 
-using GiantParticle.InspectorGraph.Editor.Data;
+using GiantParticle.InspectorGraph.Data;
 using UnityEditor.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal class InspectorElementWindowContent : BaseWindowContent
     {
@@ -16,7 +16,7 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
         public InspectorElementWindowContent(IWindowData windowData)
         {
             windowData.CreateNewSerializedTarget();
-            _view = new InspectorElement(windowData.SerializedTarget);
+            _view = new InspectorElement(windowData.SerializedObject);
 
             // Observer element
             _inspectorElementObserver = new InspectorElementObserver();

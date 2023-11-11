@@ -5,11 +5,11 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.Data;
+using GiantParticle.InspectorGraph.Data;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace GiantParticle.InspectorGraph.Editor.ContentView
+namespace GiantParticle.InspectorGraph.ContentView
 {
     internal static class WindowContentFactory
     {
@@ -33,7 +33,7 @@ namespace GiantParticle.InspectorGraph.Editor.ContentView
                 return ReturnMode(targetType, ContentViewMode.InspectorElement, inspector);
 
             // At this point we just guess the best fit
-            if (target is ScriptableObject)
+            if (target is ScriptableObject || target is MonoBehaviour)
                 return ReturnMode(targetType, ContentViewMode.IMGUI, inspector);
 
             // Default to Static Preview

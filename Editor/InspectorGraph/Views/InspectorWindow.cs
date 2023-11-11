@@ -5,38 +5,34 @@
 
 using System;
 using System.Collections.Generic;
-using GiantParticle.InspectorGraph.Editor.ContentView;
-using GiantParticle.InspectorGraph.Editor.Manipulators;
-using GiantParticle.InspectorGraph.Editor.Data.Nodes;
-using GiantParticle.InspectorGraph.Editor.Settings;
-using GiantParticle.InspectorGraph.Editor.ToolbarContent;
-using GiantParticle.InspectorGraph.Editor.UIDocuments;
-using UnityEditor.UIElements;
+using GiantParticle.InspectorGraph.ContentView;
+using GiantParticle.InspectorGraph.Manipulators;
+using GiantParticle.InspectorGraph.Data.Nodes;
+using GiantParticle.InspectorGraph.Persistence;
+using GiantParticle.InspectorGraph.ToolbarContent;
+using GiantParticle.InspectorGraph.UIToolkit;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiantParticle.InspectorGraph.Editor.Views
+namespace GiantParticle.InspectorGraph.Views
 {
-    internal class InspectorWindow : VisualElement, IDisposable
+    internal partial class InspectorWindow : VisualElement, IDisposable
     {
         private class NoTypeClass
         {
         }
 
-        private VisualElement _windowContent;
-        private ScrollView _content;
-        private Toolbar _toolbar;
-        private Toolbar _footer;
         private ContentViewMode _currentMode;
         private WindowStateController _stateController;
         private List<IManipulator> _manipulators = new();
         private QuickStatsView _quickStatsView;
         private BaseWindowContent _view;
-
-        public IReadOnlyList<IManipulator> Manipulators => _manipulators;
-        public event Action GUIChanged;
-
-        public IObjectNode Node { get; }
         private bool _forceStaticPreviewMode;
+
+        public IObjectNode Node { get; set; }
+        public IReadOnlyList<IManipulator> Manipulators => _manipulators;
+        public event Action<InspectorWindow> GUIChanged;
 
 
         public InspectorWindow(IObjectNode node, bool forceStaticPreview = false)
@@ -56,36 +52,40 @@ namespace GiantParticle.InspectorGraph.Editor.Views
 
         private void CreateLayout()
         {
-            var catalog = GlobalApplicationContext.Instance.Get<IUIDocumentCatalog<InspectorWindowUIDocumentType>>();
-            var xmlLayout = catalog[InspectorWindowUIDocumentType.InspectorWindow].Asset;
-            xmlLayout.CloneTree(this);
+            var asset = UIToolkitHelper.LocateViewForType(this);
+            if (asset == null) return;
+            asset.CloneTree(this);
+            UIToolkitHelper.ResolveVisualElements(this, this);
 
-            _content = this.Q<ScrollView>(nameof(_content));
-            _windowContent = this.Q<VisualElement>(nameof(_windowContent));
-            _footer = this.Q<Toolbar>(nameof(_footer));
-            _toolbar = this.Q<Toolbar>(nameof(_toolbar));
+            UpdateTitle();
 
-            var title = this.Q<Label>("_titleLabel");
-            title.text = $"[{Node.Target.name}]";
-
-            // Toolbar
             ContentViewMode preferredMode = _forceStaticPreviewMode
                 ? ContentViewMode.StaticPreview
-                : WindowContentFactory.PreferredViewModeForObject(Node.Target);
-            var viewModeMenu = new ViewModeMenu(Node.Target);
-            viewModeMenu.ViewMode = preferredMode;
-            viewModeMenu.ViewModeChanged += SwitchView;
-            _toolbar.Add(viewModeMenu);
-
-            var refField = this.Q<ObjectField>("_refField");
-            refField.value = Node.Target;
-            refField.objectType = typeof(NoTypeClass);
+                : WindowContentFactory.PreferredViewModeForObject(Node.Object);
+            ConfigureToolbar(preferredMode);
 
             // Footer
             _quickStatsView = new QuickStatsView(Node);
             _footer.Add(_quickStatsView);
 
             SwitchView(preferredMode);
+        }
+
+        private void UpdateTitle()
+        {
+            _titleLabel.text = $"[{Node.Object.name}]";
+            _objectIcon.style.backgroundImage = new StyleBackground(AssetPreview.GetMiniThumbnail(Node.Object));
+        }
+
+        private void ConfigureToolbar(ContentViewMode preferredMode)
+        {
+            var viewModeMenu = new ViewModeMenu(Node.Object);
+            viewModeMenu.ViewMode = preferredMode;
+            viewModeMenu.ViewModeChanged += SwitchView;
+            _toolbar.Add(viewModeMenu);
+
+            _refField.value = Node.Object;
+            _refField.objectType = typeof(NoTypeClass);
         }
 
         private void ConfigureWindowManipulation()
@@ -101,7 +101,10 @@ namespace GiantParticle.InspectorGraph.Editor.Views
             _manipulators.Add(dragManipulator);
             // Resize
             var resizeButton = this.Q<VisualElement>("_resizeCorner");
-            var resizeManipulator = new ResizeManipulator(resizeButton, this);
+            var resizeManipulator = new ResizeManipulator(
+                handle: resizeButton,
+                resizeTarget: this,
+                minValues: new Vector2(280, 60));
             resizeManipulator.TargetResized += _stateController.ForceNormalState;
             _manipulators.Add(resizeManipulator);
 
@@ -125,8 +128,8 @@ namespace GiantParticle.InspectorGraph.Editor.Views
 
         private void UpdateSettings()
         {
-            var settings = GlobalApplicationContext.Instance.Get<IInspectorGraphSettings>();
-            var sizeSettings = settings.GetSizeForWindowViewMode(_currentMode);
+            var projectSettings = GlobalApplicationContext.Instance.Get<IInspectorGraphProjectSettings>();
+            var sizeSettings = projectSettings.WindowSettings.GetWindowSizeSettings(_currentMode);
             this.style.width = new StyleLength(sizeSettings.Size.x);
             this.style.maxHeight = new StyleLength(sizeSettings.Size.y);
             if (_currentMode == ContentViewMode.Preview || _currentMode == ContentViewMode.StaticPreview)
@@ -135,6 +138,7 @@ namespace GiantParticle.InspectorGraph.Editor.Views
 
         public void UpdateView()
         {
+            _quickStatsView.Node = Node;
             _quickStatsView.UpdateView();
         }
 
@@ -161,7 +165,7 @@ namespace GiantParticle.InspectorGraph.Editor.Views
 
         private void OnContentChanged()
         {
-            GUIChanged?.Invoke();
+            GUIChanged?.Invoke(this);
         }
     }
 }

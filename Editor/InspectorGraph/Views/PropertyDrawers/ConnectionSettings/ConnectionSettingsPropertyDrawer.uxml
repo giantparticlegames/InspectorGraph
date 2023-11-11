@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;">
+        <ui:Label text="Diagram Connections Settings" display-tooltip-when-elided="true" style="-unity-font-style: bold; font-size: 14px;" />
+        <ui:VisualElement style="background-color: rgb(32, 32, 32); height: 2px; margin-top: 5px; margin-bottom: 5px;" />
+        <ui:VisualElement>
+            <ui:Label text="General" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
+            <ui:Toggle label="Draw Reference Count" tooltip="Indicate to draw the number of references, if greater than one, from an object to another based on the type of reference." name="_drawReferenceCountToggle" />
+        </ui:VisualElement>
+        <ui:VisualElement style="margin-top: 10px;">
+            <ui:Label text="Connection Colors" display-tooltip-when-elided="true" style="-unity-font-style: bold;" />
+            <ui:Label text="Indicate the colors for the lines that represent references" display-tooltip-when-elided="true" style="white-space: normal;" />
+            <ui:Foldout text="Colors" name="_referenceColorsContainer" style="-unity-font-style: normal;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
