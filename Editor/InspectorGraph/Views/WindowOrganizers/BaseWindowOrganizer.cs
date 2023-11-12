@@ -111,11 +111,12 @@ namespace GiantParticle.InspectorGraph.Views
             {
                 int windowLevel = windowData.Level;
                 var window = windowData.Window;
+                var windowWidth = window != null ? window.contentRect.width : 300;
                 // Store max width
                 if (maxWidths.Count > windowLevel)
-                    maxWidths[windowLevel] = Math.Max(maxWidths[windowLevel], window.contentRect.width);
+                    maxWidths[windowLevel] = Math.Max(maxWidths[windowLevel], windowWidth);
                 else
-                    maxWidths.Add(window.contentRect.width);
+                    maxWidths.Add(windowWidth);
             });
 
             return maxWidths;
