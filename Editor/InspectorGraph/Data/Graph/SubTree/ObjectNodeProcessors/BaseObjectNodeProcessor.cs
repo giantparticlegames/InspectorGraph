@@ -30,7 +30,8 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
 
         public abstract void ProcessNode(ObjectNode node);
 
-        protected static HashSet<Object> CreateInternalReferenceSet(SerializedObject serializedObject)
+        protected static HashSet<Object> CreateInternalReferenceSet(SerializedObject serializedObject,
+            bool onlyVisible = false)
         {
             var objectSet = new HashSet<Object>();
             objectSet.Add(serializedObject.targetObject);
@@ -47,7 +48,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 var currentObject = objectQueue.Dequeue();
                 // Iterate fields
                 var refIterator = currentObject.GetIterator();
-                while (refIterator.Next(true))
+                while (onlyVisible ? refIterator.NextVisible(true) : refIterator.Next(true))
                 {
                     // Check only PPtr<*> types, otherwise we will see errors in the console
                     if (!PointerRegex.IsMatch(refIterator.type)) continue;
@@ -91,7 +92,7 @@ namespace GiantParticle.InspectorGraph.Data.Graph.SubTree.ObjectNodeProcessors
                 excludeReferences: excludeReferences);
         }
 
-        private void ProcessSerializedProperties(bool onlyVisible, ObjectNode parentNode,
+        protected void ProcessSerializedProperties(bool onlyVisible, ObjectNode parentNode,
             SerializedObject serializedObject,
             HashSet<Object> excludeReferences = null)
         {

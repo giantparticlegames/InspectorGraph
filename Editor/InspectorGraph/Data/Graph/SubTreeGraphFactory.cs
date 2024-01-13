@@ -99,8 +99,29 @@ namespace GiantParticle.InspectorGraph.Data
 
                 // Process Object
                 Type objectType = node.Object.GetType();
-                if (_objectNodeProcessors.ContainsKey(objectType)) _objectNodeProcessors[objectType].ProcessNode(node);
-                else BaseObjectNodeProcessor.ProcessSerializedProperties(_propertyProcessors, node);
+                // Process object by exact type
+                if (_objectNodeProcessors.ContainsKey(objectType))
+                {
+                    _objectNodeProcessors[objectType].ProcessNode(node);
+                    continue;
+                }
+
+                // Process object by base type
+                bool processed = false;
+                foreach (Type type in _objectNodeProcessors.Keys)
+                {
+                    if (type.IsAssignableFrom(objectType))
+                    {
+                        _objectNodeProcessors[type].ProcessNode(node);
+                        processed = true;
+                        break;
+                    }
+                }
+
+                if (processed) continue;
+
+                // Process object as default
+                BaseObjectNodeProcessor.ProcessSerializedProperties(_propertyProcessors, node);
             }
 
             CurrentGraph = root;
