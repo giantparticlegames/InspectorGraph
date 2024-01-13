@@ -38,6 +38,14 @@ namespace GiantParticle.InspectorGraph
         private IOperation<IObjectNode> _currentOperation;
         private IInspectorGraphPlugin[] _plugins;
 
+        [MenuItem("CONTEXT/Component/Giant Particle/Open in Inspector Graph")]
+        public static void OpenInInspector(MenuCommand command)
+        {
+            MonoBehaviour mono = (MonoBehaviour)command.context;
+            InspectorGraph window = GetWindow<InspectorGraph>();
+            window.CreateContentTree(mono);
+        }
+
         [MenuItem("Window/Giant Particle/Inspector Graph")]
         public static void ShowWindow()
         {
