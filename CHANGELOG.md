@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.11.1] 2024-01-15
+
+### Added
+* **Context Menu**
+  * Added general MonoBehaviour context menu to open specific Components from GameObjects via Inspector Graph
+
+### Changed
+* **Graph**
+  * Changed Graph logic when inspecting MonoBehaviours to only show visible references
 
 ## [0.11.0] 2023-11-05
 
